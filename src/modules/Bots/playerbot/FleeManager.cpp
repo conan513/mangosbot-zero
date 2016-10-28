@@ -2,6 +2,8 @@
 #include "playerbot.h"
 #include "FleeManager.h"
 #include "PlayerbotAIConfig.h"
+#include "Group.h"
+#include "strategy/values/LastMovementValue.h"
 
 using namespace ai;
 using namespace std;
@@ -63,7 +65,7 @@ void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
 
 	for (float distance = maxAllowedDistance; distance > sPlayerbotAIConfig.tooCloseDistance + 5.0f; distance -= 5.0f)
 	{
-        for (float angle = -M_PI + followAngle; angle < M_PI + followAngle; angle += M_PI / 16)
+        for (float angle = followAngle; angle < followAngle + 2 * M_PI; angle += M_PI / 4)
         {
             float x = botPosX + cos(angle) * distance;
             float y = botPosY + sin(angle) * distance;
@@ -91,22 +93,22 @@ void FleeManager::cleanup(list<FleePoint*> &points)
 
 bool FleePoint::isReasonable()
 {
-    return toAllPlayers.max <= sPlayerbotAIConfig.sightDistance && toCreatures.min >= sPlayerbotAIConfig.tooCloseDistance;
+	return toAllPlayers.max <= sPlayerbotAIConfig.sightDistance && toCreatures.min >= sPlayerbotAIConfig.tooCloseDistance;
 }
 
 bool FleePoint::isBetterByCreatures(FleePoint* other)
 {
     return toCreatures.min > 0 && other->toCreatures.min > 0 &&
-            (toCreatures.min - other->toCreatures.min) >= 0.0f;
+            (toCreatures.min - other->toCreatures.min) >= 0;
 }
 
 bool FleePoint::isBetterByAll(FleePoint* other)
 {
     bool isFartherFromCreatures = isBetterByCreatures(other);
     bool isNearerToRangedPlayers = toRangedPlayers.max > 0 && other->toRangedPlayers.max > 0 &&
-            (toRangedPlayers.max - other->toRangedPlayers.max) <= 0.0f;
+            (toRangedPlayers.max - other->toRangedPlayers.max) <= 0;
     bool isFartherFromMeleePlayers = toMeleePlayers.min > 0 && other->toMeleePlayers.min > 0 &&
-            (toMeleePlayers.min - other->toMeleePlayers.min) >= 0.0f;
+            (toMeleePlayers.min - other->toMeleePlayers.min) >= 0;
 
     return isFartherFromCreatures && (isNearerToRangedPlayers || isFartherFromMeleePlayers);
 }
@@ -140,6 +142,19 @@ FleePoint* FleeManager::selectOptimalDestination(list<FleePoint*> &points)
 
 bool FleeManager::CalculateDestination(float* rx, float* ry, float* rz)
 {
+    LastMovement& lastMovement = *bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<LastMovement&>("last movement");
+    if ((lastMovement.lastMoveToX || lastMovement.lastMoveToY) && !lastMovement.lastFollow)
+    {
+        FleePoint last(lastMovement.lastMoveToX, lastMovement.lastMoveToY, lastMovement.lastMoveToZ);
+        if (last.isReasonable())
+        {
+            *rx = lastMovement.lastMoveToX;
+            *ry = lastMovement.lastMoveToY;
+            *rz = lastMovement.lastMoveToZ;
+            return true;
+        }
+    }
+
 	list<FleePoint*> points;
 	calculatePossibleDestinations(points);
 

@@ -100,12 +100,16 @@ class ChatHandler
         bool isValidChatMessage(const char* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
 
+#ifdef ENABLE_PLAYERBOTS
+        WorldSession* GetSession() { return m_session; }
+#endif
+
         /**
         * \brief Prepare SMSG_GM_MESSAGECHAT/SMSG_MESSAGECHAT
         *
         * Method:    BuildChatPacket build message chat packet generic way
         * FullName:  ChatHandler::BuildChatPacket
-        * Access:    public static 
+        * Access:    public static
         * Returns:   void
         *
         * \param WorldPacket& data             : Provided packet will be filled with requested info
@@ -605,8 +609,9 @@ class ChatHandler
 
 #ifdef ENABLE_PLAYERBOTS
         bool HandlePlayerbotCommand(char* args);
-        bool HandlePlayerbotConsoleCommand(char* args);
+        bool HandleRandomPlayerbotCommand(char* args);
         bool HandleAhBotCommand(char* args);
+        bool HandleGuildTaskCommand(char* args);
 #endif
 
         //! Development Commands

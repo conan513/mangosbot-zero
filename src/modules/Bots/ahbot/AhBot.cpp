@@ -1,3 +1,4 @@
+#include "../botpch.h"
 #include "Category.h"
 #include "ItemBag.h"
 #include "AhBot.h"
@@ -36,7 +37,7 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
     // overwrite possible wrong/corrupted guid
     Object::_Create( guid, 0, HIGHGUID_PLAYER );
 
-    m_name = fields[0].GetCppString();
+    m_name = fields[0].GetString();
 
     Relocate(fields[1].GetFloat(),fields[2].GetFloat(),fields[3].GetFloat());
     SetLocationMapId(fields[4].GetUInt32());
@@ -58,13 +59,11 @@ bool Player::MinimalLoadFromDB( QueryResult *result, uint32 guid )
     return true;
 }
 
-bool ChatHandler::HandleAhBotCommand(char* args)
+bool AhBot::HandleAhBotCommand(ChatHandler* handler, char const* args)
 {
     auctionbot.HandleCommand(args);
     return true;
 }
-
-INSTANTIATE_SINGLETON_1( ahbot::AhBot );
 
 uint32 AhBot::auctionIds[MAX_AUCTIONS] = {1,6,7};
 uint32 AhBot::auctioneers[MAX_AUCTIONS] = {79707,4656,23442};
@@ -132,7 +131,7 @@ void AhBot::ForceUpdate()
     if (updating)
         return;
 
-    sLog.outString("AhBot is now checking auctions");
+    sLog.outString("AhBot is now checking auctions in background");
     updating = true;
 
     if (!allBidders.size())
@@ -140,7 +139,7 @@ void AhBot::ForceUpdate()
 
     if (!allBidders.size())
     {
-        sLog.outError("Ahbot is disabled but there is no bidders available");
+        sLog.outError( "Ahbot is enabled but there are no bidders available");
         return;
     }
 
@@ -265,7 +264,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         vector<uint32> items = availableItems.Get(category);
         if (find(items.begin(), items.end(), proto->ItemId) == items.end())
         {
-            sLog.outDetail("%s (x%d) in auction %d: unavailable item",
+            sLog.outDetail( "%s (x%d) in auction %d: unavailable item",
                     item->GetProto()->Name1, item->GetCount(), auctionIds[auction]);
             continue;
         }
@@ -274,14 +273,14 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         uint32 maxAnswerCount = category->GetMaxAllowedItemAuctionCount(proto);
         if (maxAnswerCount && answerCount > maxAnswerCount)
         {
-            sLog.outDetail("%s (x%d) in auction %d: answer count %d > %d (max)",
+            sLog.outDetail( "%s (x%d) in auction %d: answer count %d > %d (max)",
                     item->GetProto()->Name1, item->GetCount(), auctionIds[auction], answerCount, maxAnswerCount);
             continue;
         }
 
         if (proto->RequiredLevel > sAhBotConfig.maxRequiredLevel || proto->ItemLevel > sAhBotConfig.maxItemLevel)
         {
-            sLog.outDetail("%s (x%d) in auction %d: above max required or item level",
+            sLog.outDetail( "%s (x%d) in auction %d: above max required or item level",
                     item->GetProto()->Name1, item->GetCount(), auctionIds[auction]);
             continue;
         }
@@ -289,7 +288,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         uint32 price = category->GetPricingStrategy()->GetBuyPrice(proto, auctionIds[auction]);
         if (!price)
         {
-            sLog.outDetail("%s (x%d) in auction %d: cannot determine price",
+            sLog.outDetail( "%s (x%d) in auction %d: cannot determine price",
                     item->GetProto()->Name1, item->GetCount(), auctionIds[auction]);
             continue;
         }
@@ -303,14 +302,14 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
 
         if (curPrice > buyoutPrice)
         {
-            sLog.outDetail("%s (x%d) in auction %d: price %d > %d (buyout price)",
+            sLog.outDetail( "%s (x%d) in auction %d: price %d > %d (buyout price)",
                     proto->Name1, item->GetCount(), auctionIds[auction], curPrice, buyoutPrice);
             continue;
         }
 
         if (availableMoney < curPrice)
         {
-            sLog.outDetail("%s (x%d) in auction %d: price %d > %d (available money)",
+            sLog.outDetail( "%s (x%d) in auction %d: price %d > %d (available money)",
                     proto->Name1, item->GetCount(), auctionIds[auction], curPrice, availableMoney);
             continue;
         }
@@ -320,14 +319,14 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
 
         if (minBid && entry->bid && minBid < entry->bid)
         {
-            sLog.outDetail("%s (x%d) in auction %d: %d (bid) > %d (minBid)",
+            sLog.outDetail( "%s (x%d) in auction %d: %d (bid) > %d (minBid)",
                     proto->Name1, item->GetCount(), auctionIds[auction], entry->bid, minBid);
             continue;
         }
 
         if (minBid && entry->startbid && minBid < entry->startbid)
         {
-            sLog.outDetail("%s (x%d) in auction %d: %d (startbid) > %d (minBid)",
+            sLog.outDetail( "%s (x%d) in auction %d: %d (startbid) > %d (minBid)",
                     proto->Name1, item->GetCount(), auctionIds[auction], entry->startbid, minBid);
             continue;
         }
@@ -336,7 +335,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         uint32 buytime = GetBuyTime(entry->Id, proto->ItemId, auctionIds[auction], category, priceLevel);
         if (time(0) < buytime)
         {
-            sLog.outDetail("%s (x%d) in auction %d: will buy/bid in %d seconds",
+            sLog.outDetail( "%s (x%d) in auction %d: will buy/bid in %d seconds",
                     proto->Name1, item->GetCount(), auctionIds[auction], buytime - time(0));
             continue;
         }
@@ -344,7 +343,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         uint32 bidder = GetRandomBidder(auctionIds[auction]);
         if (!bidder)
         {
-            sLog.outError("No bidders for auction %d", auctionIds[auction]);
+            sLog.outError( "No bidders for auction %d", auctionIds[auction]);
             break;
         }
 
@@ -357,7 +356,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         if ((entry->buyout && (entry->bid >= entry->buyout || 100 * (entry->buyout - entry->bid) / price < 25)) &&
                 !(minBuyout && entry->buyout && minBuyout < entry->buyout))
         {
-            sLog.outDetail("AhBot %d won %s (x%d) in auction %d for %d",
+            sLog.outDetail( "AhBot %d won %s (x%d) in auction %d for %d",
                     bidder, item->GetProto()->Name1, item->GetCount(), auctionIds[auction], entry->buyout);
 
             entry->bid = entry->buyout;
@@ -365,7 +364,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         }
         else
         {
-            sLog.outDetail("AhBot %d placed bid %d for %s (x%d) in auction %d",
+            sLog.outDetail( "AhBot %d placed bid %d for %s (x%d) in auction %d",
                     bidder, entry->bid, item->GetProto()->Name1, item->GetCount(), auctionIds[auction]);
 
             CharacterDatabase.PExecute("UPDATE auction SET buyguid = '%u',lastbid = '%u' WHERE id = '%u'",
@@ -491,13 +490,13 @@ int AhBot::AddAuctions(int auction, Category* category, ItemBag* inAuctionItems)
         uint32 sellTime = GetSellTime(proto->ItemId, auctionIds[auction], category);
         if (time(0) < sellTime)
         {
-            sLog.outDetail("%s in auction %d: will add in %d seconds",
+            sLog.outDetail( "%s in auction %d: will add in %d seconds",
                     proto->Name1, auctionIds[auction], sellTime - time(0));
             continue;
         }
         else if (time(0) - sellTime > sAhBotConfig.maxSellInterval)
         {
-            sLog.outDetail("%s in auction %d: too old (%d secs)",
+            sLog.outDetail( "%s in auction %d: too old (%d secs)",
                     proto->Name1, auctionIds[auction], time(0) - sellTime);
             continue;
         }
@@ -511,9 +510,21 @@ int AhBot::AddAuctions(int auction, Category* category, ItemBag* inAuctionItems)
 
 int AhBot::AddAuction(int auction, Category* category, ItemPrototype const* proto)
 {
+    uint32 owner = GetRandomBidder(auctionIds[auction]);
+    if (!owner)
+    {
+        sLog.outError( "No bidders for auction %d", auctionIds[auction]);
+        return 0;
+    }
+
+
+	string name;
+    if (!sObjectMgr.GetPlayerNameByGUID((uint64)owner, name))
+        return 0;
+
     uint32 price = category->GetPricingStrategy()->GetSellPrice(proto, auctionIds[auction]);
 
-    sLog.outDebug("AddAuction: market price adjust");
+    sLog.outDetail( "AddAuction: market price adjust");
     updateMarketPrice(proto->ItemId, price, auctionIds[auction]);
 
     price = category->GetPricingStrategy()->GetBuyPrice(proto, auctionIds[auction]);
@@ -542,13 +553,6 @@ int AhBot::AddAuction(int auction, Category* category, ItemPrototype const* prot
 
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(ahEntry);
 
-    uint32 owner = GetRandomBidder(auctionIds[auction]);
-    if (!owner)
-    {
-        sLog.outError("No bidders for auction %d", auctionIds[auction]);
-        return 0;
-    }
-
     AuctionEntry* auctionEntry = new AuctionEntry;
     auctionEntry->Id = sObjectMgr.GenerateAuctionID();
     auctionEntry->itemGuidLow = item->GetGUIDLow();
@@ -561,6 +565,7 @@ int AhBot::AddAuction(int auction, Category* category, ItemPrototype const* prot
     auctionEntry->deposit = 0;
     auctionEntry->expireTime = (time_t) (urand(8, 24) * 60 * 60 + time(NULL));
     auctionEntry->auctionHouseEntry = ahEntry;
+
     item->SaveToDB();
 
     sAuctionMgr.AddAItem(item);
@@ -571,7 +576,7 @@ int AhBot::AddAuction(int auction, Category* category, ItemPrototype const* prot
     auctionHouse->AddAuction(auctionEntry);
     auctionEntry->SaveToDB();
 
-    sLog.outDetail("AhBot %d added %d of %s to auction %d for %d..%d", owner, stackCount, proto->Name1, auctionIds[auction], bidPrice, buyoutPrice);
+    sLog.outDetail( "AhBot %d added %d of %s to auction %d for %d..%d", owner, stackCount, proto->Name1, auctionIds[auction], bidPrice, buyoutPrice);
     return 1;
 }
 
@@ -726,7 +731,7 @@ void AhBot::AddToHistory(AuctionEntry* entry, uint32 won)
             won = AHBOT_WON_SELF;
     }
 
-    sLog.outDebug("AddToHistory: market price adjust");
+    sLog.outDetail( "AddToHistory: market price adjust");
     int count = entry->itemCount ? entry->itemCount : 1;
     updateMarketPrice(proto->ItemId, entry->buyout / count, entry->auctionHouseEntry->houseId);
 
@@ -824,9 +829,9 @@ void AhBot::CheckCategoryMultipliers()
         do
         {
             Field* fields = results->Fetch();
-            categoryMultipliers[fields[0].GetCppString()] = fields[1].GetFloat();
-            categoryMaxAuctionCount[fields[0].GetCppString()] = fields[2].GetInt32();
-            categoryMultiplierExpireTimes[fields[0].GetCppString()] = fields[3].GetUInt64();
+            categoryMultipliers[fields[0].GetString()] = fields[1].GetFloat();
+            categoryMaxAuctionCount[fields[0].GetString()] = fields[2].GetInt32();
+            categoryMultiplierExpireTimes[fields[0].GetString()] = fields[3].GetUInt64();
 
         } while (results->NextRow());
 
@@ -884,8 +889,22 @@ uint32 AhBot::GetRandomBidder(uint32 auctionHouse)
     if (guids.empty())
         return 0;
 
-    int index = urand(0, guids.size() - 1);
-    return guids[index];
+    vector<uint32> online;
+    for (vector<uint32>::iterator i = guids.begin(); i != guids.end(); ++i)
+    {
+        uint32 guid = *i;
+		string name;
+        if (!sObjectMgr.GetPlayerNameByGUID((uint64)guid, name))
+            continue;
+
+        online.push_back(guid);
+    }
+
+    if (online.empty())
+        return 0;
+
+    int index = urand(0, online.size() - 1);
+    return online[index];
 }
 
 void AhBot::LoadRandomBots()
@@ -904,7 +923,7 @@ void AhBot::LoadRandomBots()
         {
             Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
-            uint32 race = fields[1].GetUInt32();
+            uint8 race = fields[1].GetUInt8();
             uint32 auctionHouse = PlayerbotAI::IsOpposing(race, RACE_HUMAN) ? 2 : 1;
             bidders[auctionHouse].push_back(guid);
             bidders[3].push_back(guid);
@@ -912,6 +931,7 @@ void AhBot::LoadRandomBots()
         } while (result->NextRow());
         delete result;
     }
+
 
     if (allBidders.empty() && sAhBotConfig.guid)
     {
@@ -923,7 +943,7 @@ void AhBot::LoadRandomBots()
         }
     }
 
-    sLog.outDetail("{A=%d,H=%d,N=%d} bidders loaded", bidders[1].size(), bidders[2].size(), bidders[3].size());
+    sLog.outDetail( "{A=%d,H=%d,N=%d} bidders loaded", bidders[1].size(), bidders[2].size(), bidders[3].size());
 }
 
 int32 AhBot::GetSellPrice(ItemPrototype const* proto)
@@ -995,3 +1015,5 @@ double AhBot::GetRarityPriceMultiplier(const ItemPrototype* proto)
     return 1.0;
 
 }
+
+INSTANTIATE_SINGLETON_1( ahbot::AhBot );

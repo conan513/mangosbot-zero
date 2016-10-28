@@ -20,8 +20,8 @@ public:
         {
             for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
             {
-                const SpellEntry* const spellInfo = sSpellStore.LookupEntry(proto->Spells[j].SpellId);
-                if (!spellInfo)
+				const SpellEntry* const spellInfo = sSpellStore.LookupEntry(proto->Spells[j].SpellId);
+				if (!spellInfo)
                     return false;
 
                 for (int i = 0 ; i < 3; i++)
@@ -68,6 +68,8 @@ void InventoryAction::IterateItems(IterateItemsVisitor* visitor, IterateItemsMas
 
 void InventoryAction::IterateItemsInBags(IterateItemsVisitor* visitor)
 {
+
+
     for(int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (!visitor->Visit(pItem))
@@ -121,7 +123,7 @@ void InventoryAction::TellItems(map<uint32, int> itemMap)
     list<ItemPrototype const*> items;
     for (map<uint32, int>::iterator i = itemMap.begin(); i != itemMap.end(); i++)
     {
-        items.push_back(sItemStorage.LookupEntry<ItemPrototype>(i->first));
+        items.push_back(sObjectMgr.GetItemPrototype(i->first));
     }
 
     items.sort(compare_items);

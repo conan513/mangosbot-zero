@@ -28,19 +28,11 @@ bool ReachAreaTriggerAction::Execute(Event event)
         return true;
     }
 
-    if (at->condition && !sObjectMgr.IsPlayerMeetToCondition(at->condition, bot, bot->GetMap(), NULL, CONDITION_AREA_TRIGGER))
-    {
-        ai->TellMaster("I won't follow: I don't meet the conditions");
-        return false;
-    }
-    
     if (bot->GetMapId() != atEntry->mapid || bot->GetDistance(atEntry->x, atEntry->y, atEntry->z) > sPlayerbotAIConfig.sightDistance)
     {
         ai->TellMaster("I won't follow: too far away");
         return true;
     }
-
-    ai->ChangeStrategy("-follow,+stay", BOT_STATE_NON_COMBAT);
 
     MotionMaster &mm = *bot->GetMotionMaster();
     mm.Clear();
@@ -70,11 +62,6 @@ bool AreaTriggerAction::Execute(Event event)
     AreaTrigger const* at = sObjectMgr.GetAreaTrigger(triggerId);
     if (!at)
         return true;
-
-    ai->ChangeStrategy("-follow,+stay", BOT_STATE_NON_COMBAT);
-
-    MotionMaster &mm = *bot->GetMotionMaster();
-    mm.Clear();
 
     WorldPacket p(CMSG_AREATRIGGER);
     p << triggerId;

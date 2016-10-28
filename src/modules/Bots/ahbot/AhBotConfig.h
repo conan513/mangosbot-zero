@@ -8,6 +8,11 @@ class AhBotConfig
 {
 public:
     AhBotConfig();
+    static AhBotConfig& instance()
+    {
+        static AhBotConfig instance;
+        return instance;
+    }
 
 public:
     bool Initialize();
@@ -86,3 +91,4 @@ private:
 };
 
 #define sAhBotConfig MaNGOS::Singleton<AhBotConfig>::Instance()
+

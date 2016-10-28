@@ -6,6 +6,7 @@
 #include "AuctionHouseMgr.h"
 #include "ObjectGuid.h"
 #include "WorldSession.h"
+#include "../botpch.h"
 
 #define MAX_AUCTIONS 3
 #define AHBOT_WON_EXPIRE 0
@@ -24,8 +25,14 @@ namespace ahbot
     public:
         AhBot() : nextAICheckTime(0), updating(false) {}
         virtual ~AhBot();
+        static AhBot& instance()
+        {
+            static AhBot instance;
+            return instance;
+        }
 
     public:
+        static bool HandleAhBotCommand(ChatHandler* handler, char const* args);
         ObjectGuid GetAHBplayerGUID();
         void Init();
         void Update();
@@ -85,3 +92,4 @@ namespace ahbot
 };
 
 #define auctionbot MaNGOS::Singleton<ahbot::AhBot>::Instance()
+

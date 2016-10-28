@@ -10,6 +10,11 @@ class PlayerbotAIConfig
 {
 public:
     PlayerbotAIConfig();
+    static PlayerbotAIConfig& instance()
+    {
+        static PlayerbotAIConfig instance;
+        return instance;
+    }
 
 public:
     bool Initialize();
@@ -46,11 +51,23 @@ public:
     uint32 randomBotTeleLevel;
     bool logInGroupOnly, logValuesPerTick;
     bool fleeingEnabled;
+    std::string combatStrategies, nonCombatStrategies;
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
     uint32 randomBotMinLevel, randomBotMaxLevel;
     float randomChangeMultiplier;
     uint32 specProbability[MAX_CLASSES][3];
     std::string commandPrefix;
+    std::string randomBotAccountPrefix;
+    uint32 randomBotAccountCount;
+    bool deleteRandomBotAccounts;
+    uint32 randomBotGuildCount;
+    bool deleteRandomBotGuilds;
+    std::list<uint32> randomBotGuilds;
+
+    bool guildTaskEnabled;
+    uint32 minGuildTaskChangeTime, maxGuildTaskChangeTime;
+    uint32 minGuildTaskAdvertisementTime, maxGuildTaskAdvertisementTime;
+    uint32 minGuildTaskRewardTime, maxGuildTaskRewardTime;
 
     uint32 iterationsPerTick;
 
@@ -60,8 +77,8 @@ public:
     void SetValue(std::string name, std::string value);
 
 private:
-    void CreateRandomBots();
     Config config;
 };
 
 #define sPlayerbotAIConfig MaNGOS::Singleton<PlayerbotAIConfig>::Instance()
+

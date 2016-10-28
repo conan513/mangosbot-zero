@@ -29,7 +29,7 @@ private:
     static ActionNode* melee(PlayerbotAI* ai)
     {
         return new ActionNode ("melee",
-            /*P*/ NextAction::array(0, new NextAction("reach melee"), NULL),
+            /*P*/ NULL,
             /*A*/ NULL,
             /*C*/ NULL);
     }
@@ -44,7 +44,7 @@ private:
     {
         return new ActionNode ("be near",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("follow master"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("follow"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* attack_anything(PlayerbotAI* ai)

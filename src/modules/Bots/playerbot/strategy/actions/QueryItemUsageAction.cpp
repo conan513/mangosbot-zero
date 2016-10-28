@@ -78,7 +78,10 @@ bool QueryItemUsageAction::QueryItemUsage(ItemPrototype const *item)
     case ITEM_USAGE_USE:
         ai->TellMaster("Use");
         return true;
-    }
+	case ITEM_USAGE_GUILD_TASK:
+		ai->TellMaster("Guild task");
+		return true;
+	}
 
     return false;
 }

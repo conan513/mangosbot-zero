@@ -32,10 +32,43 @@ namespace ai
         CastChainHealAction(PlayerbotAI* ai) : CastAoeHealSpellAction(ai, "chain heal") {}
     };
 
+    class CastRiptideAction : public CastHealingSpellAction {
+    public:
+        CastRiptideAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "riptide") {}
+    };
+
+    class CastRiptideOnPartyAction : public HealPartyMemberAction
+    {
+    public:
+        CastRiptideOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "riptide") {}
+    };
+
+
+    class CastEarthShieldAction : public CastBuffSpellAction {
+    public:
+        CastEarthShieldAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "earth shield") {}
+    };
+
+    class CastEarthShieldOnPartyAction : public BuffOnPartyAction
+    {
+    public:
+        CastEarthShieldOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "earth shield") {}
+    };
+
+    class CastWaterShieldAction : public CastBuffSpellAction {
+    public:
+        CastWaterShieldAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "water shield") {}
+    };
+
 	class CastLightningShieldAction : public CastBuffSpellAction {
 	public:
 		CastLightningShieldAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "lightning shield") {}
 	};
+
+    class CastEarthlivingWeaponAction : public CastEnchantItemAction {
+    public:
+        CastEarthlivingWeaponAction(PlayerbotAI* ai) : CastEnchantItemAction(ai, "earthliving weapon") {}
+    };
 
     class CastRockbiterWeaponAction : public CastEnchantItemAction {
     public:
@@ -134,6 +167,16 @@ namespace ai
         virtual bool isUseful() { return CastMeleeSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
     };
 
+    class CastFireNovaAction : public CastSpellAction {
+    public:
+        CastFireNovaAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire nova") {}
+    };
+
+    class CastWindShearAction : public CastSpellAction {
+    public:
+        CastWindShearAction(PlayerbotAI* ai) : CastSpellAction(ai, "wind shear") {}
+    };
+
 	class CastAncestralSpiritAction : public ResurrectPartyMemberAction
 	{
 	public:
@@ -150,6 +193,11 @@ namespace ai
 	class CastStormstrikeAction : public CastMeleeSpellAction {
 	public:
 		CastStormstrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "stormstrike") {}
+	};
+
+	class CastLavaLashAction : public CastMeleeSpellAction {
+	public:
+		CastLavaLashAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "lava lash") {}
 	};
 
     class CastWaterBreathingAction : public CastBuffSpellAction {
@@ -170,6 +218,34 @@ namespace ai
     class CastWaterWalkingOnPartyAction : public BuffOnPartyAction {
     public:
         CastWaterWalkingOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "water walking") {}
+    };
+
+
+    class CastCleanseSpiritAction : public CastCureSpellAction {
+    public:
+        CastCleanseSpiritAction(PlayerbotAI* ai) : CastCureSpellAction(ai, "cleanse spirit") {}
+    };
+
+    class CastCleanseSpiritPoisonOnPartyAction : public CurePartyMemberAction
+    {
+    public:
+        CastCleanseSpiritPoisonOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "cleanse spirit", DISPEL_POISON) {}
+
+        virtual string getName() { return "cleanse spirit poison on party"; }
+    };
+    class CastCleanseSpiritCurseOnPartyAction : public CurePartyMemberAction
+    {
+    public:
+        CastCleanseSpiritCurseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "cleanse spirit", DISPEL_CURSE) {}
+
+        virtual string getName() { return "cleanse spirit curse on party"; }
+    };
+    class CastCleanseSpiritDiseaseOnPartyAction : public CurePartyMemberAction
+    {
+    public:
+        CastCleanseSpiritDiseaseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "cleanse spirit", DISPEL_DISEASE) {}
+
+        virtual string getName() { return "cleanse spirit disease on party"; }
     };
 
     class CastFlameShockAction : public CastDebuffSpellAction
@@ -202,9 +278,27 @@ namespace ai
         CastLightningBoltAction(PlayerbotAI* ai) : CastSpellAction(ai, "lightning bolt") {}
     };
 
+    class CastThunderstormAction : public CastMeleeSpellAction
+    {
+    public:
+        CastThunderstormAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "thunderstorm") {}
+    };
+
+    class CastHeroismAction : public CastBuffSpellAction
+    {
+    public:
+        CastHeroismAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "heroism") {}
+    };
+
     class CastBloodlustAction : public CastBuffSpellAction
     {
     public:
         CastBloodlustAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "bloodlust") {}
+    };
+
+    class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
+    {
+    public:
+        CastWindShearOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "wind shear") {}
     };
 }

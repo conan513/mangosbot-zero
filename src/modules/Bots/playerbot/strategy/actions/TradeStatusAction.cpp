@@ -6,6 +6,7 @@
 #include "../../PlayerbotAIConfig.h"
 #include "../../../ahbot/AhBot.h"
 #include "../../RandomPlayerbotMgr.h"
+#include "../../GuildTaskMgr.h"
 #include "../values/ItemUsageValue.h"
 
 using namespace ai;
@@ -21,7 +22,7 @@ bool TradeStatusAction::Execute(Event event)
 
     if (trader != master)
     {
-		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader->GetObjectGuid());
+		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader->GetGUID());
     }
 
     if (trader != master || !ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master))
@@ -48,9 +49,20 @@ bool TradeStatusAction::Execute(Event event)
         {
             int32 botMoney = CalculateCost(bot->GetTradeData(), true);
 
+            map<uint32, uint32> itemIds;
+            for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
+            {
+                Item* item = master->GetTradeData()->GetItem((TradeSlots)slot);
+                if (item)
+                    itemIds[item->GetProto()->ItemId] += item->GetCount();
+            }
+
             bot->GetSession()->HandleAcceptTradeOpcode(p);
             if (bot->GetTradeData())
                 return false;
+
+            for (map<uint32, uint32>::iterator i = itemIds.begin(); i != itemIds.end(); ++i)
+                sGuildTaskMgr.CheckItemTask(i->first, i->second, master, bot);
 
             if (sRandomPlayerbotMgr.IsRandomBot(bot))
             {
@@ -62,7 +74,7 @@ bool TradeStatusAction::Execute(Event event)
     }
     else if (status == TRADE_STATUS_BEGIN_TRADE)
     {
-        if (!bot->isInFront(trader, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+        if (!bot->isInFront(trader, M_PI / 2))
             bot->SetFacingToObject(trader);
         BeginTrade();
         return true;
@@ -119,10 +131,10 @@ bool TradeStatusAction::CheckTrade()
         {
             ostringstream out; out << item->GetProto()->ItemId;
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
-			if (!auctionbot.GetBuyPrice(item->GetProto()) || usage == ITEM_USAGE_NONE)
+            if (!auctionbot.GetBuyPrice(item->GetProto()) || usage == ITEM_USAGE_NONE)
             {
                 ostringstream out;
-				out << chat->formatItem(item->GetProto()) << " - I don't need this";
+                out << chat->formatItem(item->GetProto()) << " - I don't need this";
                 ai->TellMaster(out);
                 return false;
             }

@@ -1,7 +1,6 @@
 #include "botpch.h"
 #include "../../playerbot.h"
 #include "UseItemAction.h"
-#include "DBCStore.h"
 
 using namespace ai;
 
@@ -74,19 +73,12 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
         return false;
 
     if (bot->IsInCombat())
-    {
-        for(int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-        {
-            SpellEntry const *spellInfo = sSpellStore.LookupEntry(item->GetProto()->Spells[i].SpellId);
-            if (spellInfo && IsNonCombatSpell(spellInfo))
-                return false;
-        }
-    }
+        return false;
 
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
     uint8 cast_count = 1;
-    uint64 item_guid = item->GetObjectGuid().GetRawValue();
+    uint64 item_guid = item->GetGUID();
     uint32 glyphIndex = 0;
     uint8 unk_flags = 0;
 
@@ -110,29 +102,39 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
         GameObject* go = ai->GetGameObject(goGuid);
         if (go && go->isSpawned())
         {
-            uint32 targetFlag = TARGET_FLAG_OBJECT;
-            *packet << targetFlag << goGuid.WriteAsPacked();
+            uint32 targetFlag = TARGET_FLAG_UNIT;
+            *packet << targetFlag;
+            packet->appendPackGUID(goGuid.GetRawValue());
             out << " on " << chat->formatGameobject(go);
             targetSelected = true;
         }
     }
 
-    Player* master = GetMaster();
-    if (!targetSelected && item->GetProto()->Class != ITEM_CLASS_CONSUMABLE && master)
+    if (itemTarget)
     {
-        ObjectGuid masterSelection = master->GetSelectionGuid();
-        if (masterSelection)
-        {
-            Unit* unit = ai->GetUnit(masterSelection);
-            if (unit)
-            {
-                uint32 targetFlag = TARGET_FLAG_UNIT;
-                *packet << targetFlag << masterSelection.WriteAsPacked();
-                out << " on " << unit->GetName();
-                targetSelected = true;
-            }
-        }
+        uint32 targetFlag = TARGET_FLAG_ITEM;
+        *packet << targetFlag;
+        packet->appendPackGUID(itemTarget->GetGUID());
+        out << " on " << chat->formatItem(itemTarget->GetProto());
+        targetSelected = true;
     }
+
+	Player* master = GetMaster();
+	if (!targetSelected && item->GetProto()->Class != ITEM_CLASS_CONSUMABLE && master)
+	{
+		ObjectGuid masterSelection = master->GetSelectionGuid();
+		if (masterSelection)
+		{
+			Unit* unit = ai->GetUnit(masterSelection);
+			if (unit)
+			{
+				uint32 targetFlag = TARGET_FLAG_UNIT;
+				*packet << targetFlag << masterSelection.WriteAsPacked();
+				out << " on " << unit->GetName();
+				targetSelected = true;
+			}
+		}
+	}
 
     if(uint32 questid = item->GetProto()->StartQuest)
     {
@@ -167,8 +169,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
         if (!ai->CanCastSpell(spellId, bot, false))
             continue;
 
-        const SpellEntry* const pSpellInfo = sSpellStore.LookupEntry(spellId);
-        if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
+		const SpellEntry* const pSpellInfo = sSpellStore.LookupEntry(spellId);
+		if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
         {
             Item* itemForSpell = AI_VALUE2(Item*, "item for spell", spellId);
             if (!itemForSpell)
@@ -185,16 +187,18 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
                 *packet << TARGET_FLAG_TRADE_ITEM << (uint8)1 << (uint64)TRADE_SLOT_NONTRADED;
                 targetSelected = true;
                 out << " on traded item";
-                ai->WaitForSpellCast(spellId);
             }
             else
             {
                 *packet << TARGET_FLAG_ITEM;
-                *packet << itemForSpell->GetPackGUID();
+                packet->appendPackGUID(itemForSpell->GetGUID());
                 targetSelected = true;
                 out << " on "<< chat->formatItem(itemForSpell->GetProto());
-                ai->WaitForSpellCast(spellId);
             }
+
+            Spell *spell = new Spell(bot, pSpellInfo, false);
+            ai->WaitForSpellCast(spell);
+            delete spell;
         }
         else
         {
@@ -221,64 +225,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
     bot->GetSession()->QueuePacket(packet);
     return true;
 }
-
-/*bool UseItemAction::SocketItem(Item* item, Item* gem, bool replace)
-{
-    WorldPacket* const packet = new WorldPacket(CMSG_SOCKET_GEMS);
-    *packet << item->GetObjectGuid();
-
-    bool fits = false;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
-    {
-        uint8 SocketColor = item->GetProto()->Socket[enchant_slot-SOCK_ENCHANTMENT_SLOT].Color;
-        GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(gem->GetProto()->GemProperties);
-        if (gemProperty && (gemProperty->color & SocketColor))
-        {
-            if (fits)
-            {
-                *packet << ObjectGuid();
-                continue;
-            }
-
-            uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(enchant_slot));
-            if (!enchant_id)
-            {
-                *packet << gem->GetObjectGuid();
-                fits = true;
-                continue;
-            }
-
-            SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-            if (!enchantEntry || !enchantEntry->GemID)
-            {
-                *packet << gem->GetObjectGuid();
-                fits = true;
-                continue;
-            }
-
-			if (replace && enchantEntry->GemID != gem->GetProto()->ItemId)
-            {
-                *packet << gem->GetObjectGuid();
-                fits = true;
-                continue;
-            }
-
-        }
-
-        *packet << ObjectGuid();
-    }
-
-    if (fits)
-    {
-        ostringstream out; out << "Socketing " << chat->formatItem(item->GetProto());
-        out << " with "<< chat->formatItem(gem->GetProto());
-        ai->TellMasterNoFacing(out.str());
-
-        bot->GetSession()->QueuePacket(packet);
-    }
-    return fits;
-}*/
-
 
 bool UseItemAction::isPossible()
 {

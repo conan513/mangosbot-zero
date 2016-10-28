@@ -149,6 +149,7 @@ namespace ai
                 creators["entangling roots"] = &AiObjectContextInternal::entangling_roots;
                 creators["entangling roots on cc"] = &AiObjectContextInternal::entangling_roots_on_cc;
                 creators["wrath"] = &AiObjectContextInternal::wrath;
+                creators["starfall"] = &AiObjectContextInternal::starfall;
                 creators["insect swarm"] = &AiObjectContextInternal::insect_swarm;
                 creators["moonfire"] = &AiObjectContextInternal::moonfire;
                 creators["starfire"] = &AiObjectContextInternal::starfire;
@@ -160,6 +161,7 @@ namespace ai
                 creators["ferocious bite"] = &AiObjectContextInternal::ferocious_bite;
                 creators["rip"] = &AiObjectContextInternal::rip;
                 creators["cower"] = &AiObjectContextInternal::cower;
+                creators["survival instincts"] = &AiObjectContextInternal::survival_instincts;
                 creators["thorns"] = &AiObjectContextInternal::thorns;
                 creators["cure poison"] = &AiObjectContextInternal::cure_poison;
                 creators["cure poison on party"] = &AiObjectContextInternal::cure_poison_on_party;
@@ -176,6 +178,7 @@ namespace ai
                 creators["rejuvenation on party"] = &AiObjectContextInternal::rejuvenation_on_party;
                 creators["healing touch on party"] = &AiObjectContextInternal::healing_touch_on_party;
                 creators["rebirth"] = &AiObjectContextInternal::rebirth;
+                creators["revive"] = &AiObjectContextInternal::revive;
                 creators["barskin"] = &AiObjectContextInternal::barskin;
                 creators["lacerate"] = &AiObjectContextInternal::lacerate;
                 creators["hurricane"] = &AiObjectContextInternal::hurricane;
@@ -207,6 +210,7 @@ namespace ai
             static Action* entangling_roots(PlayerbotAI* ai) { return new CastEntanglingRootsAction(ai); }
             static Action* entangling_roots_on_cc(PlayerbotAI* ai) { return new CastEntanglingRootsCcAction(ai); }
             static Action* wrath(PlayerbotAI* ai) { return new CastWrathAction(ai); }
+            static Action* starfall(PlayerbotAI* ai) { return new CastStarfallAction(ai); }
             static Action* insect_swarm(PlayerbotAI* ai) { return new CastInsectSwarmAction(ai); }
             static Action* moonfire(PlayerbotAI* ai) { return new CastMoonfireAction(ai); }
             static Action* starfire(PlayerbotAI* ai) { return new CastStarfireAction(ai); }
@@ -218,6 +222,7 @@ namespace ai
             static Action* ferocious_bite(PlayerbotAI* ai) { return new CastFerociousBiteAction(ai); }
             static Action* rip(PlayerbotAI* ai) { return new CastRipAction(ai); }
             static Action* cower(PlayerbotAI* ai) { return new CastCowerAction(ai); }
+            static Action* survival_instincts(PlayerbotAI* ai) { return new CastSurvivalInstinctsAction(ai); }
             static Action* thorns(PlayerbotAI* ai) { return new CastThornsAction(ai); }
             static Action* cure_poison(PlayerbotAI* ai) { return new CastCurePoisonAction(ai); }
             static Action* cure_poison_on_party(PlayerbotAI* ai) { return new CastCurePoisonOnPartyAction(ai); }
@@ -234,6 +239,7 @@ namespace ai
             static Action* rejuvenation_on_party(PlayerbotAI* ai) { return new CastRejuvenationOnPartyAction(ai); }
             static Action* healing_touch_on_party(PlayerbotAI* ai) { return new CastHealingTouchOnPartyAction(ai); }
             static Action* rebirth(PlayerbotAI* ai) { return new CastRebirthAction(ai); }
+            static Action* revive(PlayerbotAI* ai) { return new CastReviveAction(ai); }
             static Action* barskin(PlayerbotAI* ai) { return new CastBarskinAction(ai); }
             static Action* lacerate(PlayerbotAI* ai) { return new CastLacerateAction(ai); }
             static Action* hurricane(PlayerbotAI* ai) { return new CastHurricaneAction(ai); }

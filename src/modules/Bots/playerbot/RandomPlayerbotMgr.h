@@ -13,15 +13,21 @@ class Item;
 
 using namespace std;
 
-class MANGOS_DLL_SPEC RandomPlayerbotMgr : public PlayerbotHolder
+class RandomPlayerbotMgr : public PlayerbotHolder
 {
     public:
         RandomPlayerbotMgr();
         virtual ~RandomPlayerbotMgr();
+        static RandomPlayerbotMgr& instance()
+        {
+            static RandomPlayerbotMgr instance;
+            return instance;
+        }
 
         virtual void UpdateAIInternal(uint32 elapsed);
 
 	public:
+        static bool HandlePlayerbotConsoleCommand(ChatHandler* handler, char const* args);
         bool IsRandomBot(Player* bot);
         bool IsRandomBot(uint32 bot);
         void Randomize(Player* bot);
@@ -29,6 +35,7 @@ class MANGOS_DLL_SPEC RandomPlayerbotMgr : public PlayerbotHolder
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot);
         void HandleCommand(uint32 type, const string& text, Player& fromPlayer);
+        string HandleRemoteCommand(string request);
         void OnPlayerLogout(Player* player);
         void OnPlayerLogin(Player* player);
         Player* GetRandomPlayer();
@@ -39,6 +46,7 @@ class MANGOS_DLL_SPEC RandomPlayerbotMgr : public PlayerbotHolder
         void SetLootAmount(Player* bot, uint32 value);
         uint32 GetTradeDiscount(Player* bot);
         void Refresh(Player* bot);
+        void RandomTeleportForLevel(Player* bot);
 
 	protected:
 	    virtual void OnBotLoginInternal(Player * const bot) {}
@@ -51,16 +59,16 @@ class MANGOS_DLL_SPEC RandomPlayerbotMgr : public PlayerbotHolder
         uint32 AddRandomBot(bool alliance);
         bool ProcessBot(uint32 bot);
         void ScheduleRandomize(uint32 bot, uint32 time);
-        void RandomTeleport(Player* bot, uint32 mapId, float teleX, float teleY, float teleZ);
-        void RandomTeleportForLevel(Player* bot);
+        void RandomTeleport(Player* bot, uint16 mapId, float teleX, float teleY, float teleZ);
         void RandomTeleport(Player* bot, vector<WorldLocation> &locs);
-        uint32 GetZoneLevel(uint32 mapId, float teleX, float teleY, float teleZ);
+        uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
 
     private:
         vector<Player*> players;
         int processTicks;
+        map<uint8, vector<WorldLocation> > locsPerLevelCache;
 };
 
-#define sRandomPlayerbotMgr MaNGOS::Singleton<RandomPlayerbotMgr>::Instance()
+#define sRandomPlayerbotMgr RandomPlayerbotMgr::instance()
 
 #endif

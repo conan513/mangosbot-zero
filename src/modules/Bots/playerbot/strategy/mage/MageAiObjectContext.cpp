@@ -141,8 +141,9 @@ namespace ai
                 creators["frost nova"] = &AiObjectContextInternal::frost_nova;
                 creators["arcane intellect"] = &AiObjectContextInternal::arcane_intellect;
                 creators["arcane intellect on party"] = &AiObjectContextInternal::arcane_intellect_on_party;
-                //creators["conjure water"] = &AiObjectContextInternal::conjure_water;
-                //creators["conjure food"] = &AiObjectContextInternal::conjure_food;
+                creators["conjure water"] = &AiObjectContextInternal::conjure_water;
+                creators["conjure food"] = &AiObjectContextInternal::conjure_food;
+                creators["molten armor"] = &AiObjectContextInternal::molten_armor;
                 creators["mage armor"] = &AiObjectContextInternal::mage_armor;
                 creators["ice armor"] = &AiObjectContextInternal::ice_armor;
                 creators["frost armor"] = &AiObjectContextInternal::frost_armor;
@@ -154,24 +155,34 @@ namespace ai
                 creators["counterspell"] = &AiObjectContextInternal::counterspell;
                 creators["remove curse"] = &AiObjectContextInternal::remove_curse;
                 creators["remove curse on party"] = &AiObjectContextInternal::remove_curse_on_party;
+                creators["icy veins"] = &AiObjectContextInternal::icy_veins;
                 creators["combustion"] = &AiObjectContextInternal::combustion;
                 creators["ice block"] = &AiObjectContextInternal::ice_block;
                 creators["polymorph"] = &AiObjectContextInternal::polymorph;
+                creators["spellsteal"] = &AiObjectContextInternal::spellsteal;
+                creators["living bomb"] = &AiObjectContextInternal::living_bomb;
+                creators["dragon's breath"] = &AiObjectContextInternal::dragons_breath;
                 creators["blast wave"] = &AiObjectContextInternal::blast_wave;
+                creators["invisibility"] = &AiObjectContextInternal::invisibility;
                 creators["evocation"] = &AiObjectContextInternal::evocation;
+                creators["arcane blast"] = &AiObjectContextInternal::arcane_blast;
+                creators["arcane barrage"] = &AiObjectContextInternal::arcane_barrage;
                 creators["arcane missiles"] = &AiObjectContextInternal::arcane_missiles;
                 creators["counterspell on enemy healer"] = &AiObjectContextInternal::counterspell_on_enemy_healer;
             }
 
         private:
             static Action* arcane_missiles(PlayerbotAI* ai) { return new CastArcaneMissilesAction(ai); }
+            static Action* arcane_barrage(PlayerbotAI* ai) { return new CastArcaneBarrageAction(ai); }
+            static Action* arcane_blast(PlayerbotAI* ai) { return new CastArcaneBlastAction(ai); }
             static Action* frostbolt(PlayerbotAI* ai) { return new CastFrostboltAction(ai); }
             static Action* blizzard(PlayerbotAI* ai) { return new CastBlizzardAction(ai); }
             static Action* frost_nova(PlayerbotAI* ai) { return new CastFrostNovaAction(ai); }
             static Action* arcane_intellect(PlayerbotAI* ai) { return new CastArcaneIntellectAction(ai); }
             static Action* arcane_intellect_on_party(PlayerbotAI* ai) { return new CastArcaneIntellectOnPartyAction(ai); }
-            //static Action* conjure_water(PlayerbotAI* ai) { return new CastConjureWaterAction(ai); }
-            //static Action* conjure_food(PlayerbotAI* ai) { return new CastConjureFoodAction(ai); }
+            static Action* conjure_water(PlayerbotAI* ai) { return new CastConjureWaterAction(ai); }
+            static Action* conjure_food(PlayerbotAI* ai) { return new CastConjureFoodAction(ai); }
+            static Action* molten_armor(PlayerbotAI* ai) { return new CastMoltenArmorAction(ai); }
             static Action* mage_armor(PlayerbotAI* ai) { return new CastMageArmorAction(ai); }
             static Action* ice_armor(PlayerbotAI* ai) { return new CastIceArmorAction(ai); }
             static Action* frost_armor(PlayerbotAI* ai) { return new CastFrostArmorAction(ai); }
@@ -183,10 +194,15 @@ namespace ai
             static Action* counterspell(PlayerbotAI* ai) { return new CastCounterspellAction(ai); }
             static Action* remove_curse(PlayerbotAI* ai) { return new CastRemoveCurseAction(ai); }
             static Action* remove_curse_on_party(PlayerbotAI* ai) { return new CastRemoveCurseOnPartyAction(ai); }
+            static Action* icy_veins(PlayerbotAI* ai) { return new CastIcyVeinsAction(ai); }
             static Action* combustion(PlayerbotAI* ai) { return new CastCombustionAction(ai); }
             static Action* ice_block(PlayerbotAI* ai) { return new CastIceBlockAction(ai); }
             static Action* polymorph(PlayerbotAI* ai) { return new CastPolymorphAction(ai); }
+            static Action* spellsteal(PlayerbotAI* ai) { return new CastSpellstealAction(ai); }
+            static Action* living_bomb(PlayerbotAI* ai) { return new CastLivingBombAction(ai); }
+            static Action* dragons_breath(PlayerbotAI* ai) { return new CastDragonsBreathAction(ai); }
             static Action* blast_wave(PlayerbotAI* ai) { return new CastBlastWaveAction(ai); }
+            static Action* invisibility(PlayerbotAI* ai) { return new CastInvisibilityAction(ai); }
             static Action* evocation(PlayerbotAI* ai) { return new CastEvocationAction(ai); }
             static Action* counterspell_on_enemy_healer(PlayerbotAI* ai) { return new CastCounterspellOnEnemyHealerAction(ai); }
         };

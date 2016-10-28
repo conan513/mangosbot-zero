@@ -61,6 +61,10 @@
 #include "LuaEngine.h"
 #include "ElunaEventMgr.h"
 #endif /* ENABLE_ELUNA */
+#ifdef ENABLE_PLAYERBOTS
+#include "playerbot.h"
+#include "GuildTaskMgr.h"
+#endif
 
 #include <math.h>
 #include <stdarg.h>
@@ -1046,6 +1050,9 @@ void Unit::JustKilledCreature(Creature* victim, Player* responsiblePlayer)
             bg->HandleKillUnit(victim, responsiblePlayer);
         }
             // Used by Eluna
+#ifdef ENABLE_PLAYERBOTS
+        sGuildTaskMgr.CheckKillTask(responsiblePlayer, victim);
+#endif
 #ifdef ENABLE_ELUNA
             sEluna->OnCreatureKill(responsiblePlayer, victim);
 #endif /* ENABLE_ELUNA */
@@ -2184,13 +2191,13 @@ void Unit::AttackerStateUpdate(Unit* pVictim, WeaponAttackType attType, bool ext
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "AttackerStateUpdate: %s attacked %s for %u dmg, absorbed %u, blocked %u, resisted %u.",
                      GetGuidStr().c_str(), pVictim->GetGuidStr().c_str(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
 
-    // Owner of pet enters combat upon pet attack 
-    if (Unit* owner = GetOwner()) 
-    { 
-        owner->AddThreat(pVictim); 
-        owner->SetInCombatWith(pVictim); 
-        pVictim->SetInCombatWith(owner); 
-    } 
+    // Owner of pet enters combat upon pet attack
+    if (Unit* owner = GetOwner())
+    {
+        owner->AddThreat(pVictim);
+        owner->SetInCombatWith(pVictim);
+        pVictim->SetInCombatWith(owner);
+    }
 
     // if damage pVictim call AI reaction
     pVictim->AttackedBy(this);
@@ -3138,7 +3145,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
     m_currentSpells[CSpellType] = pSpell;
     pSpell->SetReferencedFromCurrent(true);
 
-    pSpell->SetSelfContainer(&(m_currentSpells[pSpell->GetCurrentContainer()])); 
+    pSpell->SetSelfContainer(&(m_currentSpells[pSpell->GetCurrentContainer()]));
     // previous and faulty version of the following code. If the above proves to work, then delete this instruction
     //   pSpell->m_selfContainer = &(m_currentSpells[pSpell->GetCurrentContainer()]);
 }
@@ -4678,12 +4685,12 @@ void Unit::SetPowerType(Powers new_powertype)
         if (new_powertype == POWER_RAGE)
             curValue = 0;
 
-        // set power (except for mana) 
-        if (new_powertype != POWER_MANA) 
-        { 
-            SetMaxPower(new_powertype, maxValue); 
-            SetPower(new_powertype, curValue); 
-        } 
+        // set power (except for mana)
+        if (new_powertype != POWER_MANA)
+        {
+            SetMaxPower(new_powertype, maxValue);
+            SetPower(new_powertype, curValue);
+        }
     }
 }
 
@@ -5452,7 +5459,7 @@ void Unit::EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers 
  * If benefit is 0, this function won't do anything. If pCaster isn't player, the default coefficient 1.0 will be used.
  * The spell_bonus_data table of the database is used here to define custom spell coefficients based on damage type.
  *
- * The spell bonus coefficient are always chosen by this priority: 
+ * The spell bonus coefficient are always chosen by this priority:
  * For Donepart : weapon_done > direct_done > direct
  * For Takenpart : weapon_taken > direct_taken > direct
  *
@@ -5499,13 +5506,13 @@ int32 Unit::SpellBonusWithCoeffs(Unit* pCaster, SpellEntry const* spellProto, in
                             switch (item->GetProto()->InventoryType)
                             {
                                 case INVTYPE_2HWEAPON:
-                                    coeff = (bonus->two_hand_direct_damage_done ? bonus->two_hand_direct_damage_done : 
+                                    coeff = (bonus->two_hand_direct_damage_done ? bonus->two_hand_direct_damage_done :
                                         ( bonus->two_hand_direct_damage ? bonus->two_hand_direct_damage : bonus->direct_damage_done ));
                                     break;
                                 case INVTYPE_WEAPON:
                                 case INVTYPE_WEAPONMAINHAND:
                                 case INVTYPE_WEAPONOFFHAND:
-                                    coeff = (bonus->one_hand_direct_damage_done ? bonus->one_hand_direct_damage_done : 
+                                    coeff = (bonus->one_hand_direct_damage_done ? bonus->one_hand_direct_damage_done :
                                         ( bonus->one_hand_direct_damage ? bonus->one_hand_direct_damage : bonus->direct_damage_done ));
                                 break;
                             }
@@ -5526,13 +5533,13 @@ int32 Unit::SpellBonusWithCoeffs(Unit* pCaster, SpellEntry const* spellProto, in
                             switch (item->GetProto()->InventoryType)
                             {
                                 case INVTYPE_2HWEAPON:
-                                    coeff = (bonus->two_hand_direct_damage_taken ? bonus->two_hand_direct_damage_taken : 
+                                    coeff = (bonus->two_hand_direct_damage_taken ? bonus->two_hand_direct_damage_taken :
                                         ( bonus->two_hand_direct_damage ? bonus->two_hand_direct_damage : bonus->direct_damage_taken ));
                                     break;
                                 case INVTYPE_WEAPON:
                                 case INVTYPE_WEAPONMAINHAND:
                                 case INVTYPE_WEAPONOFFHAND:
-                                    coeff = (bonus->one_hand_direct_damage_taken ? bonus->one_hand_direct_damage_taken : 
+                                    coeff = (bonus->one_hand_direct_damage_taken ? bonus->one_hand_direct_damage_taken :
                                         ( bonus->one_hand_direct_damage ? bonus->one_hand_direct_damage : bonus->direct_damage_taken ));
                                     break;
                             }
@@ -5560,7 +5567,7 @@ int32 Unit::SpellBonusWithCoeffs(Unit* pCaster, SpellEntry const* spellProto, in
         }
     }
     // Default calculation
-    else 
+    else
         { coeff = CalculateDefaultCoefficient(spellProto, damagetype); }
 
     float LvlPenalty = CalculateLevelPenalty(spellProto);
@@ -5576,7 +5583,7 @@ int32 Unit::SpellBonusWithCoeffs(Unit* pCaster, SpellEntry const* spellProto, in
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_SPELL_BONUS_DAMAGE, coeff);
         coeff /= 100.0f;
      }
- 
+
     total += int32(benefit * coeff * LvlPenalty);
 
      return total;
@@ -7097,7 +7104,7 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         };
 
         const SpeedOpcodePair& speedOpcodes = SetSpeed2Opc_table[mtype];
-        
+
         if (forced && GetTypeId() == TYPEID_PLAYER)
         {
             // register forced speed changes for WorldSession::HandleForceSpeedChangeAck

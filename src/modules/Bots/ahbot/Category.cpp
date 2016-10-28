@@ -1,3 +1,4 @@
+#include "../botpch.h"
 #include "Category.h"
 #include "ItemBag.h"
 #include "AhBotConfig.h"

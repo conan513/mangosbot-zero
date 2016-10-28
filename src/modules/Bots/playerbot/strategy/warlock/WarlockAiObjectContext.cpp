@@ -111,6 +111,7 @@ namespace ai
             AiObjectContextInternal()
             {
                 creators["summon imp"] = &AiObjectContextInternal::summon_imp;
+                creators["fel armor"] = &AiObjectContextInternal::fel_armor;
                 creators["demon armor"] = &AiObjectContextInternal::demon_armor;
                 creators["demon skin"] = &AiObjectContextInternal::demon_skin;
                 creators["create healthstone"] = &AiObjectContextInternal::create_healthstone;
@@ -118,6 +119,7 @@ namespace ai
                 creators["create spellstone"] = &AiObjectContextInternal::create_spellstone;
                 creators["spellstone"] = &AiObjectContextInternal::spellstone;
                 creators["summon voidwalker"] = &AiObjectContextInternal::summon_voidwalker;
+                creators["summon felguard"] = &AiObjectContextInternal::summon_felguard;
                 creators["immolate"] = &AiObjectContextInternal::immolate;
                 creators["corruption"] = &AiObjectContextInternal::corruption;
                 creators["corruption on attacker"] = &AiObjectContextInternal::corruption_on_attacker;
@@ -127,19 +129,24 @@ namespace ai
                 creators["drain mana"] = &AiObjectContextInternal::drain_mana;
                 creators["drain life"] = &AiObjectContextInternal::drain_life;
                 creators["banish"] = &AiObjectContextInternal::banish;
+                creators["seed of corruption"] = &AiObjectContextInternal::seed_of_corruption;
                 creators["rain of fire"] = &AiObjectContextInternal::rain_of_fire;
+                creators["shadowfury"] = &AiObjectContextInternal::shadowfury;
                 creators["life tap"] = &AiObjectContextInternal::life_tap;
                 creators["fear"] = &AiObjectContextInternal::fear;
                 creators["fear on cc"] = &AiObjectContextInternal::fear_on_cc;
+                creators["incinirate"] = &AiObjectContextInternal::incinirate;
                 creators["conflagrate"] = &AiObjectContextInternal::conflagrate;
             }
 
         private:
             static Action* conflagrate(PlayerbotAI* ai) { return new CastConflagrateAction(ai); }
+            static Action* incinirate(PlayerbotAI* ai) { return new CastIncinirateAction(ai); }
             static Action* fear_on_cc(PlayerbotAI* ai) { return new CastFearOnCcAction(ai); }
             static Action* fear(PlayerbotAI* ai) { return new CastFearAction(ai); }
             static Action* immolate(PlayerbotAI* ai) { return new CastImmolateAction(ai); }
             static Action* summon_imp(PlayerbotAI* ai) { return new CastSummonImpAction(ai); }
+            static Action* fel_armor(PlayerbotAI* ai) { return new CastFelArmorAction(ai); }
             static Action* demon_armor(PlayerbotAI* ai) { return new CastDemonArmorAction(ai); }
             static Action* demon_skin(PlayerbotAI* ai) { return new CastDemonSkinAction(ai); }
             static Action* create_healthstone(PlayerbotAI* ai) { return new CastCreateHealthstoneAction(ai); }
@@ -147,6 +154,7 @@ namespace ai
             static Action* create_spellstone(PlayerbotAI* ai) { return new CastCreateSpellstoneAction(ai); }
             static Action* spellstone(PlayerbotAI* ai) { return new UseSpellItemAction(ai, "spellstone", true); }
             static Action* summon_voidwalker(PlayerbotAI* ai) { return new CastSummonVoidwalkerAction(ai); }
+            static Action* summon_felguard(PlayerbotAI* ai) { return new CastSummonFelguardAction(ai); }
             static Action* corruption(PlayerbotAI* ai) { return new CastCorruptionAction(ai); }
             static Action* corruption_on_attacker(PlayerbotAI* ai) { return new CastCorruptionOnAttackerAction(ai); }
             static Action* curse_of_agony(PlayerbotAI* ai) { return new CastCurseOfAgonyAction(ai); }
@@ -155,7 +163,9 @@ namespace ai
             static Action* drain_mana(PlayerbotAI* ai) { return new CastDrainManaAction(ai); }
             static Action* drain_life(PlayerbotAI* ai) { return new CastDrainLifeAction(ai); }
             static Action* banish(PlayerbotAI* ai) { return new CastBanishAction(ai); }
+            static Action* seed_of_corruption(PlayerbotAI* ai) { return new CastSeedOfCorruptionAction(ai); }
             static Action* rain_of_fire(PlayerbotAI* ai) { return new CastRainOfFireAction(ai); }
+            static Action* shadowfury(PlayerbotAI* ai) { return new CastShadowfuryAction(ai); }
             static Action* life_tap(PlayerbotAI* ai) { return new CastLifeTapAction(ai); }
 
         };

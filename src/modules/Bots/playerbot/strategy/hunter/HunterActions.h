@@ -16,7 +16,11 @@ namespace ai
     BEGIN_RANGED_SPELL_ACTION(CastExplosiveShotAction, "explosive shot")
     END_SPELL_ACTION()
 
+
     BEGIN_RANGED_SPELL_ACTION(CastAimedShotAction, "aimed shot")
+    END_SPELL_ACTION()
+
+    BEGIN_RANGED_SPELL_ACTION(CastChimeraShotAction, "chimera shot")
     END_SPELL_ACTION()
 
     BEGIN_RANGED_SPELL_ACTION(CastConcussiveShotAction, "concussive shot")
@@ -70,6 +74,12 @@ namespace ai
 		CastAspectOfThePackAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "aspect of the pack") {}
 	};
 
+	class CastAspectOfTheViperAction : public CastBuffSpellAction
+	{
+	public:
+		CastAspectOfTheViperAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "aspect of the viper") {}
+	};
+
 	class CastCallPetAction : public CastBuffSpellAction
 	{
 	public:
@@ -107,6 +117,18 @@ namespace ai
 		CastRapidFireAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "rapid fire") {}
 	};
 
+	class CastReadinessAction : public CastBuffSpellAction
+	{
+	public:
+		CastReadinessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "readiness") {}
+	};
+
+	class CastBlackArrow : public CastDebuffSpellAction
+	{
+	public:
+		CastBlackArrow(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "black arrow") {}
+	};
+
     class CastFreezingTrap : public CastDebuffSpellAction
     {
     public:
@@ -121,6 +143,10 @@ namespace ai
         virtual bool isUseful()
         {
             return CastMeleeSpellAction::isUseful() && !ai->HasAura(spell, GetTarget());
+        }
+        virtual NextAction** getPrerequisites()
+        {
+            return NULL;
         }
     };
 

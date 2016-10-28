@@ -1,3 +1,4 @@
+#include "../botpch.h"
 #include "Category.h"
 #include "ItemBag.h"
 #include "ConsumableCategory.h"
@@ -29,11 +30,13 @@ CategoryList::CategoryList()
     Add(new Container());
 
     Add(new Reagent());
+    Add(new Trade());
     Add(new Alchemy());
     Add(new Scroll());
     Add(new Food());
     Add(new Bandage());
 
+    Add(new Trade());
     Add(new Engineering());
 
     Add(new OtherConsumable());

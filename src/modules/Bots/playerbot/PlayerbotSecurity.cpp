@@ -1,4 +1,3 @@
-#include "Config/Config.h"
 #include "../botpch.h"
 #include "PlayerbotMgr.h"
 #include "playerbot.h"
@@ -9,7 +8,7 @@
 PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
 {
     if (bot)
-        account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
+        account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetGUID());
 }
 
 PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* reason, bool ignoreGroup)
@@ -61,6 +60,14 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
                 if (reason) *reason = PLAYERBOT_DENY_FAR;
                 return PLAYERBOT_SECURITY_TALK;
             }
+        }
+
+        int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
+        int fromGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(from, false, false);
+        if (botGS && bot->getLevel() > 15 && (100 * (botGS - fromGS) / botGS) >= 20)
+        {
+            if (reason) *reason = PLAYERBOT_DENY_GEARSCORE;
+            return PLAYERBOT_SECURITY_TALK;
         }
 
         if (bot->IsDead())
@@ -123,7 +130,14 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
             out << "I'll do it later";
             break;
         case PLAYERBOT_DENY_LOW_LEVEL:
-            out << "You are too low level: |cffff0000" << from->getLevel() << "|cffffffff/|cff00ff00" << bot->getLevel();
+            out << "You are too low level: |cffff0000" << (uint32)from->getLevel() << "|cffffffff/|cff00ff00" << (uint32)bot->getLevel();
+            break;
+        case PLAYERBOT_DENY_GEARSCORE:
+            {
+                int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
+                int fromGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(from, false, false);
+                out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS;
+            }
             break;
         case PLAYERBOT_DENY_NOT_YOURS:
             out << "I have a master already";
@@ -147,7 +161,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                 uint32 area = bot->GetAreaId();
                 if (area)
                 {
-                    const AreaTableEntry* entry = sAreaStore.LookupEntry(area);
+					const AreaTableEntry* entry = sAreaStore.LookupEntry(area);
                     if (entry)
                     {
                         out << " |cffffffff(|cffff0000" << entry->area_name[0] << "|cffffffff)";
@@ -168,6 +182,6 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
         break;
     }
 
-	bot->Whisper(out.str(), LANG_UNIVERSAL, from->GetObjectGuid());
+	bot->Whisper(out.str(), LANG_UNIVERSAL, from->GetGUID());
     return false;
 }

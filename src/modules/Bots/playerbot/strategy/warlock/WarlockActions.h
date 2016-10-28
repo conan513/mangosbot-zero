@@ -15,6 +15,12 @@ namespace ai
 		CastDemonArmorAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demon armor") {}
 	};
 
+	class CastFelArmorAction : public CastBuffSpellAction
+	{
+	public:
+		CastFelArmorAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "fel armor") {}
+	};
+
     BEGIN_RANGED_SPELL_ACTION(CastShadowBoltAction, "shadow bolt")
     END_SPELL_ACTION()
 
@@ -71,6 +77,12 @@ namespace ai
 		CastSummonVoidwalkerAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon voidwalker") {}
 	};
 
+	class CastSummonFelguardAction : public CastBuffSpellAction
+	{
+	public:
+		CastSummonFelguardAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon felguard") {}
+	};
+
 	class CastSummonImpAction : public CastBuffSpellAction
 	{
 	public:
@@ -103,10 +115,22 @@ namespace ai
         virtual bool Execute(Event event) { return ai->CastSpell("banish", GetTarget()); }
     };
 
+    class CastSeedOfCorruptionAction : public CastDebuffSpellAction
+    {
+    public:
+        CastSeedOfCorruptionAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "seed of corruption") {}
+    };
+
     class CastRainOfFireAction : public CastSpellAction
     {
     public:
         CastRainOfFireAction(PlayerbotAI* ai) : CastSpellAction(ai, "rain of fire") {}
+    };
+
+    class CastShadowfuryAction : public CastSpellAction
+    {
+    public:
+        CastShadowfuryAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowfury") {}
     };
 
     class CastImmolateAction : public CastDebuffSpellAction
@@ -119,6 +143,12 @@ namespace ai
     {
     public:
         CastConflagrateAction(PlayerbotAI* ai) : CastSpellAction(ai, "conflagrate") {}
+    };
+
+    class CastIncinirateAction : public CastSpellAction
+    {
+    public:
+        CastIncinirateAction(PlayerbotAI* ai) : CastSpellAction(ai, "incinirate") {}
     };
 
     class CastFearAction : public CastDebuffSpellAction

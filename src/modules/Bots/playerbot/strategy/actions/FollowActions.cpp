@@ -2,30 +2,49 @@
 #include "../../playerbot.h"
 #include "FollowActions.h"
 #include "../../PlayerbotAIConfig.h"
+#include "../values/Formations.h"
 
 using namespace ai;
 
-bool FollowLineAction::Execute(Event event)
+
+bool FollowAction::Execute(Event event)
 {
-    return Follow(AI_VALUE(Unit*, "line target"), sPlayerbotAIConfig.followDistance, 0.0f);
+    Formation* formation = AI_VALUE(Formation*, "formation");
+    string target = formation->GetTargetName();
+    if (!target.empty())
+    {
+        return Follow(AI_VALUE(Unit*, target));
+    }
+    else
+    {
+        WorldLocation loc = formation->GetLocation();
+        if (Formation::IsNullLocation(loc) || loc.mapid == -1)
+            return false;
+
+        return MoveTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+    }
 }
 
-bool FollowMasterAction::Execute(Event event)
+bool FollowAction::isUseful()
 {
-    return Follow(AI_VALUE(Unit*, "master target"));
+    Formation* formation = AI_VALUE(Formation*, "formation");
+    float distance = 0;
+    string target = formation->GetTargetName();
+
+    if (!target.empty())
+    {
+        distance = AI_VALUE2(float, "distance", target);
+    }
+    else
+    {
+        WorldLocation loc = formation->GetLocation();
+        if (Formation::IsNullLocation(loc) || bot->GetMapId() != loc.mapid)
+            return false;
+
+        distance = bot->GetDistance(loc.coord_x, loc.coord_y, loc.coord_z);
+    }
+
+    return distance > formation->GetMaxDistance() &&
+            !AI_VALUE(bool, "can loot");
 }
 
-bool FollowMasterRandomAction::Execute(Event event)
-{
-    Player* master = GetMaster();
-    if (!master)
-        return false;
-
-    float range = rand() % 10 + 2;
-    float angle = GetFollowAngle();
-    float x = master->GetPositionX() + cos(angle) * range;
-    float y = master->GetPositionY() + sin(angle) * range;
-    float z = master->GetPositionZ();
-
-    return MoveTo(master->GetMapId(), x, y, z);
-}

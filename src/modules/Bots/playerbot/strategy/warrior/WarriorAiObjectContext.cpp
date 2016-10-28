@@ -105,6 +105,7 @@ namespace ai
         public:
             AiObjectContextInternal()
             {
+                creators["devastate"] = &AiObjectContextInternal::devastate;
                 creators["overpower"] = &AiObjectContextInternal::overpower;
                 creators["charge"] = &AiObjectContextInternal::charge;
                 creators["bloodthirst"] = &AiObjectContextInternal::bloodthirst;
@@ -113,6 +114,7 @@ namespace ai
                 creators["mocking blow"] = &AiObjectContextInternal::mocking_blow;
                 creators["death wish"] = &AiObjectContextInternal::death_wish;
                 creators["berserker rage"] = &AiObjectContextInternal::berserker_rage;
+                creators["victory rush"] = &AiObjectContextInternal::victory_rush;
                 creators["execute"] = &AiObjectContextInternal::execute;
                 creators["defensive stance"] = &AiObjectContextInternal::defensive_stance;
                 creators["hamstring"] = &AiObjectContextInternal::hamstring;
@@ -134,13 +136,16 @@ namespace ai
                 creators["disarm"] = &AiObjectContextInternal::disarm;
                 creators["sunder armor"] = &AiObjectContextInternal::sunder_armor;
                 creators["last stand"] = &AiObjectContextInternal::last_stand;
+                creators["shockwave"] = &AiObjectContextInternal::shockwave;
                 creators["cleave"] = &AiObjectContextInternal::cleave;
                 creators["concussion blow"] = &AiObjectContextInternal::concussion_blow;
                 creators["shield bash on enemy healer"] = &AiObjectContextInternal::shield_bash_on_enemy_healer;
             }
 
         private:
+            static Action* devastate(PlayerbotAI* ai) { return new CastDevastateAction(ai); }
             static Action* last_stand(PlayerbotAI* ai) { return new CastLastStandAction(ai); }
+            static Action* shockwave(PlayerbotAI* ai) { return new CastShockwaveAction(ai); }
             static Action* cleave(PlayerbotAI* ai) { return new CastCleaveAction(ai); }
             static Action* concussion_blow(PlayerbotAI* ai) { return new CastConcussionBlowAction(ai); }
             static Action* taunt(PlayerbotAI* ai) { return new CastTauntAction(ai); }
@@ -157,6 +162,7 @@ namespace ai
             static Action* mocking_blow(PlayerbotAI* ai) { return new CastMockingBlowAction(ai); }
             static Action* death_wish(PlayerbotAI* ai) { return new CastDeathWishAction(ai); }
             static Action* berserker_rage(PlayerbotAI* ai) { return new CastBerserkerRageAction(ai); }
+            static Action* victory_rush(PlayerbotAI* ai) { return new CastVictoryRushAction(ai); }
             static Action* execute(PlayerbotAI* ai) { return new CastExecuteAction(ai); }
             static Action* defensive_stance(PlayerbotAI* ai) { return new CastDefensiveStanceAction(ai); }
             static Action* hamstring(PlayerbotAI* ai) { return new CastHamstringAction(ai); }

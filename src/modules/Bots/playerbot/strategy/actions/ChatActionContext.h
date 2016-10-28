@@ -34,7 +34,7 @@
 #include "BuffAction.h"
 #include "AttackAction.h"
 #include "HelpAction.h"
-//#include "GuildBankAction.h"
+#include "GuildBankAction.h"
 #include "ChatShortcutActions.h"
 #include "GossipHelloAction.h"
 #include "CastCustomSpellAction.h"
@@ -48,6 +48,8 @@
 #include "UseMeetingStoneAction.h"
 #include "WhoAction.h"
 #include "SaveManaAction.h"
+#include "../values/Formations.h"
+#include "SendMailAction.h"
 
 namespace ai
 {
@@ -92,6 +94,7 @@ namespace ai
             creators["reset ai"] = &ChatActionContext::reset_ai;
             creators["buff"] = &ChatActionContext::buff;
             creators["help"] = &ChatActionContext::help;
+            creators["gb"] = &ChatActionContext::gb;
             creators["bank"] = &ChatActionContext::bank;
             creators["follow chat shortcut"] = &ChatActionContext::follow_chat_shortcut;
             creators["stay chat shortcut"] = &ChatActionContext::stay_chat_shortcut;
@@ -112,9 +115,13 @@ namespace ai
             creators["save mana"] = &ChatActionContext::save_mana;
             creators["max dps chat shortcut"] = &ChatActionContext::max_dps_chat_shortcut;
             creators["tell attackers"] = &ChatActionContext::tell_attackers;
+            creators["formation"] = &ChatActionContext::formation;
+            creators["sendmail"] = &ChatActionContext::sendmail;
         }
 
     private:
+        static Action* sendmail(PlayerbotAI* ai) { return new SendMailAction(ai); }
+        static Action* formation(PlayerbotAI* ai) { return new SetFormationAction(ai); }
         static Action* tell_attackers(PlayerbotAI* ai) { return new TellAttackersAction(ai); }
         static Action* max_dps_chat_shortcut(PlayerbotAI* ai) { return new MaxDpsChatShortcutAction(ai); }
         static Action* save_mana(PlayerbotAI* ai) { return new SaveManaAction(ai); }
@@ -133,6 +140,7 @@ namespace ai
         static Action* runaway_chat_shortcut(PlayerbotAI* ai) { return new GoawayChatShortcutAction(ai); }
         static Action* stay_chat_shortcut(PlayerbotAI* ai) { return new StayChatShortcutAction(ai); }
         static Action* follow_chat_shortcut(PlayerbotAI* ai) { return new FollowChatShortcutAction(ai); }
+        static Action* gb(PlayerbotAI* ai) { return new GuildBankAction(ai); }
         static Action* bank(PlayerbotAI* ai) { return new BankAction(ai); }
         static Action* help(PlayerbotAI* ai) { return new HelpAction(ai); }
         static Action* buff(PlayerbotAI* ai) { return new BuffAction(ai); }

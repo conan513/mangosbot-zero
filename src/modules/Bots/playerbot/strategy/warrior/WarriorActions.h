@@ -91,6 +91,12 @@ namespace ai
         CastBloodrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "bloodrage") {}
     };
 
+    // defensive
+    class CastDevastateAction : public CastDefensiveMeleeSpellAction {
+    public:
+        CastDevastateAction(PlayerbotAI* ai) : CastDefensiveMeleeSpellAction(ai, "devastate") {}
+    };
+
     // all
     class CastSlamAction : public CastMeleeSpellAction {
     public:
@@ -111,14 +117,12 @@ namespace ai
 
     //debuffs
     BEGIN_DEBUFF_ACTION(CastRendAction, "rend")
-        virtual NextAction** getPrerequisites();
     END_SPELL_ACTION()
 
     class CastRendOnAttackerAction : public CastDebuffSpellOnAttackerAction
     {
     public:
         CastRendOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "rend") {}
-        virtual NextAction** getPrerequisites();
     };
 
     BEGIN_DEBUFF_ACTION(CastDisarmAction, "disarm")
@@ -126,7 +130,6 @@ namespace ai
     END_SPELL_ACTION()
 
     BEGIN_DEBUFF_ACTION(CastSunderArmorAction, "sunder armor") // 5 times
-        virtual NextAction** getPrerequisites();
     END_SPELL_ACTION()
 
     class CastDemoralizingShoutAction : public CastDebuffSpellAction {
@@ -182,10 +185,19 @@ namespace ai
 	};
 
 	// defensive
+	class CastShockwaveAction : public CastDefensiveMeleeSpellAction {
+	public:
+		CastShockwaveAction(PlayerbotAI* ai) : CastDefensiveMeleeSpellAction(ai, "shockwave") {}
+	};
+
+	// defensive
 	class CastConcussionBlowAction : public CastDefensiveMeleeSpellAction {
 	public:
 		CastConcussionBlowAction(PlayerbotAI* ai) : CastDefensiveMeleeSpellAction(ai, "concussion blow") {}
 	};
+
+	BEGIN_MELEE_SPELL_ACTION(CastVictoryRushAction, "victory rush")
+	END_SPELL_ACTION()
 
     class CastShieldBashOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
     {

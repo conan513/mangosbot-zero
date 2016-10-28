@@ -49,13 +49,13 @@ bool PlayerbotAIConfig::Initialize()
     reactDelay = (uint32) config.GetIntDefault("AiPlayerbot.ReactDelay", 100);
 
     sightDistance = config.GetFloatDefault("AiPlayerbot.SightDistance", 50.0f);
-    spellDistance = config.GetFloatDefault("AiPlayerbot.SpellDistance", 30.0f);
+    spellDistance = config.GetFloatDefault("AiPlayerbot.SpellDistance", 25.0f);
     reactDistance = config.GetFloatDefault("AiPlayerbot.ReactDistance", 150.0f);
     grindDistance = config.GetFloatDefault("AiPlayerbot.GrindDistance", 100.0f);
     lootDistance = config.GetFloatDefault("AiPlayerbot.LootDistance", 20.0f);
     fleeDistance = config.GetFloatDefault("AiPlayerbot.FleeDistance", 20.0f);
-    tooCloseDistance = config.GetFloatDefault("AiPlayerbot.TooCloseDistance", 7.0f);
-    meleeDistance = config.GetFloatDefault("AiPlayerbot.MeleeDistance", 1.5f);
+    tooCloseDistance = config.GetFloatDefault("AiPlayerbot.TooCloseDistance", 5.0f);
+    meleeDistance = config.GetFloatDefault("AiPlayerbot.MeleeDistance", 0.5f);
     followDistance = config.GetFloatDefault("AiPlayerbot.FollowDistance", 1.5f);
     whisperDistance = config.GetFloatDefault("AiPlayerbot.WhisperDistance", 6000.0f);
     contactDistance = config.GetFloatDefault("AiPlayerbot.ContactDistance", 0.5f);
@@ -67,10 +67,10 @@ bool PlayerbotAIConfig::Initialize()
     lowMana = config.GetIntDefault("AiPlayerbot.LowMana", 15);
     mediumMana = config.GetIntDefault("AiPlayerbot.MediumMana", 40);
 
-    randomGearLoweringChance = config.GetFloatDefault("AiPlayerbot.RandomGearLoweringChance", 0.15f);
-    randomBotMaxLevelChance = config.GetFloatDefault("AiPlayerbot.RandomBotMaxLevelChance", 0.4f);
+    randomGearLoweringChance = config.GetFloatDefault("AiPlayerbot.RandomGearLoweringChance", 0.15);
+    randomBotMaxLevelChance = config.GetFloatDefault("AiPlayerbot.RandomBotMaxLevelChance", 0.4);
 
-    iterationsPerTick = config.GetIntDefault("AiPlayerbot.IterationsPerTick", 4);
+    iterationsPerTick = config.GetIntDefault("AiPlayerbot.IterationsPerTick", 10);
 
     allowGuildBots = config.GetBoolDefault("AiPlayerbot.AllowGuildBots", true);
 
@@ -85,7 +85,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotUpdateInterval = config.GetIntDefault("AiPlayerbot.RandomBotUpdateInterval", 60);
     randomBotCountChangeMinInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMinInterval", 24 * 3600);
     randomBotCountChangeMaxInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMaxInterval", 3 * 24 * 3600);
-    minRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MinRandomBotInWorldTime", 2 * 3600);
+    minRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MinRandomBotInWorldTime", 24 * 3600);
     maxRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MaxRandomBotInWorldTime", 14 * 24 * 3600);
     minRandomBotRandomizeTime = config.GetIntDefault("AiPlayerbot.MinRandomBotRandomizeTime", 2 * 3600);
     maxRandomBotRandomizeTime = config.GetIntDefault("AiPlayerbot.MaxRandomRandomizeTime", 14 * 24 * 3600);
@@ -107,8 +107,10 @@ bool PlayerbotAIConfig::Initialize()
 
     randomChangeMultiplier = config.GetFloatDefault("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
-    randomBotCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotCombatStrategies", "+dps,+attack weak");
+    randomBotCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotCombatStrategies", "+dps,+dps assist,-threat");
     randomBotNonCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotNonCombatStrategies", "+grind,+move random,+loot");
+    combatStrategies = config.GetStringDefault("AiPlayerbot.CombatStrategies", "+custom::say");
+    nonCombatStrategies = config.GetStringDefault("AiPlayerbot.NonCombatStrategies", "+custom::say");
 
     commandPrefix = config.GetStringDefault("AiPlayerbot.CommandPrefix", "");
 
@@ -123,7 +125,21 @@ bool PlayerbotAIConfig::Initialize()
         }
     }
 
-    CreateRandomBots();
+    randomBotAccountPrefix = config.GetStringDefault("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
+    randomBotAccountCount = config.GetIntDefault("AiPlayerbot.RandomBotAccountCount", 50);
+    deleteRandomBotAccounts = config.GetBoolDefault("AiPlayerbot.DeleteRandomBotAccounts", false);
+    randomBotGuildCount = config.GetIntDefault("AiPlayerbot.RandomBotGuildCount", 50);
+    deleteRandomBotGuilds = config.GetBoolDefault("AiPlayerbot.DeleteRandomBotGuilds", false);
+
+    guildTaskEnabled = config.GetBoolDefault("AiPlayerbot.EnableGuildTasks", true);
+    minGuildTaskChangeTime = config.GetIntDefault("AiPlayerbot.MinGuildTaskChangeTime", 2 * 24 * 3600);
+    maxGuildTaskChangeTime = config.GetIntDefault("AiPlayerbot.MaxGuildTaskChangeTime", 5 * 24 * 3600);
+    minGuildTaskAdvertisementTime = config.GetIntDefault("AiPlayerbot.MinGuildTaskAdvertisementTime", 8 * 3600);
+    maxGuildTaskAdvertisementTime = config.GetIntDefault("AiPlayerbot.MaxGuildTaskAdvertisementTime", 4 * 24 * 3600);
+    minGuildTaskRewardTime = config.GetIntDefault("AiPlayerbot.MinGuildTaskRewardTime", 60);
+    maxGuildTaskRewardTime = config.GetIntDefault("AiPlayerbot.MaxGuildTaskRewardTime", 600);
+
+    RandomPlayerbotFactory::CreateRandomBots();
     sLog.outString("AI Playerbot configuration loaded");
 
     return true;
@@ -214,88 +230,4 @@ void PlayerbotAIConfig::SetValue(string name, string value)
 
     else if (name == "IterationsPerTick")
         out >> iterationsPerTick;
-}
-
-
-void PlayerbotAIConfig::CreateRandomBots()
-{
-    string randomBotAccountPrefix = config.GetStringDefault("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
-    int32 randomBotAccountCount = config.GetIntDefault("AiPlayerbot.RandomBotAccountCount", 50);
-
-    if (config.GetBoolDefault("AiPlayerbot.DeleteRandomBotAccounts", false))
-    {
-        sLog.outBasic("Deleting random bot accounts...");
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username like '%s%%'", randomBotAccountPrefix.c_str());
-        if (results)
-        {
-            do
-            {
-                Field* fields = results->Fetch();
-                sAccountMgr.DeleteAccount(fields[0].GetUInt32());
-            } while (results->NextRow());
-
-            delete results;
-        }
-
-        CharacterDatabase.Execute("DELETE FROM ai_playerbot_random_bots");
-        sLog.outBasic("Random bot accounts deleted");
-    }
-
-    for (int accountNumber = 0; accountNumber < randomBotAccountCount; ++accountNumber)
-    {
-        ostringstream out; out << randomBotAccountPrefix << accountNumber;
-        string accountName = out.str();
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", accountName.c_str());
-        if (results)
-        {
-            delete results;
-            continue;
-        }
-
-        string password = "";
-        for (int i = 0; i < 10; i++)
-        {
-            password += (char)urand('!', 'z');
-        }
-        sAccountMgr.CreateAccount(accountName, password);
-
-        sLog.outDetail("Account %s created for random bots", accountName.c_str());
-    }
-
-    LoginDatabase.PExecute("UPDATE account SET expansion = '%u', playerbot = %u where username like '%s%%'", 0,true, randomBotAccountPrefix.c_str());
-
-    int totalRandomBotChars = 0;
-    for (int accountNumber = 0; accountNumber < randomBotAccountCount; ++accountNumber)
-    {
-        ostringstream out; out << randomBotAccountPrefix << accountNumber;
-        string accountName = out.str();
-
-        QueryResult *results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", accountName.c_str());
-        if (!results)
-            continue;
-
-        Field* fields = results->Fetch();
-        uint32 accountId = fields[0].GetUInt32();
-        delete results;
-
-        randomBotAccounts.push_back(accountId);
-
-        int count = sAccountMgr.GetCharactersCount(accountId);
-        if (count >= 10)
-        {
-            totalRandomBotChars += count;
-            continue;
-        }
-
-        RandomPlayerbotFactory factory(accountId);
-        for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
-        {
-            if (cls != 10 && cls != 6)
-                factory.CreateRandomBot(cls);
-        }
-
-        totalRandomBotChars += sAccountMgr.GetCharactersCount(accountId);
-    }
-
-    sLog.outBasic("%d random bot accounts with %d characters available", randomBotAccounts.size(), totalRandomBotChars);
 }

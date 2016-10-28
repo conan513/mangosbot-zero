@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../botpch.h"
 #include "PlayerbotMgr.h"
 #include "PlayerbotAIBase.h"
 #include "strategy/AiObjectContext.h"
@@ -7,6 +8,7 @@
 #include "strategy/ExternalEventHelper.h"
 #include "ChatFilter.h"
 #include "PlayerbotSecurity.h"
+#include <stack>
 
 class Player;
 class PlayerbotMgr;
@@ -20,11 +22,8 @@ bool IsAlliance(uint8 race);
 class PlayerbotChatHandler: protected ChatHandler
 {
 public:
-    explicit PlayerbotChatHandler(Player* pMasterPlayer) : ChatHandler(pMasterPlayer) {}
-    bool revive(const Player& botPlayer) { return HandleReviveCommand((char*)botPlayer.GetName()); }
-    bool teleport(const Player& botPlayer) { return HandleSummonCommand((char*)botPlayer.GetName()); }
+    explicit PlayerbotChatHandler(Player* pMasterPlayer) : ChatHandler(pMasterPlayer->GetSession()) {}
     void sysmessage(string str) { SendSysMessage(str.c_str()); }
-    bool dropQuest(string str) { return HandleQuestRemoveCommand((char*)str.c_str()); }
     uint32 extractQuestId(string str);
     uint32 extractSpellId(string str)
     {
@@ -109,6 +108,7 @@ public:
 public:
 	virtual void UpdateAI(uint32 elapsed);
 	virtual void UpdateAIInternal(uint32 elapsed);
+	string HandleRemoteCommand(string command);
     void HandleCommand(uint32 type, const string& text, Player& fromPlayer);
 	void HandleBotOutgoingPacket(const WorldPacket& packet);
     void HandleMasterIncomingPacket(const WorldPacket& packet);
@@ -133,11 +133,12 @@ public:
     bool TellMaster(string text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMasterNoFacing(string text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     void SpellInterrupted(uint32 spellid);
-    uint32 CalculateGlobalCooldown(uint32 spellid);
+    int32 CalculateGlobalCooldown(uint32 spellid);
     void InterruptSpell();
     void RemoveAura(string name);
     void RemoveShapeshift();
-    void WaitForSpellCast(uint32 spellId);
+    void WaitForSpellCast(Spell *spell);
+    bool PlaySound(uint32 emote);
 
     virtual bool CanCastSpell(string name, Unit* target);
     virtual bool CastSpell(string name, Unit* target);
@@ -151,6 +152,11 @@ public:
     bool HasAura(uint32 spellId, const Unit* player);
     bool CastSpell(uint32 spellId, Unit* target);
     bool canDispel(const SpellEntry* entry, uint32 dispelType);
+
+    uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
+
+private:
+    void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
 
 public:
 	Player* GetBot() { return bot; }

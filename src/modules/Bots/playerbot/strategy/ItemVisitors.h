@@ -14,7 +14,7 @@ namespace ai
 
     class FindItemVisitor : public IterateItemsVisitor {
     public:
-        FindItemVisitor() : IterateItemsVisitor() {}
+        FindItemVisitor() : IterateItemsVisitor(), result(NULL) {}
 
         virtual bool Visit(Item* item)
         {
@@ -176,7 +176,7 @@ namespace ai
         virtual bool Visit(Item* item)
         {
             const ItemPrototype* proto = item->GetProto();
-            if (proto && proto->Name1 && strstri(proto->Name1, name.c_str()))
+            if (proto && !proto->Name1 && strstri(proto->Name1, name.c_str()))
                 count += item->GetCount();
 
             return true;
@@ -195,7 +195,7 @@ namespace ai
 
         virtual bool Accept(const ItemPrototype* proto)
         {
-            return proto && proto->Name1 && strstri(proto->Name1, name.c_str());
+            return proto && !proto->Name1 && strstri(proto->Name1, name.c_str());
         }
 
     private:

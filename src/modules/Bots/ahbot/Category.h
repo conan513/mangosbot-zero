@@ -286,7 +286,6 @@ namespace ahbot
         }
     };
 
-
     class QualityCategoryWrapper : public Category
     {
     public:

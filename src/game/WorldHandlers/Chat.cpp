@@ -45,6 +45,12 @@
 #include "LuaEngine.h"
 #endif /* ENABLE_ELUNA */
 
+#ifdef ENABLE_PLAYERBOTS
+#include "../../../modules/Bots/ahbot/AhBot.h"
+#include "../../../modules/Bots/playerbot/playerbot.h"
+#include "../../../modules/Bots/playerbot/GuildTaskMgr.h"
+#endif /* ENABLE_PLAYERBOTS */
+
 // Supported shift-links (client generated and server side)
 // |color|Harea:area_id|h[name]|h|r
 // |color|Hareatrigger:id|h[name]|h|r
@@ -705,7 +711,9 @@ ChatCommand* ChatHandler::getCommandTable()
     {
         { "account",        SEC_PLAYER,         true,  NULL,                                           "", accountCommandTable  },
         { "auction",        SEC_ADMINISTRATOR,  false, NULL,                                           "", auctionCommandTable  },
+#ifndef ENABLE_PLAYERBOTS
         { "ahbot",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", ahbotCommandTable    },
+#endif
         { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                           "", castCommandTable     },
         { "character",      SEC_GAMEMASTER,     true,  NULL,                                           "", characterCommandTable},
         { "debug",          SEC_MODERATOR,      true,  NULL,                                           "", debugCommandTable    },
@@ -791,9 +799,10 @@ ChatCommand* ChatHandler::getCommandTable()
         { "mmap",           SEC_GAMEMASTER,     false, NULL,                                           "", mmapCommandTable },
         { "spell_linked",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadSpellLinkedCommand,   "", NULL },
 #ifdef ENABLE_PLAYERBOTS
-        { "bot",            SEC_PLAYER,         false, &ChatHandler::HandlePlayerbotCommand,           "", NULL },
-        { "rndbot",         SEC_CONSOLE,        true,  &ChatHandler::HandlePlayerbotConsoleCommand,    "", NULL },
-        { "ahbot",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleAhBotCommand,               "", NULL },
+        { "ahbot",            SEC_GAMEMASTER,    true,  &ChatHandler::HandleAhBotCommand,                      "" },
+        { "rndbot",           SEC_GAMEMASTER,    true,  &ChatHandler::HandleRandomPlayerbotCommand,     "" },
+        { "bot",              SEC_PLAYER,        false, &ChatHandler::HandlePlayerbotCommand,               "" },
+        { "gtask",            SEC_GAMEMASTER,    true,  &ChatHandler::HandleGuildTaskCommand,           "" },
 #endif
 
         { NULL,             0,                  false, NULL,                                           "", NULL }
@@ -3378,14 +3387,14 @@ void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const
             data << senderName;
             data << ObjectGuid(targetGuid);                         // Unit Target
             break;
-    
+
         case CHAT_MSG_SAY:
         case CHAT_MSG_PARTY:
         case CHAT_MSG_YELL:
             data << ObjectGuid(senderGuid);
             data << ObjectGuid(senderGuid);
             break;
-    
+
         case CHAT_MSG_MONSTER_SAY:
         case CHAT_MSG_MONSTER_YELL:
             MANGOS_ASSERT(senderName);
@@ -3394,14 +3403,14 @@ void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const
             data << senderName;
             data << ObjectGuid(targetGuid);                         // Unit Target
             break;
-    
+
         case CHAT_MSG_CHANNEL:
             MANGOS_ASSERT(channelName);
             data << channelName;
             data << uint32(playerRank);
             data << ObjectGuid(senderGuid);
             break;
-    
+
         default:
             data << ObjectGuid(senderGuid);
             break;

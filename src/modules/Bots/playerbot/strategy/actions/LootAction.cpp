@@ -7,6 +7,7 @@
 #include "../../../ahbot/AhBot.h"
 #include "../../RandomPlayerbotMgr.h"
 #include "../values/ItemUsageValue.h"
+#include "../../GuildTaskMgr.h"
 
 using namespace ai;
 
@@ -120,15 +121,15 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
     {
         uint32 spellId = itr->first;
 
-        if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled || IsPassiveSpell(spellId))
-            continue;
+		if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled || IsPassiveSpell(spellId))
+			continue;
 
-        if (spellId == MINING || spellId == HERB_GATHERING)
-            continue;
+		if (spellId == MINING || spellId == HERB_GATHERING)
+			continue;
 
-        const SpellEntry* pSpellInfo = sSpellStore.LookupEntry(spellId);
-        if (!pSpellInfo)
-            continue;
+		const SpellEntry* pSpellInfo = sSpellStore.LookupEntry(spellId);
+		if (!pSpellInfo)
+			continue;
 
         if (CanOpenLock(lootObject, pSpellInfo, go))
             return spellId;
@@ -139,8 +140,8 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
         if (spellId == MINING || spellId == HERB_GATHERING)
             continue;
 
-        const SpellEntry* pSpellInfo = sSpellStore.LookupEntry(spellId);
-        if (!pSpellInfo)
+		const SpellEntry* pSpellInfo = sSpellStore.LookupEntry(spellId);
+		if (!pSpellInfo)
             continue;
 
         if (CanOpenLock(lootObject, pSpellInfo, go))
@@ -152,7 +153,7 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
 
 bool OpenLootAction::CanOpenLock(LootObject& lootObject, const SpellEntry* pSpellInfo, GameObject* go)
 {
-    for (int effIndex = 0; effIndex < MAX_EFFECT_INDEX; effIndex++)
+    for (int effIndex = 0; effIndex <= EFFECT_INDEX_2; effIndex++)
     {
         if (pSpellInfo->Effect[effIndex] != SPELL_EFFECT_OPEN_LOCK && pSpellInfo->Effect[effIndex] != SPELL_EFFECT_SKINNING)
             return false;
@@ -205,14 +206,18 @@ bool StoreLootAction::Execute(Event event)
     WorldPacket p(event.getPacket()); // (8+1+4+1+1+4+4+4+4+4+1)
     ObjectGuid guid;
     uint8 loot_type;
-    uint32 gold;
-    uint8 items;
+    uint32 gold = 0;
+    uint8 items = 0;
 
     p.rpos(0);
     p >> guid;      // 8 corpse guid
     p >> loot_type; // 1 loot type
-    p >> gold;      // 4 money on corpse
-    p >> items;     // 1 number of items on corpse
+
+    if (p.size() > 10)
+    {
+        p >> gold;      // 4 money on corpse
+        p >> items;     // 1 number of items on corpse
+    }
 
     if (gold > 0)
     {
@@ -236,16 +241,16 @@ bool StoreLootAction::Execute(Event event)
         p.read_skip<uint32>();  // randomPropertyId
         p >> lootslot_type;     // 0 = can get, 1 = look only, 2 = master get
 
-        if (lootslot_type != LOOT_SLOT_NORMAL)
-            continue;
+		if (lootslot_type != LOOT_SLOT_NORMAL)
+			continue;
 
         if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid))
             continue;
 
         if (sRandomPlayerbotMgr.IsRandomBot(bot))
         {
-            ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
-            if (proto)
+			ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
+			if (proto)
             {
                 uint32 price = itemcount * auctionbot.GetSellPrice(proto) * sRandomPlayerbotMgr.GetSellMultiplier(bot) + gold;
                 uint32 lootAmount = sRandomPlayerbotMgr.GetLootAmount(bot);
@@ -256,6 +261,16 @@ bool StoreLootAction::Execute(Event event)
                 else if (lootAmount)
                 {
                     sRandomPlayerbotMgr.SetLootAmount(bot, 0);
+                }
+
+                Group* group = bot->GetGroup();
+                if (group)
+                {
+                    for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+                    {
+                        if( ref->getSource() != bot)
+                            sGuildTaskMgr.CheckItemTask(itemid, itemcount, ref->getSource(), bot);
+                    }
                 }
             }
         }
@@ -285,7 +300,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid)
     if (lootItems.find(itemid) != lootItems.end())
         return true;
 
-    ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
+    ItemPrototype const *proto = sObjectMgr.GetItemPrototype(itemid);
     if (!proto)
         return false;
 
@@ -304,7 +319,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid)
 
     ostringstream out; out << itemid;
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
-    if (usage == ITEM_USAGE_SKILL || usage == ITEM_USAGE_USE)
+    if (usage == ITEM_USAGE_SKILL || usage == ITEM_USAGE_USE || usage == ITEM_USAGE_GUILD_TASK)
         return true;
 
     if (lootStrategy == LOOTSTRATEGY_SKILL)

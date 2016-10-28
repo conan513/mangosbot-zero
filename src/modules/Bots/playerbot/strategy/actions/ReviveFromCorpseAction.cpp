@@ -16,12 +16,9 @@ bool ReviveFromCorpseAction::Execute(Event event)
     if (reclaimTime > time(0) || corpse->GetDistance(bot) > sPlayerbotAIConfig.spellDistance)
         return false;
 
-    PlayerbotChatHandler ch(bot);
-    if (! ch.revive(*bot))
-    {
-        ai->TellMaster(".. could not be revived ..");
-        return false;
-    }
+    bot->ResurrectPlayer(0.5f);
+    bot->SpawnCorpseBones();
+    bot->SaveToDB();
     context->GetValue<Unit*>("current target")->Set(NULL);
     bot->SetSelectionGuid(ObjectGuid());
     return true;
@@ -40,11 +37,9 @@ bool SpiritHealerAction::Execute(Event event)
         if (unit && unit->IsSpiritHealer())
         {
             PlayerbotChatHandler ch(bot);
-            if (! ch.revive(*bot))
-            {
-                ai->TellMaster(".. could not be revived ..");
-                return false;
-            }
+            bot->ResurrectPlayer(0.5f);
+            bot->SpawnCorpseBones();
+            bot->SaveToDB();
             context->GetValue<Unit*>("current target")->Set(NULL);
             bot->SetSelectionGuid(ObjectGuid());
             return true;

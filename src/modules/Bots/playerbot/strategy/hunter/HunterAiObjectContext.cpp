@@ -116,6 +116,7 @@ namespace ai
             {
                 creators["auto shot"] = &AiObjectContextInternal::auto_shot;
                 creators["aimed shot"] = &AiObjectContextInternal::aimed_shot;
+                creators["chimera shot"] = &AiObjectContextInternal::chimera_shot;
                 creators["explosive shot"] = &AiObjectContextInternal::explosive_shot;
                 creators["arcane shot"] = &AiObjectContextInternal::arcane_shot;
                 creators["concussive shot"] = &AiObjectContextInternal::concussive_shot;
@@ -131,11 +132,14 @@ namespace ai
                 creators["mend pet"] = &AiObjectContextInternal::mend_pet;
                 creators["revive pet"] = &AiObjectContextInternal::revive_pet;
                 creators["call pet"] = &AiObjectContextInternal::call_pet;
+                creators["black arrow"] = &AiObjectContextInternal::black_arrow;
                 creators["freezing trap"] = &AiObjectContextInternal::freezing_trap;
                 creators["rapid fire"] = &AiObjectContextInternal::rapid_fire;
                 creators["boost"] = &AiObjectContextInternal::rapid_fire;
+                creators["readiness"] = &AiObjectContextInternal::readiness;
                 creators["aspect of the hawk"] = &AiObjectContextInternal::aspect_of_the_hawk;
                 creators["aspect of the wild"] = &AiObjectContextInternal::aspect_of_the_wild;
+                creators["aspect of the viper"] = &AiObjectContextInternal::aspect_of_the_viper;
                 creators["aspect of the pack"] = &AiObjectContextInternal::aspect_of_the_pack;
                 creators["aspect of the cheetah"] = &AiObjectContextInternal::aspect_of_the_cheetah;
                 creators["trueshot aura"] = &AiObjectContextInternal::trueshot_aura;
@@ -148,6 +152,7 @@ namespace ai
             static Action* trueshot_aura(PlayerbotAI* ai) { return new CastTrueshotAuraAction(ai); }
             static Action* auto_shot(PlayerbotAI* ai) { return new CastAutoShotAction(ai); }
             static Action* aimed_shot(PlayerbotAI* ai) { return new CastAimedShotAction(ai); }
+            static Action* chimera_shot(PlayerbotAI* ai) { return new CastChimeraShotAction(ai); }
             static Action* explosive_shot(PlayerbotAI* ai) { return new CastExplosiveShotAction(ai); }
             static Action* arcane_shot(PlayerbotAI* ai) { return new CastArcaneShotAction(ai); }
             static Action* concussive_shot(PlayerbotAI* ai) { return new CastConcussiveShotAction(ai); }
@@ -163,10 +168,13 @@ namespace ai
             static Action* mend_pet(PlayerbotAI* ai) { return new CastMendPetAction(ai); }
             static Action* revive_pet(PlayerbotAI* ai) { return new CastRevivePetAction(ai); }
             static Action* call_pet(PlayerbotAI* ai) { return new CastCallPetAction(ai); }
+            static Action* black_arrow(PlayerbotAI* ai) { return new CastBlackArrow(ai); }
             static Action* freezing_trap(PlayerbotAI* ai) { return new CastFreezingTrap(ai); }
             static Action* rapid_fire(PlayerbotAI* ai) { return new CastRapidFireAction(ai); }
+            static Action* readiness(PlayerbotAI* ai) { return new CastReadinessAction(ai); }
             static Action* aspect_of_the_hawk(PlayerbotAI* ai) { return new CastAspectOfTheHawkAction(ai); }
             static Action* aspect_of_the_wild(PlayerbotAI* ai) { return new CastAspectOfTheWildAction(ai); }
+            static Action* aspect_of_the_viper(PlayerbotAI* ai) { return new CastAspectOfTheViperAction(ai); }
             static Action* aspect_of_the_pack(PlayerbotAI* ai) { return new CastAspectOfThePackAction(ai); }
             static Action* aspect_of_the_cheetah(PlayerbotAI* ai) { return new CastAspectOfTheCheetahAction(ai); }
             static Action* wing_clip(PlayerbotAI* ai) { return new CastWingClipAction(ai); }

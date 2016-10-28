@@ -76,9 +76,6 @@ void BuffAction::TellHeader(uint32 subClass)
     case ITEM_SUBCLASS_FOOD:
         ai->TellMaster("--- Food ---");
         return;
-    case ITEM_SUBCLASS_CONSUMABLE_OTHER:
-        ai->TellMaster("--- Other ---");
-        return;
     case ITEM_SUBCLASS_ITEM_ENHANCEMENT:
         ai->TellMaster("--- Enchant ---");
         return;

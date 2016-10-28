@@ -25,7 +25,7 @@ enum DenyReason
     PLAYERBOT_DENY_FULL_GROUP
 };
 
-class MANGOS_DLL_SPEC PlayerbotSecurity
+class PlayerbotSecurity
 {
     public:
         PlayerbotSecurity(Player* const bot);

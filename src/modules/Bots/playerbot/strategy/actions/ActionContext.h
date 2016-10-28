@@ -13,6 +13,8 @@
 #include "SuggestWhatToDoAction.h"
 #include "PositionAction.h"
 #include "AttackAction.h"
+#include "CheckMailAction.h"
+#include "SayAction.h"
 
 namespace ai
 {
@@ -44,15 +46,10 @@ namespace ai
             creators["add gathering loot"] = &ActionContext::add_gathering_loot;
             creators["add all loot"] = &ActionContext::add_all_loot;
             creators["shoot"] = &ActionContext::shoot;
-            creators["follow line"] = &ActionContext::follow_line;
-            creators["follow"] = &ActionContext::follow_master;
-            creators["follow master"] = &ActionContext::follow_master;
-            creators["be near"] = &ActionContext::follow_master_random;
+            creators["follow"] = &ActionContext::follow;
+            creators["follow"] = &ActionContext::follow;
             creators["runaway"] = &ActionContext::runaway;
             creators["stay"] = &ActionContext::stay;
-            creators["stay circle"] = &ActionContext::stay_circle;
-            creators["stay line"] = &ActionContext::stay_line;
-            creators["stay combat"] = &ActionContext::stay_combat;
             creators["attack anything"] = &ActionContext::attack_anything;
             creators["attack least hp target"] = &ActionContext::attack_least_hp_target;
             creators["attack enemy player"] = &ActionContext::enemy_player_target;
@@ -66,9 +63,12 @@ namespace ai
             creators["set facing"] = &ActionContext::set_facing;
             creators["attack duel opponent"] = &ActionContext::attack_duel_opponent;
             creators["drop target"] = &ActionContext::drop_target;
+            creators["check mail"] = &ActionContext::check_mail;
+            creators["say"] = &ActionContext::say;
         }
 
     private:
+        static Action* check_mail(PlayerbotAI* ai) { return new CheckMailAction(ai); }
         static Action* drop_target(PlayerbotAI* ai) { return new DropTargetAction(ai); }
         static Action* attack_duel_opponent(PlayerbotAI* ai) { return new AttackDuelOpponentAction(ai); }
         static Action* guard(PlayerbotAI* ai) { return new GuardAction(ai); }
@@ -90,14 +90,9 @@ namespace ai
         static Action* attack_anything(PlayerbotAI* ai) { return new AttackAnythingAction(ai); }
         static Action* attack_least_hp_target(PlayerbotAI* ai) { return new AttackLeastHpTargetAction(ai); }
         static Action* enemy_player_target(PlayerbotAI* ai) { return new AttackEnemyPlayerAction(ai); }
-        static Action* stay_combat(PlayerbotAI* ai) { return new StayCombatAction(ai); }
-        static Action* stay_line(PlayerbotAI* ai) { return new StayLineAction(ai); }
-        static Action* stay_circle(PlayerbotAI* ai) { return new StayCircleAction(ai); }
         static Action* stay(PlayerbotAI* ai) { return new StayAction(ai); }
         static Action* runaway(PlayerbotAI* ai) { return new RunAwayAction(ai); }
-        static Action* follow_master_random(PlayerbotAI* ai) { return new FollowMasterRandomAction(ai); }
-        static Action* follow_master(PlayerbotAI* ai) { return new FollowMasterAction(ai); }
-        static Action* follow_line(PlayerbotAI* ai) { return new FollowLineAction(ai); }
+        static Action* follow(PlayerbotAI* ai) { return new FollowAction(ai); }
         static Action* add_gathering_loot(PlayerbotAI* ai) { return new AddGatheringLootAction(ai); }
         static Action* add_loot(PlayerbotAI* ai) { return new AddLootAction(ai); }
         static Action* add_all_loot(PlayerbotAI* ai) { return new AddAllLootAction(ai); }
@@ -112,6 +107,7 @@ namespace ai
         static Action* healthstone(PlayerbotAI* ai) { return new UseItemAction(ai, "healthstone"); }
         static Action* move_out_of_enemy_contact(PlayerbotAI* ai) { return new MoveOutOfEnemyContactAction(ai); }
         static Action* set_facing(PlayerbotAI* ai) { return new SetFacingTargetAction(ai); }
+        static Action* say(PlayerbotAI* ai) { return new SayAction(ai); }
     };
 
 };

@@ -173,4 +173,6 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("summon");
     supported.push_back("who");
     supported.push_back("save mana");
+    supported.push_back("formation");
+    supported.push_back("sendmail");
 }

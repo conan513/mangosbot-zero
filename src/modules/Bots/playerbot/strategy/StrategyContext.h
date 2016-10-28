@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CustomStrategy.h"
 #include "generic/NonCombatStrategy.h"
 #include "generic/RacialsStrategy.h"
 #include "generic/ChatCommandHandlerStrategy.h"
@@ -11,21 +12,12 @@
 #include "generic/KiteStrategy.h"
 #include "generic/FleeStrategy.h"
 #include "generic/FollowMasterStrategy.h"
-#include "generic/FollowMasterRandomStrategy.h"
-#include "generic/FollowLineStrategy.h"
 #include "generic/RunawayStrategy.h"
-#include "generic/StayCircleStrategy.h"
-#include "generic/StayLineStrategy.h"
-#include "generic/StayCombatStrategy.h"
 #include "generic/StayStrategy.h"
 #include "generic/UseFoodStrategy.h"
 #include "generic/ConserveManaStrategy.h"
 #include "generic/EmoteStrategy.h"
-#include "generic/AttackRtiStrategy.h"
-#include "generic/AttackWeakStrategy.h"
 #include "generic/TankAoeStrategy.h"
-#include "generic/TankAssistStrategy.h"
-#include "generic/DpsAoeStrategy.h"
 #include "generic/DpsAssistStrategy.h"
 #include "generic/PassiveStrategy.h"
 #include "generic/GrindingStrategy.h"
@@ -64,6 +56,8 @@ namespace ai
             creators["tell target"] = &StrategyContext::tell_target;
             creators["pvp"] = &StrategyContext::pvp;
             creators["move random"] = &StrategyContext::move_random;
+            creators["lfg"] = &StrategyContext::lfg;
+            creators["custom"] = &StrategyContext::custom;
         }
 
     private:
@@ -87,6 +81,8 @@ namespace ai
         static Strategy* ready_check(PlayerbotAI* ai) { return new ReadyCheckStrategy(ai); }
         static Strategy* pvp(PlayerbotAI* ai) { return new AttackEnemyPlayersStrategy(ai); }
         static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
+        static Strategy* lfg(PlayerbotAI* ai) { return new LfgStrategy(ai); }
+        static Strategy* custom(PlayerbotAI* ai) { return new CustomStrategy(ai); }
     };
 
     class MovementStrategyContext : public NamedObjectContext<Strategy>
@@ -94,31 +90,19 @@ namespace ai
     public:
         MovementStrategyContext() : NamedObjectContext<Strategy>(false, true)
         {
-            creators["follow master"] = &MovementStrategyContext::follow_master;
-            creators["be near"] = &MovementStrategyContext::follow_master_random;
-            creators["follow line"] = &MovementStrategyContext::follow_line;
+            creators["follow"] = &MovementStrategyContext::follow_master;
             creators["stay"] = &MovementStrategyContext::stay;
             creators["runaway"] = &MovementStrategyContext::runaway;
             creators["flee from adds"] = &MovementStrategyContext::flee_from_adds;
-            creators["stay circle"] = &MovementStrategyContext::stay_circle;
-            creators["stay combat"] = &MovementStrategyContext::stay_combat;
-            creators["stay line"] = &MovementStrategyContext::stay_line;
             creators["guard"] = &MovementStrategyContext::guard;
-            creators["move random"] = &MovementStrategyContext::move_random;
         }
 
     private:
-        static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
         static Strategy* guard(PlayerbotAI* ai) { return new GuardStrategy(ai); }
-        static Strategy* follow_master_random(PlayerbotAI* ai) { return new FollowMasterRandomStrategy(ai); }
         static Strategy* follow_master(PlayerbotAI* ai) { return new FollowMasterStrategy(ai); }
-        static Strategy* follow_line(PlayerbotAI* ai) { return new FollowLineStrategy(ai); }
         static Strategy* stay(PlayerbotAI* ai) { return new StayStrategy(ai); }
         static Strategy* runaway(PlayerbotAI* ai) { return new RunawayStrategy(ai); }
         static Strategy* flee_from_adds(PlayerbotAI* ai) { return new FleeFromAddsStrategy(ai); }
-        static Strategy* stay_circle(PlayerbotAI* ai) { return new StayCircleStrategy(ai); }
-        static Strategy* stay_combat(PlayerbotAI* ai) { return new StayCombatStrategy(ai); }
-        static Strategy* stay_line(PlayerbotAI* ai) { return new StayLineStrategy(ai); }
     };
 
     class AssistStrategyContext : public NamedObjectContext<Strategy>
@@ -127,22 +111,14 @@ namespace ai
         AssistStrategyContext() : NamedObjectContext<Strategy>(false, true)
         {
             creators["dps assist"] = &AssistStrategyContext::dps_assist;
-            creators["dps aoe"] = &AssistStrategyContext::dps_aoe;
-            creators["tank assist"] = &AssistStrategyContext::tank_assist;
             creators["tank aoe"] = &AssistStrategyContext::tank_aoe;
-            creators["attack weak"] = &AssistStrategyContext::attack_weak;
             creators["grind"] = &AssistStrategyContext::grind;
-            creators["attack rti"] = &AssistStrategyContext::attack_rti;
         }
 
     private:
         static Strategy* dps_assist(PlayerbotAI* ai) { return new DpsAssistStrategy(ai); }
-        static Strategy* dps_aoe(PlayerbotAI* ai) { return new DpsAoeStrategy(ai); }
-        static Strategy* tank_assist(PlayerbotAI* ai) { return new TankAssistStrategy(ai); }
         static Strategy* tank_aoe(PlayerbotAI* ai) { return new TankAoeStrategy(ai); }
-        static Strategy* attack_weak(PlayerbotAI* ai) { return new AttackWeakStrategy(ai); }
         static Strategy* grind(PlayerbotAI* ai) { return new GrindingStrategy(ai); }
-        static Strategy* attack_rti(PlayerbotAI* ai) { return new AttackRtiStrategy(ai); }
     };
 
     class QuestStrategyContext : public NamedObjectContext<Strategy>

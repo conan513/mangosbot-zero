@@ -31,6 +31,12 @@ namespace ai
 		CastFeintAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "feint") {}
 	};
 
+	class CastDismantleAction : public CastSpellAction
+	{
+	public:
+		CastDismantleAction(PlayerbotAI* ai) : CastSpellAction(ai, "dismantle") {}
+	};
+
 	class CastDistractAction : public CastSpellAction
 	{
 	public:
@@ -49,10 +55,23 @@ namespace ai
 		CastBlindAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "blind") {}
 	};
 
+
 	class CastBladeFlurryAction : public CastBuffSpellAction
 	{
 	public:
 		CastBladeFlurryAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "blade flurry") {}
+	};
+
+	class CastAdrenalineRushAction : public CastBuffSpellAction
+	{
+	public:
+		CastAdrenalineRushAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "adrenaline rush") {}
+	};
+
+	class CastKillingSpreeAction : public CastBuffSpellAction
+	{
+	public:
+		CastKillingSpreeAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "killing spree") {}
 	};
 
     class CastKickOnEnemyHealerAction : public CastSpellOnEnemyHealerAction

@@ -155,13 +155,19 @@ namespace ai
                 creators["fade"] = &AiObjectContextInternal::fade;
                 creators["inner fire"] = &AiObjectContextInternal::inner_fire;
                 creators["resurrection"] = &AiObjectContextInternal::resurrection;
+                creators["circle of healing"] = &AiObjectContextInternal::circle_of_healing;
                 creators["psychic scream"] = &AiObjectContextInternal::psychic_scream;
+                creators["vampiric touch"] = &AiObjectContextInternal::vampiric_touch;
                 creators["vampiric embrace"] = &AiObjectContextInternal::vampiric_embrace;
+                creators["dispersion"] = &AiObjectContextInternal::dispersion;
             }
 
         private:
+            static Action* dispersion(PlayerbotAI* ai) { return new CastDispersionAction(ai); }
             static Action* vampiric_embrace(PlayerbotAI* ai) { return new CastVampiricEmbraceAction(ai); }
+            static Action* vampiric_touch(PlayerbotAI* ai) { return new CastVampiricTouchAction(ai); }
             static Action* psychic_scream(PlayerbotAI* ai) { return new CastPsychicScreamAction(ai); }
+            static Action* circle_of_healing(PlayerbotAI* ai) { return new CastCircleOfHealingAction(ai); }
             static Action* resurrection(PlayerbotAI* ai) { return new CastResurrectionAction(ai); }
             static Action* shadow_word_pain(PlayerbotAI* ai) { return new CastPowerWordPainAction(ai); }
             static Action* shadow_word_pain_on_attacker(PlayerbotAI* ai) { return new CastPowerWordPainOnAttackerAction(ai); }

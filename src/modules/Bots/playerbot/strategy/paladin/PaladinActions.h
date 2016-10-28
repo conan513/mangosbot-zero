@@ -45,6 +45,18 @@ namespace ai
 		CastConcentrationAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "concentration aura") {}
 	};
 
+	class CastDivineStormAction : public CastBuffSpellAction
+	{
+	public:
+		CastDivineStormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine storm") {}
+	};
+
+	class CastCrusaderStrikeAction : public CastMeleeSpellAction
+	{
+	public:
+		CastCrusaderStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "crusader strike") {}
+	};
+
 	class CastShadowResistanceAuraAction : public CastBuffSpellAction
 	{
 	public:
@@ -61,6 +73,12 @@ namespace ai
 	{
 	public:
 		CastFireResistanceAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "fire resistance aura") {}
+	};
+
+	class CastCrusaderAuraAction : public CastBuffSpellAction
+	{
+	public:
+		CastCrusaderAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "crusader aura") {}
 	};
 
 	class CastSealOfRighteousnessAction : public CastBuffSpellAction
@@ -93,6 +111,13 @@ namespace ai
 	public:
 		CastSealOfCommandAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "seal of command") {}
 	};
+
+	class CastSealOfVengeanceAction : public CastBuffSpellAction
+	{
+	public:
+	    CastSealOfVengeanceAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "seal of vengeance") {}
+	};
+
 
 	class CastBlessingOfMightAction : public CastBuffSpellAction
 	{
@@ -232,6 +257,12 @@ namespace ai
 		CastHammerOfWrathAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "hammer of wrath") {}
 	};
 
+	class CastHammerOfTheRighteousAction : public CastMeleeSpellAction
+	{
+	public:
+		CastHammerOfTheRighteousAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "hammer of the righteous") {}
+	};
+
 	class CastPurifyPoisonAction : public CastCureSpellAction
 	{
 	public:
@@ -258,6 +289,12 @@ namespace ai
 		CastPurifyDiseaseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "purify", DISPEL_DISEASE) {}
 
 		virtual string getName() { return "purify disease on party"; }
+	};
+
+	class CastHandOfReckoningAction : public CastSpellAction
+	{
+	public:
+		CastHandOfReckoningAction(PlayerbotAI* ai) : CastSpellAction(ai, "hand of reckoning") {}
 	};
 
 	class CastCleansePoisonAction : public CastCureSpellAction
@@ -301,6 +338,9 @@ namespace ai
 
 		virtual string getName() { return "cleanse magic on party"; }
 	};
+
+    BEGIN_SPELL_ACTION(CastAvengersShieldAction, "avenger's shield")
+    END_SPELL_ACTION()
 
 	BEGIN_SPELL_ACTION(CastExorcismAction, "exorcism")
 	END_SPELL_ACTION()

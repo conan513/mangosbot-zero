@@ -8,6 +8,7 @@
 #include "DBCStore.h"
 #include "SharedDefines.h"
 #include "ahbot/AhBot.h"
+#include "RandomPlayerbotFactory.h"
 
 using namespace ai;
 using namespace std;
@@ -79,13 +80,16 @@ void PlayerbotFactory::Prepare()
 
 void PlayerbotFactory::Randomize(bool incremental)
 {
+    sLog.outString("Preparing to randomize...");
     Prepare();
 
+    sLog.outString("Resetting player...");
     bot->resetTalents(true);
     ClearSpells();
     ClearInventory();
     bot->SaveToDB();
 
+    sLog.outString("Initializing quests...");
     InitQuests();
     // quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
@@ -94,27 +98,56 @@ void PlayerbotFactory::Randomize(bool incremental)
     CancelAuras();
     bot->SaveToDB();
 
+    sLog.outString("Initializing spells (step 1)...");
     InitAvailableSpells();
+
+    sLog.outString("Initializing skills (step 1)...");
     InitSkills();
     InitTradeSkills();
+
+    sLog.outString("Initializing talents...");
     InitTalents();
+
+    sLog.outString("Initializing spells (step 2)...");
     InitAvailableSpells();
     InitSpecialSpells();
+
+    sLog.outString("Initializing mounts...");
     InitMounts();
+
+    sLog.outString("Initializing skills (step 2)...");
     UpdateTradeSkills();
     bot->SaveToDB();
 
+    sLog.outString("Initializing equipmemt...");
     InitEquipment(incremental);
-    InitBags();
-    InitAmmo();
-    InitFood();
-    InitPotions();
-    InitSecondEquipmentSet();
-    InitInventory();
-    bot->SetMoney(urand(level * 1000, level * 5 * 1000));
-    bot->SaveToDB();
 
+    sLog.outString("Initializing bags...");
+    InitBags();
+
+    sLog.outString("Initializing ammo...");
+    InitAmmo();
+
+    sLog.outString("Initializing food...");
+    InitFood();
+
+    sLog.outString("Initializing potions...");
+    InitPotions();
+
+    sLog.outString("Initializing second equipment set...");
+    InitSecondEquipmentSet();
+
+    sLog.outString("Initializing inventory...");
+    InitInventory();
+
+    sLog.outString("Initializing guilds...");
+    InitGuild();
+
+    sLog.outString("Initializing pet...");
     InitPet();
+
+    sLog.outString("Saving to DB...");
+    bot->SetMoney(urand(level * 1000, level * 5 * 1000));
     bot->SaveToDB();
 }
 
@@ -134,7 +167,10 @@ void PlayerbotFactory::InitPet()
         for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
         {
             CreatureInfo const* co = sCreatureStorage.LookupEntry<CreatureInfo>(id);
-            if (!co || !co->isTameable())
+			if (!co)
+				continue;
+
+            if (!co->isTameable())
                 continue;
 
             if (co->MinLevel > bot->getLevel())
@@ -156,7 +192,9 @@ void PlayerbotFactory::InitPet()
 		for (int i = 0; i < 100; i++)
 		{
 			int index = urand(0, ids.size() - 1);
-			CreatureInfo const* co = sCreatureStorage.LookupEntry<CreatureInfo>(ids[index]);
+            CreatureInfo const* co = sCreatureStorage.LookupEntry<CreatureInfo>(ids[index]);
+            if (!co)
+                continue;
 
             PetLevelInfo const* petInfo = sObjectMgr.GetPetLevelInfo(co->Entry, bot->getLevel());
             if (!petInfo)
@@ -178,7 +216,7 @@ void PlayerbotFactory::InitPet()
             pet->SetLevel(bot->getLevel());
             bot->SetPet(pet);
 
-            sLog.outDetail("Bot %s: assign pet %d (%d level)", bot->GetName(), co->Entry, bot->getLevel());
+            sLog.outDebug(  "Bot %s: assign pet %d (%d level)", bot->GetName(), co->Entry, bot->getLevel());
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
             break;
         }
@@ -209,15 +247,15 @@ void PlayerbotFactory::ClearSpells()
     for(PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
-        if(itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled || IsPassiveSpell(spellId))
-            continue;
+		if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled || IsPassiveSpell(spellId))
+			continue;
 
         spells.push_back(spellId);
     }
 
     for (list<uint32>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
-        bot->removeSpell(*i);
+        bot->removeSpell(*i, false, false);
     }
 }
 
@@ -268,6 +306,7 @@ private:
 
         if (sPlayerbotAIConfig.IsInRandomQuestItemList(id))
             return true;
+
 
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype>(id);
         if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK)
@@ -348,50 +387,21 @@ void PlayerbotFactory::AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tan
 {
     switch (mod)
     {
-        //FOEREAPER
-    //case ITEM_MOD_HIT_RATING:
-    //case ITEM_MOD_CRIT_RATING:
-    //case ITEM_MOD_HASTE_RATING:
     case ITEM_MOD_HEALTH:
     case ITEM_MOD_STAMINA:
-    //case ITEM_MOD_HEALTH_REGEN:
     case ITEM_MOD_MANA:
     case ITEM_MOD_INTELLECT:
     case ITEM_MOD_SPIRIT:
-    //case ITEM_MOD_MANA_REGENERATION:
-    //case ITEM_MOD_SPELL_POWER:
-    //case ITEM_MOD_SPELL_PENETRATION:
-    //case ITEM_MOD_HIT_SPELL_RATING:
-    //case ITEM_MOD_CRIT_SPELL_RATING:
-    //case ITEM_MOD_HASTE_SPELL_RATING:
         sp++;
         break;
     }
 
     switch (mod)
     {
-    //case ITEM_MOD_HIT_RATING:
-    //case ITEM_MOD_CRIT_RATING:
-    //case ITEM_MOD_HASTE_RATING:
     case ITEM_MOD_AGILITY:
     case ITEM_MOD_STRENGTH:
     case ITEM_MOD_HEALTH:
     case ITEM_MOD_STAMINA:
-    //case ITEM_MOD_HEALTH_REGEN:
-    //case ITEM_MOD_DEFENSE_SKILL_RATING:
-    //case ITEM_MOD_DODGE_RATING:
-    //case ITEM_MOD_PARRY_RATING:
-    //case ITEM_MOD_BLOCK_RATING:
-    //case ITEM_MOD_HIT_TAKEN_MELEE_RATING:
-    //case ITEM_MOD_HIT_TAKEN_RANGED_RATING:
-    //case ITEM_MOD_HIT_TAKEN_SPELL_RATING:
-    //case ITEM_MOD_CRIT_TAKEN_MELEE_RATING:
-    //case ITEM_MOD_CRIT_TAKEN_RANGED_RATING:
-    //case ITEM_MOD_CRIT_TAKEN_SPELL_RATING:
-    //case ITEM_MOD_HIT_TAKEN_RATING:
-    //case ITEM_MOD_CRIT_TAKEN_RATING:
-    //case ITEM_MOD_RESILIENCE_RATING:
-    //case ITEM_MOD_BLOCK_VALUE:
         tank++;
         break;
     }
@@ -400,22 +410,8 @@ void PlayerbotFactory::AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tan
     {
     case ITEM_MOD_HEALTH:
     case ITEM_MOD_STAMINA:
-    //case ITEM_MOD_HEALTH_REGEN:
     case ITEM_MOD_AGILITY:
     case ITEM_MOD_STRENGTH:
-    //case ITEM_MOD_HIT_MELEE_RATING:
-    //case ITEM_MOD_HIT_RANGED_RATING:
-    //case ITEM_MOD_CRIT_MELEE_RATING:
-    //case ITEM_MOD_CRIT_RANGED_RATING:
-    //case ITEM_MOD_HASTE_MELEE_RATING:
-    //case ITEM_MOD_HASTE_RANGED_RATING:
-    //case ITEM_MOD_HIT_RATING:
-    //case ITEM_MOD_CRIT_RATING:
-    //case ITEM_MOD_HASTE_RATING:
-    //case ITEM_MOD_EXPERTISE_RATING:
-    //case ITEM_MOD_ATTACK_POWER:
-    //case ITEM_MOD_RANGED_ATTACK_POWER:
-    //case ITEM_MOD_ARMOR_PENETRATION_RATING:
         ap++;
         break;
     }
@@ -605,7 +601,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         vector<uint32>& ids = items[slot];
         if (ids.empty())
         {
-            sLog.outDetail("%s: no items to equip for slot %d", bot->GetName(), slot);
+            sLog.outDebug(  "%s: no items to equip for slot %d", bot->GetName(), slot);
             continue;
         }
 
@@ -725,7 +721,7 @@ void PlayerbotFactory::InitSecondEquipmentSet()
         vector<uint32>& ids = i->second;
         if (ids.empty())
         {
-            sLog.outDetail("%s: no items to make second equipment set for slot %d", bot->GetName(), i->first);
+            sLog.outDebug(  "%s: no items to make second equipment set for slot %d", bot->GetName(), i->first);
             continue;
         }
 
@@ -832,6 +828,10 @@ void PlayerbotFactory::EnchantItem(Item* item)
             if (!enchant || enchant->slot != PERM_ENCHANTMENT_SLOT)
                 continue;
 
+			const SpellEntry *enchantSpell = sSpellStore.LookupEntry(enchant->spellid[0]);
+            if (enchantSpell->spellLevel && enchantSpell->spellLevel > level)
+                continue;
+
             uint8 sp = 0, ap = 0, tank = 0;
             for (int i = 0; i < 3; ++i)
             {
@@ -853,7 +853,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
 
     if (ids.empty())
     {
-        sLog.outDetail("%s: no enchantments found for item %d", bot->GetName(), item->GetProto()->ItemId);
+        sLog.outDebug(  "%s: no enchantments found for item %d", bot->GetName(), item->GetProto()->ItemId);
         return;
     }
 
@@ -888,7 +888,7 @@ void PlayerbotFactory::InitTradeSkills()
 {
     for (int i = 0; i < sizeof(tradeSkills) / sizeof(uint32); ++i)
     {
-        bot->SetSkill(tradeSkills[i], 0, 0);
+        bot->SetSkill(tradeSkills[i], 0, 0, 0);
     }
 
     vector<uint32> firstSkills;
@@ -917,21 +917,19 @@ void PlayerbotFactory::InitTradeSkills()
     SetRandomSkill(SKILL_FISHING);
     SetRandomSkill(SKILL_COOKING);
 
-    switch (urand(0, 1))
+    switch (urand(0, 3))
     {
     case 0:
         SetRandomSkill(SKILL_HERBALISM);
         SetRandomSkill(SKILL_ALCHEMY);
         break;
-    /*case 1:
+    case 1:
         SetRandomSkill(SKILL_HERBALISM);
-        SetRandomSkill(SKILL_INSCRIPTION);
         break;
     case 2:
         SetRandomSkill(SKILL_MINING);
-        SetRandomSkill(SKILL_JEWELCRAFTING);
-        break;*/
-    case 1://3:
+        break;
+    case 3:
         SetRandomSkill(firstSkills[urand(0, firstSkills.size() - 1)]);
         SetRandomSkill(secondSkills[urand(0, secondSkills.size() - 1)]);
         break;
@@ -943,7 +941,7 @@ void PlayerbotFactory::UpdateTradeSkills()
     for (int i = 0; i < sizeof(tradeSkills) / sizeof(uint32); ++i)
     {
         if (bot->GetSkillValue(tradeSkills[i]) == 1)
-            bot->SetSkill(tradeSkills[i], 0, 0);
+            bot->SetSkill(tradeSkills[i], 0, 0, 0);
     }
 }
 
@@ -968,27 +966,26 @@ void PlayerbotFactory::InitSkills()
     SetRandomSkill(SKILL_FIST_WEAPONS);
 
     if (bot->getLevel() >= 70)
-        bot->SetSkill(SKILL_RIDING, 300, 300);
+        bot->SetSkill(SKILL_RIDING, 0, 300, 300);
     else if (bot->getLevel() >= 60)
-        bot->SetSkill(SKILL_RIDING, 225, 225);
+        bot->SetSkill(SKILL_RIDING, 0, 225, 225);
     else if (bot->getLevel() >= 40)
-        bot->SetSkill(SKILL_RIDING, 150, 150);
+        bot->SetSkill(SKILL_RIDING, 0, 150, 150);
     else if (bot->getLevel() >= 20)
-        bot->SetSkill(SKILL_RIDING, 75, 75);
+        bot->SetSkill(SKILL_RIDING, 0, 75, 75);
     else
-        bot->SetSkill(SKILL_RIDING, 0, 0);
+        bot->SetSkill(SKILL_RIDING, 0, 0, 0);
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
     switch (bot->getClass())
     {
-    //case CLASS_DEATH_KNIGHT:
     case CLASS_WARRIOR:
     case CLASS_PALADIN:
-        bot->SetSkill(SKILL_PLATE_MAIL, skillLevel, skillLevel);
+        bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
         break;
     case CLASS_SHAMAN:
     case CLASS_HUNTER:
-        bot->SetSkill(SKILL_MAIL, skillLevel, skillLevel);
+        bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
     }
 }
 
@@ -996,7 +993,7 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 {
     uint32 maxValue = level * 5;
     uint32 curValue = urand(maxValue - level, maxValue);
-    bot->SetSkill(id, curValue, maxValue);
+    bot->SetSkill(id, 0, curValue, maxValue);
 
 }
 
@@ -1016,11 +1013,11 @@ void PlayerbotFactory::InitAvailableSpells()
         if (co->TrainerType == TRAINER_TYPE_CLASS && co->TrainerClass != bot->getClass())
             continue;
 
-		uint32 trainerId = co->TrainerTemplateId;
+        uint32 trainerId = co->TrainerTemplateId;
         if (!trainerId)
             trainerId = co->Entry;
 
-		TrainerSpellData const* trainer_spells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
+        TrainerSpellData const* trainer_spells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
         if (!trainer_spells)
             trainer_spells = sObjectMgr.GetNpcTrainerSpells(trainerId);
 
@@ -1045,6 +1042,7 @@ void PlayerbotFactory::InitAvailableSpells()
         }
     }
 }
+
 
 void PlayerbotFactory::InitSpecialSpells()
 {
@@ -1099,7 +1097,7 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
                 bot->learnSpell(spellId, false);
                 bot->UpdateFreeTalentPoints(false);
             }
-			spells.erase(spells.begin() + index);
+            spells.erase(spells.begin() + index);
         }
 
         freePoints = bot->GetFreeTalentPoints();
@@ -1137,47 +1135,48 @@ ObjectGuid PlayerbotFactory::GetRandomBot()
     return guids[index];
 }
 
+
+void AddPrevQuests(uint32 questId, list<uint32>& questIds)
+{
+    Quest const *quest = sObjectMgr.GetQuestTemplate(questId);
+    for (Quest::PrevQuests::const_iterator iter = quest->prevQuests.begin(); iter != quest->prevQuests.end(); ++iter)
+    {
+        uint32 prevId = abs(*iter);
+        AddPrevQuests(prevId, questIds);
+        questIds.push_back(prevId);
+    }
+}
+
 void PlayerbotFactory::InitQuests()
 {
-    QueryResult *results = WorldDatabase.PQuery("SELECT entry, RequiredClasses, RequiredRaces FROM quest_template where QuestLevel = -1 and MinLevel <= '%u'",
-            bot->getLevel());
-    if (!results)
-        return;
-
-    list<uint32> ids;
-    do
+    ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
+    list<uint32> questIds;
+    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
     {
-        Field* fields = results->Fetch();
-        uint32 questId = fields[0].GetUInt32();
-        uint32 requiredClasses = fields[1].GetUInt32();
-        uint32 requiredRaces = fields[2].GetUInt32();
-        if ((requiredClasses & bot->getClassMask()) && (requiredRaces & bot->getRaceMask()))
-            ids.push_back(questId);
-    } while (results->NextRow());
+        uint32 questId = i->first;
+        Quest const *quest = i->second;
 
-    delete results;
+        if (!quest->GetRequiredClasses() ||
+                quest->GetMinLevel() > bot->getLevel() ||
+                quest->IsRepeatable())
+            continue;
 
-    for (int i = 0; i < 15; i++)
+        AddPrevQuests(questId, questIds);
+        questIds.push_back(questId);
+    }
+
+    for (list<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
     {
-        for (list<uint32>::iterator i = ids.begin(); i != ids.end(); ++i)
-        {
-			uint32 questId = *i;
-            Quest const *quest = sObjectMgr.GetQuestTemplate(questId);
+        uint32 questId = *i;
+        Quest const *quest = sObjectMgr.GetQuestTemplate(questId);
 
-            bot->SetQuestStatus(questId, QUEST_STATUS_NONE);
+        if (!bot->SatisfyQuestClass(quest, false) ||
+                !bot->SatisfyQuestRace(quest, false))
+            continue;
 
-            if (!bot->SatisfyQuestClass(quest, false) ||
-                    !bot->SatisfyQuestRace(quest, false) ||
-                    !bot->SatisfyQuestStatus(quest, false))
-                continue;
-
-            if (quest->IsRepeatable())
-                continue;
-
-            bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-            bot->RewardQuest(quest, 0, bot, false);
-            ClearInventory();
-        }
+        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
+        bot->RewardQuest(quest, 0, bot, false);
+        ClearInventory();
     }
 }
 
@@ -1211,7 +1210,7 @@ void PlayerbotFactory::InitAmmo()
     if (!subClass)
         return;
 
-    QueryResult *results = WorldDatabase.PQuery("select max(entry), max(RequiredLevel) from item_template where class = '%u' and subclass = '%u' and RequiredLevel <= '%u'",
+    QueryResult* results = WorldDatabase.PQuery("select max(entry), max(RequiredLevel) from item_template where class = '%u' and subclass = '%u' and RequiredLevel <= '%u'",
             ITEM_CLASS_PROJECTILE, subClass, bot->getLevel());
     if (!results)
         return;
@@ -1220,9 +1219,9 @@ void PlayerbotFactory::InitAmmo()
     if (fields)
     {
         uint32 entry = fields[0].GetUInt32();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
-            Item* newItem = bot->StoreNewItemInInventorySlot(entry, 1000);
+            Item* newItem = bot->StoreNewItemInInventorySlot(entry, 200);
             if (newItem)
                 newItem->AddToUpdateQueueOf(bot);
         }
@@ -1387,10 +1386,6 @@ void PlayerbotFactory::InitInventorySkill()
     if (bot->HasSkill(SKILL_MINING)) {
         StoreItem(2901, 1); // Mining Pick
     }
-    /*if (bot->HasSkill(SKILL_JEWELCRAFTING)) {
-        StoreItem(20815, 1); // Jeweler's Kit
-        StoreItem(20824, 1); // Simple Grinder
-    }*/
     if (bot->HasSkill(SKILL_BLACKSMITHING) || bot->HasSkill(SKILL_ENGINEERING)) {
         StoreItem(5956, 1); // Blacksmith Hammer
     }
@@ -1398,11 +1393,8 @@ void PlayerbotFactory::InitInventorySkill()
         StoreItem(6219, 1); // Arclight Spanner
     }
     if (bot->HasSkill(SKILL_ENCHANTING)) {
-        StoreItem(16207, 1); // Runed Arcanite Rod
+        StoreItem(44452, 1); // Runed Titanium Rod
     }
-    /*if (bot->HasSkill(SKILL_INSCRIPTION)) {
-        StoreItem(39505, 1); // Virtuoso Inking Set
-    }*/
     if (bot->HasSkill(SKILL_SKINNING)) {
         StoreItem(7005, 1); // Skinning Knife
     }
@@ -1411,11 +1403,12 @@ void PlayerbotFactory::InitInventorySkill()
 Item* PlayerbotFactory::StoreItem(uint32 itemId, uint32 count)
 {
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
-    Item* newItem = bot->StoreNewItemInInventorySlot(itemId, min(count, proto->GetMaxStackSize()));
-    if (newItem)
-        newItem->AddToUpdateQueueOf(bot);
+    ItemPosCountVec sDest;
+    InventoryResult msg = bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, itemId, count);
+    if (msg != EQUIP_ERR_OK)
+        return NULL;
 
-    return newItem;
+    return bot->StoreNewItem(sDest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
 }
 
 void PlayerbotFactory::InitInventoryTrade()
@@ -1521,4 +1514,35 @@ void PlayerbotFactory::InitInventoryEquip()
         if (StoreItem(itemId, 1) && count++ >= maxCount)
             break;
    }
+}
+
+void PlayerbotFactory::InitGuild()
+{
+    if (bot->GetGuildId())
+        return;
+
+    if (sPlayerbotAIConfig.randomBotGuilds.empty())
+        RandomPlayerbotFactory::CreateRandomGuilds();
+
+    vector<uint32> guilds;
+    for(list<uint32>::iterator i = sPlayerbotAIConfig.randomBotGuilds.begin(); i != sPlayerbotAIConfig.randomBotGuilds.end(); ++i)
+        guilds.push_back(*i);
+
+    if (guilds.empty())
+    {
+        sLog.outError("No random guilds available");
+        return;
+    }
+
+    int index = urand(0, guilds.size() - 1);
+    uint32 guildId = guilds[index];
+    Guild* guild = sGuildMgr.GetGuildById(guildId);
+    if (!guild)
+    {
+        sLog.outError("Invalid guild %u", guildId);
+        return;
+    }
+
+    if (guild->GetMemberSize() < 10)
+        guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE));
 }

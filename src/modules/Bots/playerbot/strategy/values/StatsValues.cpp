@@ -57,8 +57,8 @@ bool HasManaValue::Calculate()
 uint8 ComboPointsValue::Calculate()
 {
     Unit *target = GetTarget();
-    if (!target || target->GetObjectGuid() != bot->GetComboTargetGuid())
-        return 0;
+	if (!target || target->GetObjectGuid() != bot->GetComboTargetGuid())
+		return 0;
 
     return bot->GetComboPoints();
 }
@@ -108,4 +108,13 @@ uint8 BagSpaceValue::Calculate()
     }
 
     return (static_cast<float> (totalused) / total) * 100;
+}
+
+uint8 SpeedValue::Calculate()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return 100;
+
+    return (uint8) (100.0f * target->GetSpeedRate(MOVE_RUN));
 }

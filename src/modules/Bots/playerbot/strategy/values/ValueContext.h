@@ -53,7 +53,9 @@
 #include "ManaSaveLevelValue.h"
 #include "LfgValues.h"
 #include "EnemyHealerTargetValue.h"
+#include "Formations.h"
 #include "ItemUsageValue.h"
+#include "LastSaidValue.h"
 
 namespace ai
 {
@@ -138,11 +140,16 @@ namespace ai
             creators["lfg proposal"] = &ValueContext::lfg_proposal;
             creators["bag space"] = &ValueContext::bag_space;
             creators["enemy healer target"] = &ValueContext::enemy_healer_target;
+            creators["formation"] = &ValueContext::formation;
             creators["item usage"] = &ValueContext::item_usage;
+            creators["speed"] = &ValueContext::speed;
+            creators["last said"] = &ValueContext::last_said;
+            creators["last emote"] = &ValueContext::last_emote;
         }
 
     private:
         static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }
+        static UntypedValue* formation(PlayerbotAI* ai) { return new FormationValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }
         static UntypedValue* invalid_target(PlayerbotAI* ai) { return new InvalidTargetValue(ai); }
         static UntypedValue* balance(PlayerbotAI* ai) { return new BalancePercentValue(ai); }
@@ -218,5 +225,8 @@ namespace ai
         static UntypedValue* lfg_proposal(PlayerbotAI* ai) { return new LfgProposalValue(ai); }
         static UntypedValue* bag_space(PlayerbotAI* ai) { return new BagSpaceValue(ai); }
         static UntypedValue* enemy_healer_target(PlayerbotAI* ai) { return new EnemyHealerTargetValue(ai); }
+        static UntypedValue* speed(PlayerbotAI* ai) { return new SpeedValue(ai); }
+        static UntypedValue* last_said(PlayerbotAI* ai) { return new LastSaidValue(ai); }
+        static UntypedValue* last_emote(PlayerbotAI* ai) { return new LastEmoteValue(ai); }
     };
 };

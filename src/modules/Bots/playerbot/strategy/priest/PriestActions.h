@@ -166,6 +166,9 @@ namespace ai
     BEGIN_DEBUFF_ACTION(CastDevouringPlagueAction, "devouring plague")
     END_SPELL_ACTION()
 
+    BEGIN_DEBUFF_ACTION(CastVampiricTouchAction, "vampiric touch")
+    END_SPELL_ACTION()
+
     BEGIN_RANGED_SPELL_ACTION(CastMindBlastAction, "mind blast")
     END_SPELL_ACTION()
 
@@ -221,9 +224,23 @@ namespace ai
 		CastResurrectionAction(PlayerbotAI* ai) : ResurrectPartyMemberAction(ai, "resurrection") {}
 	};
 
+	class CastCircleOfHealingAction : public CastAoeHealSpellAction
+	{
+	public:
+		CastCircleOfHealingAction(PlayerbotAI* ai) : CastAoeHealSpellAction(ai, "circle of healing") {}
+	};
+
 	class CastPsychicScreamAction : public CastSpellAction
 	{
 	public:
 	    CastPsychicScreamAction(PlayerbotAI* ai) : CastSpellAction(ai, "psychic scream") {}
 	};
+
+	class CastDispersionAction : public CastSpellAction
+	{
+	public:
+	    CastDispersionAction(PlayerbotAI* ai) : CastSpellAction(ai, "dispersion") {}
+	    virtual string GetTargetName() { return "self target"; }
+	};
+
 }

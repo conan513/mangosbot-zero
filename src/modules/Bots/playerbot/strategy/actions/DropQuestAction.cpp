@@ -8,13 +8,29 @@ using namespace ai;
 bool DropQuestAction::Execute(Event event)
 {
     string link = event.getParam();
-
-    PlayerbotChatHandler ch(bot);
-    if (!ch.dropQuest(link))
-    {
-        ostringstream out; out << "Could not drop quest: " << link;
-        ai->TellMaster(out);
+    if (!GetMaster())
         return false;
+
+    PlayerbotChatHandler handler(GetMaster());
+    uint32 entry = handler.extractQuestId(link);
+    if (!entry)
+        return false;
+
+    Quest const* quest = sObjectMgr.GetQuestTemplate(entry);
+    if (!quest)
+        return false;
+
+    // remove all quest entries for 'entry' from quest log
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 logQuest = bot->GetQuestSlotQuestId(slot);
+        if (logQuest == entry)
+        {
+            bot->SetQuestSlot(slot, 0);
+
+            // we ignore unequippable quest items in this case, its' still be equipped
+            bot->TakeQuestSourceItem(logQuest, false);
+        }
     }
 
     ai->TellMaster("Quest removed");
