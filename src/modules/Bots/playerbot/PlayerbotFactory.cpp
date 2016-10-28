@@ -1024,22 +1024,22 @@ void PlayerbotFactory::InitAvailableSpells()
         if (!trainer_spells)
             continue;
 
-        for (TrainerSpellMap::const_iterator itr =  trainer_spells->spellList.begin(); itr !=  trainer_spells->spellList.end(); ++itr)
-        {
-            TrainerSpell const* tSpell = &itr->second;
+		for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
+		{
+			TrainerSpell const* tSpell = &itr->second;
 
-            if (!tSpell)
-                continue;
+			if (!tSpell)
+				continue;
 
-            uint32 reqLevel = 0;
+			uint32 reqLevel = 0;
 
-            reqLevel = tSpell->isProvidedReqLevel ? tSpell->reqLevel : std::max(reqLevel, tSpell->reqLevel);
-            TrainerSpellState state = bot->GetTrainerSpellState(tSpell, reqLevel);
-            if (state != TRAINER_SPELL_GREEN)
-                continue;
+			reqLevel = tSpell->isProvidedReqLevel ? tSpell->reqLevel : std::max(reqLevel, tSpell->reqLevel);
+			TrainerSpellState state = bot->GetTrainerSpellState(tSpell, reqLevel);
+			if (state != TRAINER_SPELL_GREEN)
+				continue;
 
-            ai->CastSpell(tSpell->spell, bot);
-        }
+			bot->learnSpell(tSpell->spell, false);
+		}
     }
 }
 
