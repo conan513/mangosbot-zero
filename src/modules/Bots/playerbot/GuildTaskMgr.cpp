@@ -617,6 +617,8 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
 
     uint32 owner = (uint32)ownerPlayer->GetGUID();
 	Guild *guild = sGuildMgr.GetGuildById(ownerPlayer->GetGuildId());
+	if (!guild)
+		return;
 
     sLog.outDebug("%s / %s: checking guild task",
 			guild->GetName().c_str(), ownerPlayer->GetName());
