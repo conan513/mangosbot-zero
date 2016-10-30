@@ -144,6 +144,12 @@ void PlayerbotAI::UpdateAI(uint32 elapsed)
         }
     }
 
+    Pet* pet = bot->GetPet();
+    if (pet && pet->getPetType() == HUNTER_PET)
+    {
+        pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+    }
+
     if (nextAICheckDelay > sPlayerbotAIConfig.maxWaitForMove && bot->IsInCombat() && !bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
     {
         nextAICheckDelay = sPlayerbotAIConfig.maxWaitForMove;

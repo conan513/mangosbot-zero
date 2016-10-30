@@ -41,6 +41,7 @@ void PlayerbotFactory::Refresh()
     InitAmmo();
     InitFood();
     InitPotions();
+    InitPet();
 
     uint32 money = urand(level * 1000, level * 5 * 1000);
     if (bot->GetMoney() < money)
@@ -202,8 +203,9 @@ void PlayerbotFactory::InitPet()
 
             uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
             CreatureCreatePos pos(map, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation());
+            uint32 pet_number = sObjectMgr.GeneratePetNumber();
             pet = new Pet(HUNTER_PET);
-            if (!pet->Create(guid, pos, co, 0))
+            if (!pet->Create(guid, pos, co, pet_number))
             {
                 delete pet;
                 pet = NULL;
@@ -214,15 +216,31 @@ void PlayerbotFactory::InitPet()
             pet->SetCreatorGuid(bot->GetObjectGuid());
             pet->setFaction(bot->getFaction());
             pet->SetLevel(bot->getLevel());
+            pet->SetLoyaltyLevel(BEST_FRIEND);
+            pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+            pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
+            pet->AIM_Initialize();
+            pet->InitPetCreateSpells();
             bot->SetPet(pet);
+            bot->SetPetGuid(pet->GetGUID());
 
             sLog.outDebug(  "Bot %s: assign pet %d (%d level)", bot->GetName(), co->Entry, bot->getLevel());
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+            bot->PetSpellInitialize();
             break;
         }
     }
 
-    if (!pet)
+    pet = bot->GetPet();
+    if (pet)
+    {
+        pet->InitStatsForLevel(bot->getLevel());
+        pet->SetLevel(bot->getLevel());
+        pet->SetLoyaltyLevel(BEST_FRIEND);
+        pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
+        pet->SetHealth(pet->GetMaxHealth());
+    }
+    else
     {
         sLog.outError("Cannot create pet for bot %s", bot->GetName());
         return;
@@ -884,12 +902,16 @@ bool PlayerbotFactory::CanEquipUnseenItem(uint8 slot, uint16 &dest, uint32 item)
     return false;
 }
 
+#define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
 void PlayerbotFactory::InitTradeSkills()
 {
     for (int i = 0; i < sizeof(tradeSkills) / sizeof(uint32); ++i)
     {
         bot->SetSkill(tradeSkills[i], 0, 0, 0);
     }
+
+    bot->SetUInt32Value(PLAYER_SKILL_INDEX(0), 0);
+    bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
 
     vector<uint32> firstSkills;
     vector<uint32> secondSkills;
@@ -966,26 +988,26 @@ void PlayerbotFactory::InitSkills()
     SetRandomSkill(SKILL_FIST_WEAPONS);
 
     if (bot->getLevel() >= 70)
-        bot->SetSkill(SKILL_RIDING, 0, 300, 300);
+        bot->SetSkill(SKILL_RIDING, 300, 300);
     else if (bot->getLevel() >= 60)
-        bot->SetSkill(SKILL_RIDING, 0, 225, 225);
+        bot->SetSkill(SKILL_RIDING, 225, 225);
     else if (bot->getLevel() >= 40)
-        bot->SetSkill(SKILL_RIDING, 0, 150, 150);
+        bot->SetSkill(SKILL_RIDING, 150, 150);
     else if (bot->getLevel() >= 20)
-        bot->SetSkill(SKILL_RIDING, 0, 75, 75);
+        bot->SetSkill(SKILL_RIDING, 75, 75);
     else
-        bot->SetSkill(SKILL_RIDING, 0, 0, 0);
+        bot->SetSkill(SKILL_RIDING, 0, 0);
 
     uint32 skillLevel = bot->getLevel() < 40 ? 0 : 1;
     switch (bot->getClass())
     {
     case CLASS_WARRIOR:
     case CLASS_PALADIN:
-        bot->SetSkill(SKILL_PLATE_MAIL, 0, skillLevel, skillLevel);
+        bot->SetSkill(SKILL_PLATE_MAIL, skillLevel, skillLevel);
         break;
     case CLASS_SHAMAN:
     case CLASS_HUNTER:
-        bot->SetSkill(SKILL_MAIL, 0, skillLevel, skillLevel);
+        bot->SetSkill(SKILL_MAIL, skillLevel, skillLevel);
     }
 }
 
@@ -993,7 +1015,7 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 {
     uint32 maxValue = level * 5;
     uint32 curValue = urand(maxValue - level, maxValue);
-    bot->SetSkill(id, 0, curValue, maxValue);
+    bot->SetSkill(id, curValue, maxValue);
 
 }
 
