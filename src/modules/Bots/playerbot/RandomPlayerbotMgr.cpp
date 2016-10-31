@@ -532,7 +532,7 @@ vector<uint32> RandomPlayerbotMgr::GetFreeBots(bool alliance)
             )))
                 guids.push_back(guid);
         } while (result->NextRow());
-		delete results;
+		delete result;
 	}
 
 
