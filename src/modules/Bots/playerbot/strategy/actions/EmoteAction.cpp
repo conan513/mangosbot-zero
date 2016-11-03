@@ -264,6 +264,12 @@ void EmoteAction::InitEmotes()
     textEmotes["enemy"] = TEXTEMOTE_ENEMY;
     textEmotes["eyebrow"] = TEXTEMOTE_EYEBROW;
     textEmotes["toast"] = TEXTEMOTE_TOAST;
+    textEmotes["oom"] = 323;
+    textEmotes["follow"] = 324;
+    textEmotes["wait"] = 325;
+    textEmotes["healme"] = 326;
+    textEmotes["openfire"] = 327;
+    textEmotes["helpme"] = 303;
 }
 
 
