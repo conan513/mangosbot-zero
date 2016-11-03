@@ -43,6 +43,7 @@ const char DurabilityCostsfmt[] = "niiiiiiiiiiiiiiiiiiiiiiiiiiiii";
 const char DurabilityQualityfmt[] = "nf";
 const char EmotesEntryfmt[] = "nxxxixx";
 const char EmotesTextEntryfmt[] = "nxixxxxxxxxxxxxxxxx";
+char const EmotesTextSoundEntryfmt[] = "niiii";
 const char FactionEntryfmt[] = "niiiiiiiiiiiiiiiiiissssssssxxxxxxxxxx";
 const char FactionTemplateEntryfmt[] = "niiiiiiiiiiiii";
 const char GameObjectDisplayInfofmt[] = "nsxxxxxxxxxx";
