@@ -62,6 +62,12 @@ bool AttackAction::Attack(Unit* target)
         if (verbose) ai->TellMaster(msg.str());
         return false;
     }
+    if (target->IsDead())
+    {
+        msg << " is dead";
+        if (verbose) ai->TellMaster(msg.str());
+        return false;
+    }
 
     if (bot->IsMounted())
     {
