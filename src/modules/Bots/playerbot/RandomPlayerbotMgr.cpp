@@ -10,12 +10,14 @@
 #include "Player.h"
 #include "AiFactory.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotCommandServer.h"
 
 INSTANTIATE_SINGLETON_1(RandomPlayerbotMgr);
 
 
 RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
 {
+    sPlayerbotCommandServer.Start();
 }
 
 RandomPlayerbotMgr::~RandomPlayerbotMgr()
@@ -235,7 +237,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
 			terrain->IsUnderWater(x, y, z) ||
 			terrain->IsInWater(x, y, z))
 			continue;
-		
+
         float ground = map->GetHeight(x, y, z + 0.5f);
         if (ground <= INVALID_HEIGHT)
             continue;

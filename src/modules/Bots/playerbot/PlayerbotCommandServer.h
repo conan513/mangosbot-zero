@@ -5,4 +5,22 @@
 #include "PlayerbotAIBase.h"
 #include "PlayerbotMgr.h"
 
+using namespace std;
+
+class PlayerbotCommandServer
+{
+public:
+    PlayerbotCommandServer() {}
+    virtual ~PlayerbotCommandServer() {}
+    static PlayerbotCommandServer& instance()
+    {
+        static PlayerbotCommandServer instance;
+        return instance;
+    }
+
+    void Start();
+};
+
+#define sPlayerbotCommandServer PlayerbotCommandServer::instance()
+
 #endif
