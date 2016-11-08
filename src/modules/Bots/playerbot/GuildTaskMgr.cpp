@@ -378,7 +378,9 @@ uint32 GuildTaskMgr::GetMaxItemTaskCount(uint32 itemId)
     if (!proto)
         return 0;
 
-    if (proto->Quality < ITEM_QUALITY_RARE && proto->Stackable && proto->GetMaxStackSize() > 1)
+    if (proto->Quality == ITEM_QUALITY_NORMAL && proto->Stackable && proto->GetMaxStackSize() > 1)
+        return urand(2, 4) * proto->GetMaxStackSize();
+    else if (proto->Quality < ITEM_QUALITY_RARE && proto->Stackable && proto->GetMaxStackSize() > 1)
         return proto->GetMaxStackSize();
     else if (proto->Stackable && proto->GetMaxStackSize() > 1)
         return urand(1 + proto->GetMaxStackSize() / 4, proto->GetMaxStackSize());
@@ -543,14 +545,44 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
                 if (type == "killTask")
                 {
                     CreatureInfo const* proto = sObjectMgr.GetCreatureTemplate(value);
-                    string rank = proto->Rank == CREATURE_ELITE_RARE ? "rare" : "elite";
-                    if (proto) name << " (" << proto->Name << "," << rank << ")";
+                    if (proto)
+                    {
+                        name << " (" << proto->Name << ",";
+                        switch (proto->Rank)
+                        {
+                        case CREATURE_ELITE_RARE:
+                            name << "rare";
+                            break;
+                        case CREATURE_ELITE_RAREELITE:
+                            name << "rare elite";
+                            break;
+                        }
+                        name << ")";
+                    }
                 }
                 else if (type == "itemTask")
                 {
                     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(value);
-                    string rank = proto->Quality == ITEM_QUALITY_UNCOMMON ? "uncommon" : "rare";
-                    if (proto) name << " (" << proto->Name1 << "," << rank << ")";
+                    if (proto)
+                    {
+                        name << " (" << proto->Name1 << ",";
+                        switch (proto->Quality)
+                        {
+                        case ITEM_QUALITY_UNCOMMON:
+                            name << "green";
+                            break;
+                        case ITEM_QUALITY_NORMAL:
+                            name << "white";
+                            break;
+                        case ITEM_QUALITY_RARE:
+                            name << "blue";
+                            break;
+                        case ITEM_QUALITY_EPIC:
+                            name << "epic";
+                            break;
+                        }
+                        name << ")";
+                    }
                 }
 
                 sLog.outString("Player '%s' Guild '%s' %s=%s (%u secs)",
@@ -616,7 +648,7 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
         return;
 
     uint32 owner = (uint32)ownerPlayer->GetGUID();
-	Guild *guild = sGuildMgr.GetGuildById(ownerPlayer->GetGuildId());
+	Guild *guild = sGuildMgr.GetGuildById(bot->GetGuildId());
 	if (!guild)
 		return;
 
@@ -697,7 +729,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         body << "Many thanks,\n";
         body << guild->GetName() << "\n";
         body << leader->GetName() << "\n";
-        rewardType = RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP;
+        rewardType = proto->Quality > ITEM_QUALITY_NORMAL ? RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_BLUE : RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_GREEN;
     }
     else if (killTask)
     {

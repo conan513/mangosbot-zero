@@ -21,7 +21,7 @@ public:
                 proto->Bonding == BIND_WHEN_USE)
             return false;
 
-        if (proto->Quality < ITEM_QUALITY_UNCOMMON)
+        if (proto->Quality < ITEM_QUALITY_NORMAL)
             return false;
 
         if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Quality >= ITEM_QUALITY_RARE)
@@ -37,7 +37,7 @@ public:
 class RandomItemGuildTaskRewardPredicate : public RandomItemPredicate
 {
 public:
-    RandomItemGuildTaskRewardPredicate(bool equip) { this->equip = equip; }
+    RandomItemGuildTaskRewardPredicate(bool equip, bool rare) { this->equip = equip; this->rare = rare;}
 
     virtual bool Apply(ItemPrototype const* proto)
     {
@@ -46,30 +46,41 @@ public:
                 proto->Bonding == BIND_WHEN_USE)
             return false;
 
-        if (proto->Quality < ITEM_QUALITY_RARE)
-            return false;
-
         if (proto->Class == ITEM_CLASS_QUEST)
             return false;
 
-        if (equip && (proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON))
-            return true;
+        if (equip)
+        {
+            uint32 desiredQuality = rare ? ITEM_QUALITY_RARE : ITEM_QUALITY_UNCOMMON;
+            if (proto->Quality < desiredQuality)
+                return false;
 
-        if (!equip && (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_CONSUMABLE))
-            return true;
+            if (proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON)
+                return true;
+        }
+        else
+        {
+            if (proto->Quality < ITEM_QUALITY_UNCOMMON)
+                return false;
+
+            if (proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_CONSUMABLE)
+                return true;
+        }
 
         return false;
     }
 
 private:
     bool equip;
+    bool rare;
 };
 
 RandomItemMgr::RandomItemMgr()
 {
     predicates[RANDOM_ITEM_GUILD_TASK] = new RandomItemGuildTaskPredicate();
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP] = new RandomItemGuildTaskRewardPredicate(true);
-    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_TRADE] = new RandomItemGuildTaskRewardPredicate(false);
+    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_GREEN] = new RandomItemGuildTaskRewardPredicate(true, false);
+    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_EQUIP_BLUE] = new RandomItemGuildTaskRewardPredicate(true, true);
+    predicates[RANDOM_ITEM_GUILD_TASK_REWARD_TRADE] = new RandomItemGuildTaskRewardPredicate(false, false);
 }
 
 RandomItemMgr::~RandomItemMgr()
