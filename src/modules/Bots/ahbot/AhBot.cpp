@@ -958,6 +958,10 @@ int32 AhBot::GetSellPrice(ItemPrototype const* proto)
         if (!category->Contains(proto))
             continue;
 
+        vector<uint32> items = availableItems.Get(category);
+        if (find(items.begin(), items.end(), proto->ItemId) == items.end())
+            continue;
+
         for (int auction = 0; auction < MAX_AUCTIONS; auction++)
         {
             int32 price = (int32)category->GetPricingStrategy()->GetSellPrice(proto, auctionIds[auction]);
@@ -982,6 +986,10 @@ int32 AhBot::GetBuyPrice(ItemPrototype const* proto)
     {
         Category* category = CategoryList::instance[i];
         if (!category->Contains(proto))
+            continue;
+
+        vector<uint32> items = availableItems.Get(category);
+        if (find(items.begin(), items.end(), proto->ItemId) == items.end())
             continue;
 
         for (int auction = 0; auction < MAX_AUCTIONS; auction++)
