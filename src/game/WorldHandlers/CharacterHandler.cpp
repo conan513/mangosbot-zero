@@ -142,13 +142,18 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(QueryResult * dummy, SqlQuery
         allowed = true;
 
     if (allowed)
+    {
         OnBotLogin(bot);
-    else if (masterSession)
+        return;
+    }
+
+    if (masterSession)
     {
         ChatHandler ch(masterSession);
-        ch.PSendSysMessage("You are not allowed to control bot %s...", bot->GetName());
-        LogoutPlayerBot(bot->GetGUID());
+        ch.PSendSysMessage("You are not allowed to control bot %s", bot->GetName());
     }
+    LogoutPlayerBot(bot->GetGUID());
+    sLog.outError("Attempt to add not allowed bot %s, please try to reset all random bots", bot->GetName());
 }
 #endif
 
