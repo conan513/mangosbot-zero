@@ -354,9 +354,13 @@ bool GuildTaskMgr::SendThanks(uint32 owner, uint32 guildId)
         ostringstream body;
         body << "Hello, " << player->GetName() << ",\n";
         body << "\n";
-        body << "One of our guild members wishes to thank you for the " << proto->Name1 << "! If we have another ";
+        body << "One of our guild members wishes to thank you for the " << proto->Name1 << "!";
         uint32 count = GetTaskValue(owner, guildId, "itemCount");
-        body << count << " of them that would help us tremendously.\n";
+        if (count)
+        {
+            body << " If we have another ";
+            body << count << " of them that would help us tremendously.\n";
+        }
         body << "\n";
         body << "Thanks again,\n";
         body << guild->GetName() << "\n";
@@ -466,11 +470,11 @@ uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, string type, uin
 
 uint32 GuildTaskMgr::SetTaskValue(uint32 owner, uint32 guildId, string type, uint32 value, uint32 validIn)
 {
-    CharacterDatabase.PExecute("delete from ai_playerbot_guild_tasks where owner = '%u' and guildid = '%u' and `type` = '%s'",
+    CharacterDatabase.DirectPExecute("delete from ai_playerbot_guild_tasks where owner = '%u' and guildid = '%u' and `type` = '%s'",
             owner, guildId, type.c_str());
     if (value)
     {
-        CharacterDatabase.PExecute(
+        CharacterDatabase.DirectPExecute(
                 "insert into ai_playerbot_guild_tasks (owner, guildid, `time`, validIn, `type`, `value`) values ('%u', '%u', '%u', '%u', '%s', '%u')",
                 owner, guildId, (uint32)time(0), validIn, type.c_str(), value);
     }
@@ -664,6 +668,11 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
         return;
     }
 
+    uint32 count = GetTaskValue(owner, guildId, "itemCount");
+    if (!count) {
+        return;
+    }
+
     if (byMail)
     {
         ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
@@ -675,19 +684,20 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
                 sPlayerbotAIConfig.maxGuildTaskRewardTime);
     }
 
-    uint32 count = GetTaskValue(owner, guildId, "itemCount");
     if (obtained >= count)
     {
         sLog.outDebug("%s / %s: guild task complete",
 				guild->GetName().c_str(), ownerPlayer->GetName());
         SetTaskValue(owner, guildId, "reward", 1,
                 urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime));
+        SetTaskValue(owner, guildId, "itemCount", 0, 0);
+        SetTaskValue(owner, guildId, "thanks", 0, 0);
         ChatHandler(ownerPlayer->GetSession()).PSendSysMessage("You have completed a guild task");
     }
     else
     {
-        sLog.outDebug("%s / %s: guild task progress",
-				guild->GetName().c_str(), ownerPlayer->GetName());
+        sLog.outDebug("%s / %s: guild task progress %u/%u",
+				guild->GetName().c_str(), ownerPlayer->GetName(), obtained, count);
         SetTaskValue(owner, guildId, "itemCount", count - obtained, sPlayerbotAIConfig.maxGuildTaskChangeTime);
         SetTaskValue(owner, guildId, "thanks", 1,
                 urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime));
