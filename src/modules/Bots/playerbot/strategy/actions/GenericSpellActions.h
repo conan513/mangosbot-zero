@@ -130,7 +130,7 @@ namespace ai
 			range = sPlayerbotAIConfig.spellDistance;
 		}
 
-        virtual bool isUseful();
+        virtual bool isPossible();
         virtual string GetTargetName() { return "self target"; }
 	};
 
