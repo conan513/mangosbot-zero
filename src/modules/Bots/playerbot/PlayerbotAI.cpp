@@ -894,16 +894,16 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     {
         targets.setSource(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     }
+    else if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
+    {
+        spell->m_CastItem = aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
+        targets.setItemTarget(spell->m_CastItem);
+    }
     else
     {
         targets.setUnitTarget(target);
     }
 
-    if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
-    {
-        spell->m_CastItem = aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
-        targets.setItemTarget(spell->m_CastItem);
-    }
 
     if (pSpellInfo->Effect[0] == SPELL_EFFECT_OPEN_LOCK ||
         pSpellInfo->Effect[0] == SPELL_EFFECT_SKINNING)
