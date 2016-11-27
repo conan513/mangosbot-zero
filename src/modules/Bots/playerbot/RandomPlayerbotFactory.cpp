@@ -324,6 +324,7 @@ string RandomPlayerbotFactory::CreateRandomGuildName()
 
     Field *fields = result->Fetch();
     uint32 maxId = fields[0].GetUInt32();
+    delete result;
 
     uint32 id = urand(0, maxId);
     result = CharacterDatabase.PQuery("SELECT n.name FROM ai_playerbot_guild_names n "
