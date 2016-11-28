@@ -51,3 +51,7 @@ endif()
 if(BUILD_TOOLS)
     add_subdirectory(tools)
 endif()
+
+if(TESTS)
+  add_subdirectory(test)
+endif(TESTS)

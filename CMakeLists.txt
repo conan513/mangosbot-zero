@@ -53,6 +53,7 @@ option(SCRIPT_LIB_ELUNA     "Compile with support for Eluna scripts"        ON)
 option(SCRIPT_LIB_SD3       "Compile with support for ScriptDev3 scripts"   ON)
 option(PLAYERBOTS           "Enable Player Bots"                            OFF)
 option(SOAP                 "Enable remote access via SOAP"                 OFF)
+option(TESTS                "Build AI CppUnit Tests"                        OFF)
 # Hidden option to enable/disable PCH. DEV ONLY!
 set(PCH ON)
 
