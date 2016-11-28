@@ -96,14 +96,6 @@ void GenericMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     RangedCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
-        "remove curse",
-        NextAction::array(0, new NextAction("remove curse", 41.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "remove curse on party",
-        NextAction::array(0, new NextAction("remove curse on party", 40.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "enemy too close for spell",
         NextAction::array(0, new NextAction("frost nova", 50.0f), NULL)));
 
@@ -134,4 +126,16 @@ void GenericMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "low mana",
         NextAction::array(0, new NextAction("evocation", ACTION_EMERGENCY + 5), NULL)));
+}
+
+void MageCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+{
+    triggers.push_back(new TriggerNode(
+        "remove curse",
+        NextAction::array(0, new NextAction("remove curse", 41.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "remove curse on party",
+        NextAction::array(0, new NextAction("remove curse on party", 40.0f), NULL)));
+
 }

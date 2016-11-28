@@ -55,6 +55,7 @@ protected:
 
     void dispel()
     {
+        engine->addStrategy("cure");
         tick();
 
 		tickWithAuraToDispel(DISPEL_CURSE);

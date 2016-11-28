@@ -41,7 +41,14 @@ void GenericPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "party member low health",
         NextAction::array(0, new NextAction("power word: shield on party", 50.0f), new NextAction("greater heal on party", 50.0f), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "medium threat",
+        NextAction::array(0, new NextAction("psychic scream", 50.0f), NULL)));
 
+}
+
+void PriestCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+{
     triggers.push_back(new TriggerNode(
         "dispel magic",
         NextAction::array(0, new NextAction("dispel magic", 41.0f), NULL)));
@@ -58,10 +65,4 @@ void GenericPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member cure disease",
         NextAction::array(0, new NextAction("abolish disease on party", 30.0f), NULL)));
-
-
-    triggers.push_back(new TriggerNode(
-        "medium threat",
-        NextAction::array(0, new NextAction("psychic scream", 50.0f), NULL)));
-
 }

@@ -15,7 +15,9 @@ class HealShamanTestCase : public EngineTestBase
     CPPUNIT_TEST( buff );
     CPPUNIT_TEST( interruptSpell );
 	CPPUNIT_TEST( dispel );
-	//CPPUNIT_TEST( cure );
+	CPPUNIT_TEST( cureCurse );
+	CPPUNIT_TEST( cureDisease );
+	CPPUNIT_TEST( curePoison );
 	CPPUNIT_TEST( lowMana );
 	CPPUNIT_TEST( range );
 	CPPUNIT_TEST( aoe );
@@ -93,31 +95,47 @@ protected:
 		assertActions(">T:purge");
 	}
 
-	void cure()
+	void cureCurse()
 	{
+	    engine->addStrategy("cure");
 		tickWithAuraToDispel(DISPEL_CURSE);
-        tickWithAuraToDispel(DISPEL_CURSE);
 
+		spellAvailable("cleanse spirit");
+        tickWithPartyAuraToDispel(DISPEL_CURSE);
+
+		assertActions(">S:cleanse spirit>P:cleanse spirit curse on party");
+	}
+
+	void cureDisease()
+	{
+        engine->addStrategy("cure");
 		tickWithAuraToDispel(DISPEL_DISEASE);
         tickWithAuraToDispel(DISPEL_DISEASE);
+        spellUnavailable("cleanse spirit");
 
-		tickWithAuraToDispel(DISPEL_POISON);
+        spellAvailable("cleanse spirit");
+        spellAvailable("cure disease");
+        tickWithPartyAuraToDispel(DISPEL_DISEASE);
+        tickWithPartyAuraToDispel(DISPEL_DISEASE);
+
+		assertActions(">S:cure disease>S:cleanse spirit>P:cure disease on party>P:cleanse spirit disease on party");
+	}
+
+    void curePoison()
+    {
+        engine->addStrategy("cure");
+        tickWithAuraToDispel(DISPEL_POISON);
+        spellUnavailable("cleanse spirit");
         tickWithAuraToDispel(DISPEL_POISON);
 
         spellAvailable("cleanse spirit");
-        tickWithPartyAuraToDispel(DISPEL_CURSE);
-        tickWithPartyAuraToDispel(DISPEL_CURSE);
-
-        spellAvailable("cleanse spirit");
-		tickWithPartyAuraToDispel(DISPEL_DISEASE);
-        tickWithPartyAuraToDispel(DISPEL_DISEASE);
-
-        spellAvailable("cleanse spirit");
-		tickWithPartyAuraToDispel(DISPEL_POISON);
+        spellAvailable("cure poison");
+        tickWithPartyAuraToDispel(DISPEL_POISON);
+        spellUnavailable("cleanse spirit");
         tickWithPartyAuraToDispel(DISPEL_POISON);
 
-		assertActions(">S:cleanse spirit>S:cleanse spirit>S:cleanse spirit>P:cleanse spirit curse on party>P:cleanse spirit disease on party>P:cleanse spirit poison on party");
-	}
+        assertActions(">S:cleanse spirit>S:cure poison>P:cleanse spirit poison on party>P:cure poison on party");
+    }
 
 	void lowMana()
 	{

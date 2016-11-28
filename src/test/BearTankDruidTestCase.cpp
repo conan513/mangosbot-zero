@@ -152,6 +152,7 @@ protected:
     }
     void curePoison()
     {
+        engine->addStrategy("cure");
         tick();
         addAura("dire bear form");
 

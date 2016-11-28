@@ -158,6 +158,7 @@ protected:
 
     void cureKind(DispelType type)
     {
+        engine->addStrategy("cure");
         spellAvailable("cleanse");
         tickWithAuraToDispel(type);
 

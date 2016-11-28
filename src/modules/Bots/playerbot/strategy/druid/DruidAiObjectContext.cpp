@@ -28,6 +28,7 @@ namespace ai
                 creators["caster aoe"] = &druid::StrategyFactoryInternal::caster_aoe;
                 creators["caster debuff"] = &druid::StrategyFactoryInternal::caster_debuff;
                 creators["dps debuff"] = &druid::StrategyFactoryInternal::caster_debuff;
+                creators["cure"] = &druid::StrategyFactoryInternal::cure;
             }
 
         private:
@@ -35,6 +36,7 @@ namespace ai
             static Strategy* cat_aoe(PlayerbotAI* ai) { return new CatAoeDruidStrategy(ai); }
             static Strategy* caster_aoe(PlayerbotAI* ai) { return new CasterDruidAoeStrategy(ai); }
             static Strategy* caster_debuff(PlayerbotAI* ai) { return new CasterDruidDebuffStrategy(ai); }
+            static Strategy* cure(PlayerbotAI* ai) { return new DruidCureStrategy(ai); }
         };
 
         class DruidStrategyFactoryInternal : public NamedObjectContext<Strategy>

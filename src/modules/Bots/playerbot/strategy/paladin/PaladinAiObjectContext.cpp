@@ -24,10 +24,12 @@ namespace ai
             StrategyFactoryInternal()
             {
                 creators["nc"] = &paladin::StrategyFactoryInternal::nc;
+                creators["cure"] = &paladin::StrategyFactoryInternal::cure;
             }
 
         private:
             static Strategy* nc(PlayerbotAI* ai) { return new GenericPaladinNonCombatStrategy(ai); }
+            static Strategy* cure(PlayerbotAI* ai) { return new PaladinCureStrategy(ai); }
         };
 
         class ResistanceStrategyFactoryInternal : public NamedObjectContext<Strategy>

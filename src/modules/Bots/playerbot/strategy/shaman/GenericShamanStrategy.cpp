@@ -142,22 +142,6 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"bloodlust",
 		NextAction::array(0, new NextAction("bloodlust", 30.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cure poison",
-        NextAction::array(0, new NextAction("cure poison", 21.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cure poison",
-        NextAction::array(0, new NextAction("cure poison on party", 21.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cure disease",
-        NextAction::array(0, new NextAction("cure disease", 31.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cure disease",
-        NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -172,4 +156,50 @@ void ShamanBuffManaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "water shield",
         NextAction::array(0, new NextAction("water shield", 22.0f), NULL)));
+}
+
+void ShamanCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+{
+    triggers.push_back(new TriggerNode(
+        "cure poison",
+        NextAction::array(0, new NextAction("cure poison", 21.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member cure poison",
+        NextAction::array(0, new NextAction("cure poison on party", 21.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "cleanse spirit poison",
+        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member cleanse spirit poison",
+        NextAction::array(0, new NextAction("cleanse spirit poison on party", 23.0f), NULL)));
+
+
+    triggers.push_back(new TriggerNode(
+        "cure disease",
+        NextAction::array(0, new NextAction("cure disease", 31.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member cure disease",
+        NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "cleanse spirit disease",
+        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member cleanse spirit disease",
+        NextAction::array(0, new NextAction("cleanse spirit disease on party", 23.0f), NULL)));
+
+
+    triggers.push_back(new TriggerNode(
+        "cleanse spirit curse",
+        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member cleanse spirit curse",
+        NextAction::array(0, new NextAction("cleanse spirit curse on party", 23.0f), NULL)));
+
 }

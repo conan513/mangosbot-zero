@@ -125,6 +125,7 @@ protected:
 
 	void curePoison()
 	{
+	    engine->addStrategy("cure");
 		tickWithAuraToDispel(DISPEL_POISON);
 
 		spellAvailable("abolish poison");

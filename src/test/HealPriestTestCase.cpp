@@ -155,6 +155,7 @@ protected:
 
     void dispel()
     {
+        engine->addStrategy("cure");
         tick(); // shoot
 
 		tickWithAuraToDispel(DISPEL_MAGIC);
