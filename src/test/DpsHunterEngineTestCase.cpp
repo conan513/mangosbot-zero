@@ -59,7 +59,7 @@ protected:
         tick();
 		tickWithSpellAvailable("auto shot");
 
-		assertActions(">S:aspect of the hawk>T:hunter's mark>T:black arrow>T:serpent sting>T:explosive shot>T:auto shot>T:wing clip>S:flee>T:concussive shot>T:wyvern sting>T:chimera shot>T:auto shot>T:arcane shot");
+		assertActions(">S:aspect of the hawk>T:hunter's mark>T:black arrow>T:serpent sting>T:explosive shot>T:auto shot>T:wing clip>S:flee>T:aimed shot>T:auto shot>T:chimera shot>T:auto shot>T:arcane shot");
 
 	}
 
