@@ -7,7 +7,7 @@ using namespace ai;
 
 bool RememberTaxiAction::Execute(Event event)
 {
-    
+
 
     WorldPacket p(event.getPacket());
     p.rpos(0);
@@ -26,8 +26,8 @@ bool RememberTaxiAction::Execute(Event event)
     case CMSG_ACTIVATETAXIEXPRESS:
         {
             ObjectGuid guid;
-            uint32 node_count;
-            p >> guid >> node_count;
+            uint32 node_count, totalcost;
+            p >> guid >> totalcost >> node_count;
 
             LastMovement& movement = context->GetValue<LastMovement&>("last movement")->Get();
             movement.taxiNodes.clear();
