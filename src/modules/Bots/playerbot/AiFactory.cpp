@@ -219,11 +219,16 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     int tab = GetPlayerSpecTab(player);
 
     switch (player->getClass()){
+        case CLASS_PRIEST:
+            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+            break;
         case CLASS_PALADIN:
             if (tab == 1)
                 nonCombatEngine->addStrategies("bthreat", "tank aoe", NULL);
             else
                 nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
+
+            nonCombatEngine->addStrategies("cure", NULL);
             break;
         case CLASS_HUNTER:
             nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
@@ -234,7 +239,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             else
                 nonCombatEngine->addStrategy("bdps");
 
-            nonCombatEngine->addStrategy("dps assist");
+            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
             break;
         case CLASS_MAGE:
             if (tab == 1)
@@ -242,13 +247,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             else
                 nonCombatEngine->addStrategy("bmana");
 
-            nonCombatEngine->addStrategy("dps assist");
+            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
             break;
         case CLASS_DRUID:
             if (tab == 1)
                 nonCombatEngine->addStrategy("tank aoe");
             else
-                nonCombatEngine->addStrategy("dps assist");
+                nonCombatEngine->addStrategies("dps assist", "cure", NULL);
             break;
         case CLASS_WARRIOR:
             if (tab == 2)
@@ -261,7 +266,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
     }
     nonCombatEngine->addStrategies("nc", "food", "stay", "chat",
-            "default", "quest", "loot", "gather", "duel", "emote", "lfg", "cure", NULL);
+            "default", "quest", "loot", "gather", "duel", "emote", "lfg", NULL);
 
     if (sRandomPlayerbotMgr.IsRandomBot(player))
     {
