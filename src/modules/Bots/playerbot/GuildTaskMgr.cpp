@@ -773,10 +773,10 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
 
 void GuildTaskMgr::CheckKillTask(Player* player, Unit* victim)
 {
-    Group *group = player->GetGroup();
+	Group *group = player->GetGroup();
     if (group)
     {
-        for (GroupReference *gr = group->GetFirstMember(); gr->hasNext(); gr = gr->next())
+        for (GroupReference *gr = group->GetFirstMember(); gr; gr = gr->next())
         {
             CheckKillTaskInternal(gr->getSource(), victim);
         }
@@ -808,6 +808,17 @@ void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
                 guild->GetName().c_str(), player->GetName());
         SetTaskValue(owner, guildId, "reward", 1,
                 urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime));
+
+        Group *group = player->GetGroup();
+        if (group)
+        {
+            for (GroupReference *gr = group->GetFirstMember(); gr; gr = gr->next())
+            {
+                Player *member = gr->getSource();
+                if (member != player)
+                    ChatHandler(member->GetSession()).PSendSysMessage("%s has completed a guild task", player->GetName());
+            }
+        }
         ChatHandler(player->GetSession()).PSendSysMessage("You have completed a guild task");
     }
 }
