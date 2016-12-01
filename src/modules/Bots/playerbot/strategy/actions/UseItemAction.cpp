@@ -73,9 +73,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
     if (bot->IsNonMeleeSpellCasted(true))
         return false;
 
-    if (bot->IsInCombat())
-        return false;
-
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
     uint8 cast_count = 1;
