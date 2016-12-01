@@ -183,5 +183,6 @@ protected:
     PacketHandlingHelper masterOutgoingPacketHandlers;
     CompositeChatFilter chatFilter;
     PlayerbotSecurity security;
+    map<string, time_t> whispers;
 };
 

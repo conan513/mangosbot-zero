@@ -207,6 +207,7 @@ void PlayerbotAI::Reset()
 
     currentEngine = engines[BOT_STATE_NON_COMBAT];
     nextAICheckDelay = 0;
+    whispers.clear();
 
     aiObjectContext->GetValue<Unit*>("old target")->Set(NULL);
     aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
@@ -659,7 +660,12 @@ bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securit
             (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.whisperDistance))
         return false;
 
-    bot->Whisper(text, LANG_UNIVERSAL, master->GetGUID());
+    time_t lastSaid = whispers[text];
+    if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
+    {
+        whispers[text] = time(0);
+        bot->Whisper(text, LANG_UNIVERSAL, master->GetGUID());
+    }
     return true;
 }
 
