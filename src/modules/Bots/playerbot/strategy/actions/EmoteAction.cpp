@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "EmoteAction.h"
 
+#include "../../PlayerbotAIConfig.h"
 using namespace ai;
 
 map<string, uint32> EmoteAction::emotes;
@@ -276,5 +277,5 @@ void EmoteAction::InitEmotes()
 bool EmoteAction::isUseful()
 {
     time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
-    return (time(0) - lastEmote) > 30;
+    return (time(0) - lastEmote) >= sPlayerbotAIConfig.maxWaitForMove / 1000;
 }

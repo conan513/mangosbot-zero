@@ -138,9 +138,9 @@ namespace ai
         static Trigger* not_dps_target_active(PlayerbotAI* ai) { return new NotDpsTargetActiveTrigger(ai); }
         static Trigger* has_nearest_adds(PlayerbotAI* ai) { return new HasNearestAddsTrigger(ai); }
         static Trigger* enemy_player_is_attacking(PlayerbotAI* ai) { return new EnemyPlayerIsAttacking(ai); }
-        static Trigger* Random(PlayerbotAI* ai) { return new RandomTrigger(ai); }
-        static Trigger* seldom(PlayerbotAI* ai) { return new SeldomTrigger(ai); }
-        static Trigger* often(PlayerbotAI* ai) { return new OftenTrigger(ai); }
+        static Trigger* Random(PlayerbotAI* ai) { return new RandomTrigger(ai, "random", 7); }
+        static Trigger* seldom(PlayerbotAI* ai) { return new RandomTrigger(ai, "seldom", 15); }
+        static Trigger* often(PlayerbotAI* ai) { return new RandomTrigger(ai, "often", 5); }
         static Trigger* EnemyOutOfMelee(PlayerbotAI* ai) { return new EnemyOutOfMeleeTrigger(ai); }
         static Trigger* EnemyOutOfSpell(PlayerbotAI* ai) { return new EnemyOutOfSpellRangeTrigger(ai); }
         static Trigger* enemy_too_close_for_spell(PlayerbotAI* ai) { return new EnemyTooCloseForSpellTrigger(ai); }
