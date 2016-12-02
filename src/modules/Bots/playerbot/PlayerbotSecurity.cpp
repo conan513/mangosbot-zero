@@ -182,6 +182,13 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
         break;
     }
 
-	bot->Whisper(out.str(), LANG_UNIVERSAL, from->GetGUID());
+    string text = out.str();
+    uint64 guid = from->GetGUID();
+    time_t lastSaid = whispers[guid][text];
+    if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
+    {
+        whispers[guid][text] = time(0);
+        bot->Whisper(text, LANG_UNIVERSAL, guid);
+    }
     return false;
 }

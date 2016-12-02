@@ -37,6 +37,7 @@ class PlayerbotSecurity
     private:
         Player* const bot;
         uint32 account;
+        map<uint64, map<string, time_t> > whispers;
 };
 
 #endif
