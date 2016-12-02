@@ -11,6 +11,7 @@ class NonCombatEngineTestCase2 : public MockedAiObjectContextTestCase
 {
   CPPUNIT_TEST_SUITE( NonCombatEngineTestCase2 );
       CPPUNIT_TEST( emote );
+      CPPUNIT_TEST( suggest );
       CPPUNIT_TEST( ready_check );
       CPPUNIT_TEST( reveal );
   CPPUNIT_TEST_SUITE_END();
@@ -27,9 +28,17 @@ protected:
     {
         engine->addStrategy("emote");
         tickWithTrigger("random");
+        tickWithTrigger("random");
+
+        assertActions(">S:emote>S:suggest trade");
+    }
+
+    void suggest()
+    {
+        engine->addStrategy("emote");
         tickWithTrigger("seldom");
 
-        assertActions(">S:emote>S:suggest what to do");
+        assertActions(">S:suggest what to do");
     }
 
     void ready_check()
