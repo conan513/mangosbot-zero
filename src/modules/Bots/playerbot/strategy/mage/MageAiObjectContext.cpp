@@ -157,6 +157,8 @@ namespace ai
                 creators["counterspell"] = &AiObjectContextInternal::counterspell;
                 creators["remove curse"] = &AiObjectContextInternal::remove_curse;
                 creators["remove curse on party"] = &AiObjectContextInternal::remove_curse_on_party;
+                creators["remove lesser curse"] = &AiObjectContextInternal::remove_lesser_curse;
+                creators["remove lesser curse on party"] = &AiObjectContextInternal::remove_lesser_curse_on_party;
                 creators["icy veins"] = &AiObjectContextInternal::icy_veins;
                 creators["combustion"] = &AiObjectContextInternal::combustion;
                 creators["ice block"] = &AiObjectContextInternal::ice_block;
@@ -196,6 +198,8 @@ namespace ai
             static Action* counterspell(PlayerbotAI* ai) { return new CastCounterspellAction(ai); }
             static Action* remove_curse(PlayerbotAI* ai) { return new CastRemoveCurseAction(ai); }
             static Action* remove_curse_on_party(PlayerbotAI* ai) { return new CastRemoveCurseOnPartyAction(ai); }
+            static Action* remove_lesser_curse(PlayerbotAI* ai) { return new CastRemoveLesserCurseAction(ai); }
+            static Action* remove_lesser_curse_on_party(PlayerbotAI* ai) { return new CastRemoveLesserCurseOnPartyAction(ai); }
             static Action* icy_veins(PlayerbotAI* ai) { return new CastIcyVeinsAction(ai); }
             static Action* combustion(PlayerbotAI* ai) { return new CastCombustionAction(ai); }
             static Action* ice_block(PlayerbotAI* ai) { return new CastIceBlockAction(ai); }

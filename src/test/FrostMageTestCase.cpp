@@ -57,15 +57,17 @@ protected:
         tick();
 
 		tickWithAuraToDispel(DISPEL_CURSE);
-
 		spellAvailable("remove curse");
 		tickWithPartyAuraToDispel(DISPEL_CURSE);
 
-        tick();
+        tickWithAuraToDispel(DISPEL_CURSE);
+		spellAvailable("remove lesser curse");
+		tickWithPartyAuraToDispel(DISPEL_CURSE);
 
+        tick();
 		tickWithTargetAuraToDispel(DISPEL_MAGIC);
 
-		assertActions(">T:frostbolt>S:remove curse>P:remove curse on party>T:shoot>T:spellsteal");
+		assertActions(">T:frostbolt>S:remove curse>P:remove curse on party>S:remove lesser curse>P:remove lesser curse on party>T:shoot>T:spellsteal");
     }
 
     void boost()

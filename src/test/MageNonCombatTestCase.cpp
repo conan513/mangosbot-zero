@@ -12,7 +12,6 @@ class MageNonCombatTestCase : public EngineTestBase
     CPPUNIT_TEST( buff );
     CPPUNIT_TEST( bdps );
     CPPUNIT_TEST( bmana );
-    CPPUNIT_TEST( dispel );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -68,19 +67,6 @@ protected:
         assertActions(">S:molten armor>S:mage armor>S:ice armor>S:frost armor");
     }
 
-    void dispel()
-    {
-        addAura("arcane intellect");
-        addPartyAura("arcane intellect");
-        addAura("mage armor");
-
-        tickWithAuraToDispel(DISPEL_CURSE);
-
-        spellAvailable("remove curse");
-        tickWithPartyAuraToDispel(DISPEL_CURSE);
-
-        assertActions(">S:remove curse>P:remove curse on party");
-    }
 
 };
 

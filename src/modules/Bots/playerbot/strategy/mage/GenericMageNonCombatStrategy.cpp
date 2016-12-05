@@ -62,14 +62,6 @@ void GenericMageNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigger
 	triggers.push_back(new TriggerNode(
 		"no food",
 		NextAction::array(0, new NextAction("conjure food", 15.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "remove curse",
-        NextAction::array(0, new NextAction("remove curse", 41.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "remove curse on party",
-        NextAction::array(0, new NextAction("remove curse on party", 40.0f), NULL)));
 }
 
 void MageBuffManaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
