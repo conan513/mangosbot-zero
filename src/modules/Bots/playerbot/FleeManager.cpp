@@ -83,6 +83,8 @@ void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
 
             if (point->isReasonable())
                 points.push_back(point);
+            else
+                delete point;
         }
 	}
 }
