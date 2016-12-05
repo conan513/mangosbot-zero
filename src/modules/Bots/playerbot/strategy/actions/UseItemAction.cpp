@@ -19,8 +19,8 @@ bool UseItemAction::Execute(Event event)
         if (items.size() > 1)
         {
             list<Item*>::iterator i = items.begin();
-            Item* itemTarget = *i++;
-            Item* item = *i;
+            Item* item = *i++;
+            Item* itemTarget = *i;
             return UseItemOnItem(item, itemTarget);
         }
         else if (!items.empty())
