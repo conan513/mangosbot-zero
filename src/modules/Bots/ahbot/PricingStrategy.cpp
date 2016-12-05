@@ -17,7 +17,7 @@ uint32 PricingStrategy::GetSellPrice(ItemPrototype const* proto, uint32 auctionH
         GetItemPriceMultiplier(proto, now, auctionHouse) *
         sAhBotConfig.GetSellPriceMultiplier(category->GetName()) *
         GetDefaultSellPrice(proto);
-    return (uint32)price;
+    return RoundPrice(price);
 }
 
 double PricingStrategy::GetMarketPrice(uint32 itemId, uint32 auctionHouse)
@@ -31,7 +31,7 @@ double PricingStrategy::GetMarketPrice(uint32 itemId, uint32 auctionHouse)
         delete results;
     }
 
-    return marketPrice;
+    return RoundPrice(marketPrice);
 }
 
 uint32 PricingStrategy::GetBuyPrice(ItemPrototype const* proto, uint32 auctionHouse)
@@ -49,7 +49,7 @@ uint32 PricingStrategy::GetBuyPrice(ItemPrototype const* proto, uint32 auctionHo
         GetItemPriceMultiplier(proto, untilTime, auctionHouse) *
         sAhBotConfig.GetBuyPriceMultiplier(category->GetName()) *
         GetDefaultBuyPrice(proto);
-    return (uint32)price;
+    return RoundPrice(price);
 }
 
 string PricingStrategy::ExplainSellPrice(ItemPrototype const* proto, uint32 auctionHouse)
@@ -226,3 +226,19 @@ uint32 BuyOnlyRarePricingStrategy::GetBuyPrice(ItemPrototype const* proto, uint3
     return PricingStrategy::GetBuyPrice(proto, auctionHouse);
 }
 
+uint32 PricingStrategy::RoundPrice(double price)
+{
+    if (price < 100) {
+        return (uint32) price;
+    }
+
+    if (price < 10000) {
+        return (uint32) (price / 100.0) * 100;
+    }
+
+    if (price < 100000) {
+        return (uint32) (price / 1000.0) * 1000;
+    }
+
+    return (uint32) (price / 10000.0) * 10000;
+}
