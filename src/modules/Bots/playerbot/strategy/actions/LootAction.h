@@ -32,8 +32,6 @@ namespace ai
     public:
         StoreLootAction(PlayerbotAI* ai) : MovementAction(ai, "store loot") {}
         virtual bool Execute(Event event);
-
-    protected:
-        bool IsLootAllowed(uint32 itemid);
+        static bool IsLootAllowed(uint32 itemid, PlayerbotAI *ai);
     };
 }

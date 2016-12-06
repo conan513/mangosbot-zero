@@ -8,6 +8,7 @@
 #include "../../RandomPlayerbotMgr.h"
 #include "../values/ItemUsageValue.h"
 #include "../../GuildTaskMgr.h"
+#include "../values/LootStrategyValue.h"
 
 using namespace ai;
 
@@ -244,7 +245,7 @@ bool StoreLootAction::Execute(Event event)
 		if (lootslot_type != LOOT_SLOT_NORMAL)
 			continue;
 
-        if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid))
+        if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, ai))
             continue;
 
         if (sRandomPlayerbotMgr.IsRandomBot(bot))
@@ -289,12 +290,10 @@ bool StoreLootAction::Execute(Event event)
     return true;
 }
 
-bool StoreLootAction::IsLootAllowed(uint32 itemid)
+bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
 {
-    LootStrategy lootStrategy = AI_VALUE(LootStrategy, "loot strategy");
-
-    if (lootStrategy == LOOTSTRATEGY_ALL)
-        return true;
+    AiObjectContext *context = ai->GetAiObjectContext();
+    LootStrategy* lootStrategy = AI_VALUE(LootStrategy*, "loot strategy");
 
     set<uint32>& lootItems = AI_VALUE(set<uint32>&, "always loot list");
     if (lootItems.find(itemid) != lootItems.end())
@@ -305,7 +304,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid)
         return false;
 
     uint32 max = proto->MaxCount;
-    if (max > 0 && bot->HasItemCount(itemid, max, true))
+    if (max > 0 && ai->GetBot()->HasItemCount(itemid, max, true))
         return false;
 
     if (proto->StartQuest ||
@@ -314,25 +313,5 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid)
         proto->Class == ITEM_CLASS_QUEST)
         return true;
 
-    if (lootStrategy == LOOTSTRATEGY_QUEST)
-        return false;
-
-    ostringstream out; out << itemid;
-    ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
-    if (usage == ITEM_USAGE_SKILL || usage == ITEM_USAGE_USE || usage == ITEM_USAGE_GUILD_TASK)
-        return true;
-
-    if (lootStrategy == LOOTSTRATEGY_SKILL)
-        return false;
-
-    if (proto->Quality == ITEM_QUALITY_POOR)
-        return true;
-
-    if (lootStrategy == LOOTSTRATEGY_GRAY)
-        return true;
-
-    if (proto->Bonding == BIND_WHEN_PICKED_UP)
-        return false;
-
-    return true;
+    return lootStrategy->CanLoot(proto, context);
 }

@@ -4,13 +4,12 @@ using namespace std;
 
 namespace ai
 {
-    enum LootStrategy
+    class LootStrategy
     {
-        LOOTSTRATEGY_QUEST = 1,
-        LOOTSTRATEGY_SKILL = 2,
-        LOOTSTRATEGY_GRAY = 3,
-        LOOTSTRATEGY_NORMAL = 4,
-        LOOTSTRATEGY_ALL = 5
+    public:
+        LootStrategy() {}
+        virtual bool CanLoot(ItemPrototype const *proto, AiObjectContext *context) = 0;
+        virtual string GetName() = 0;
     };
 
     class LootObject

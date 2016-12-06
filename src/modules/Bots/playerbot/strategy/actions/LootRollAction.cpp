@@ -40,7 +40,7 @@ bool LootRollAction::Execute(Event event)
                     vote = ROLL_NEED;
                 break;
             default:
-                if (IsLootAllowed(itemId))
+                if (IsLootAllowed(itemId, bot->GetPlayerbotAI()))
                     vote = ROLL_NEED;
                 break;
             }
