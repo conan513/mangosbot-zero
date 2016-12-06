@@ -20,6 +20,7 @@
 #include "SpellAuras.h"
 #include "../AhBot/ahbot.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotDbStore.h"
 
 using namespace ai;
 using namespace std;
@@ -163,7 +164,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
     ExternalEventHelper helper(aiObjectContext);
     while (!chatCommands.empty())
     {
-        ChatCommandHolder holder = chatCommands.top();
+        ChatCommandHolder holder = chatCommands.front();
         string command = holder.GetCommand();
         Player* owner = holder.GetOwner();
         if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
@@ -445,6 +446,24 @@ void PlayerbotAI::ChangeStrategy(string names, BotState type)
     e->ChangeStrategy(names);
 }
 
+void PlayerbotAI::ClearStrategies(BotState type)
+{
+    Engine* e = engines[type];
+    if (!e)
+        return;
+
+    e->removeAllStrategies();
+}
+
+list<string> PlayerbotAI::GetStrategies(BotState type)
+{
+    Engine* e = engines[type];
+    if (!e)
+        return list<string>();
+
+    return e->GetStrategies();
+}
+
 void PlayerbotAI::DoSpecificAction(string name)
 {
     for (int i = 0 ; i < BOT_STATE_MAX; i++)
@@ -515,6 +534,7 @@ void PlayerbotAI::ResetStrategies()
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
+    sPlayerbotDbStore.Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)
