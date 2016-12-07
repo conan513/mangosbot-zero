@@ -31,6 +31,13 @@ namespace ai
         virtual bool Calculate();
     };
 
+    class PetIsDeadValue : public BoolCalculatedValue
+    {
+    public:
+        PetIsDeadValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
+        virtual bool Calculate();
+    };
+
     class RageValue : public Uint8CalculatedValue, public Qualified
     {
     public:

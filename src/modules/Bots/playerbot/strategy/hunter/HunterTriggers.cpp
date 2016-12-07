@@ -16,10 +16,8 @@ bool HunterNoStingsActiveTrigger::IsActive()
 
 bool HuntersPetDeadTrigger::IsActive()
 {
-    Unit* pet = AI_VALUE(Unit*, "pet target");
-    return pet && AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
+    return AI_VALUE(bool, "pet dead") && !AI_VALUE2(bool, "mounted", "self target");
 }
-
 
 bool HuntersPetLowHealthTrigger::IsActive()
 {

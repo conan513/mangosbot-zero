@@ -355,9 +355,9 @@ void EngineTestBase::tickWithPetLowHealth(int amount)
 
 void EngineTestBase::tickWithPetDead()
 {
-    set<bool>("dead", "pet target", true);
+    set<bool>("pet dead", true);
     tick();
-    set<bool>("dead", "pet target", false);
+    set<bool>("pet dead", false);
 }
 
 void EngineTestBase::tickWithLowMana(int amount)

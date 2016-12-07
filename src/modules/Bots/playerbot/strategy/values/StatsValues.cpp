@@ -17,13 +17,16 @@ bool IsDeadValue::Calculate()
     Unit* target = GetTarget();
     if (!target)
         return false;
-    if (target == bot->GetPet())
-    {
-        PetDatabaseStatus status = Pet::GetStatusFromDB(bot);
-        if (status == PET_DB_DEAD)
-            return true;
-    }
     return target->GetDeathState() != ALIVE;
+}
+
+bool PetIsDeadValue::Calculate()
+{
+    PetDatabaseStatus status = Pet::GetStatusFromDB(bot);
+    if (status == PET_DB_DEAD)
+        return true;
+
+    return bot->GetPet() && bot->GetPet()->GetDeathState() != ALIVE;
 }
 
 
