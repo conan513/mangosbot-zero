@@ -32,19 +32,12 @@ bool LootRollAction::Execute(Event event)
             if (!proto)
                 continue;
 
-            switch (proto->Class)
+            QueryItemUsage(proto);
+            if (IsLootAllowed(itemId, bot->GetPlayerbotAI()))
             {
-            case ITEM_CLASS_WEAPON:
-            case ITEM_CLASS_ARMOR:
-                if (QueryItemUsage(proto))
-                    vote = ROLL_NEED;
-                break;
-            default:
-                if (IsLootAllowed(itemId, bot->GetPlayerbotAI()))
-                    vote = ROLL_NEED;
+                vote = ROLL_NEED;
                 break;
             }
-            break;
         }
     }
 
