@@ -28,14 +28,14 @@ public:
             return "";
 
         bool dps = message.find("@dps") == 0;
-        if (dps && ai->IsTank(bot))
+        if (dps && (ai->IsTank(bot) || ai->IsHeal(bot)))
             return "";
 
         bool heal = message.find("@heal") == 0;
         if (heal && !ai->IsHeal(bot))
             return "";
 
-        if (tank || dps)
+        if (tank || dps || heal)
             return ChatFilter::Filter(message);
 
         return message;
