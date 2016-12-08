@@ -1415,7 +1415,7 @@ void PlayerbotFactory::InitInventorySkill()
         StoreItem(6219, 1); // Arclight Spanner
     }
     if (bot->HasSkill(SKILL_ENCHANTING)) {
-        StoreItem(44452, 1); // Runed Titanium Rod
+        StoreItem(16207, 1); // Runed Arcanite Rod
     }
     if (bot->HasSkill(SKILL_SKINNING)) {
         StoreItem(7005, 1); // Skinning Knife
