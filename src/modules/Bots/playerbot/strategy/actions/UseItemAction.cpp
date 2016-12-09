@@ -81,8 +81,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
     uint8 unk_flags = 0;
 
     WorldPacket* const packet = new WorldPacket(CMSG_USE_ITEM, 1 + 1 + 1 + 4 + 8 + 4 + 1 + 8 + 1);
-    *packet << bagIndex << slot << cast_count << uint32(0) << item_guid
-        << glyphIndex << unk_flags;
+    *packet << bagIndex << slot << cast_count;
 
     bool targetSelected = false;
     ostringstream out; out << "Using " << chat->formatItem(item->GetProto());
@@ -100,7 +99,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
         GameObject* go = ai->GetGameObject(goGuid);
         if (go && go->isSpawned())
         {
-            uint32 targetFlag = TARGET_FLAG_UNIT;
+            uint16 targetFlag = TARGET_FLAG_OBJECT;
             *packet << targetFlag;
             packet->appendPackGUID(goGuid.GetRawValue());
             out << " on " << chat->formatGameobject(go);
@@ -110,7 +109,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
 
     if (itemTarget)
     {
-        uint32 targetFlag = TARGET_FLAG_ITEM;
+        uint16 targetFlag = TARGET_FLAG_ITEM;
         *packet << targetFlag;
         packet->appendPackGUID(itemTarget->GetGUID());
         out << " on " << chat->formatItem(itemTarget->GetProto());
@@ -126,7 +125,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
 			Unit* unit = ai->GetUnit(masterSelection);
 			if (unit)
 			{
-				uint32 targetFlag = TARGET_FLAG_UNIT;
+			    uint16 targetFlag = TARGET_FLAG_UNIT;
 				*packet << targetFlag << masterSelection.WriteAsPacked();
 				out << " on " << unit->GetName();
 				targetSelected = true;
@@ -182,13 +181,13 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
                 if (selfOnly)
                     return false;
 
-                *packet << TARGET_FLAG_TRADE_ITEM << (uint8)1 << (uint64)TRADE_SLOT_NONTRADED;
+                *packet << (uint16)TARGET_FLAG_TRADE_ITEM << (uint8)1 << (uint64)TRADE_SLOT_NONTRADED;
                 targetSelected = true;
                 out << " on traded item";
             }
             else
             {
-                *packet << TARGET_FLAG_ITEM;
+                *packet << (uint16)TARGET_FLAG_ITEM;
                 packet->appendPackGUID(itemForSpell->GetGUID());
                 targetSelected = true;
                 out << " on "<< chat->formatItem(itemForSpell->GetProto());
@@ -198,9 +197,9 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
             ai->WaitForSpellCast(spell);
             delete spell;
         }
-        else
+        else if (!goGuid && !itemTarget)
         {
-            *packet << TARGET_FLAG_SELF;
+            *packet << (uint16)TARGET_FLAG_SELF;
             targetSelected = true;
             out << " on self";
         }
