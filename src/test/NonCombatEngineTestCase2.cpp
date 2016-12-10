@@ -14,6 +14,7 @@ class NonCombatEngineTestCase2 : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( suggest );
       CPPUNIT_TEST( ready_check );
       CPPUNIT_TEST( reveal );
+      CPPUNIT_TEST( gather );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -56,6 +57,17 @@ protected:
 
         assertActions(">S:reveal gathering item");
     }
-};
+
+
+    void gather()
+    {
+        engine->addStrategy("stay");
+        engine->addStrategy("gather");
+        engine->addStrategy("loot");
+
+        tickWithTrigger("timer");
+
+        assertActions(">S:add gathering loot");
+    }};
 
 CPPUNIT_TEST_SUITE_REGISTRATION( NonCombatEngineTestCase2 );
