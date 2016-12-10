@@ -16,7 +16,6 @@ class NonCombatEngineTestCase : public EngineTestBase
       CPPUNIT_TEST( grindIfNoMana );
       CPPUNIT_TEST( loot );
       CPPUNIT_TEST( loot_failed );
-      CPPUNIT_TEST( gather );
       CPPUNIT_TEST( runaway );
       CPPUNIT_TEST( passive );
       CPPUNIT_TEST( movementStrategies );
@@ -120,23 +119,6 @@ protected:
         tick();
 
         assertActions(">S:loot>S:move to loot>S:open loot>S:open loot");
-    }
-
-    void gather()
-    {
-		engine->addStrategy("stay");
-		engine->addStrategy("gather");
-		engine->addStrategy("loot");
-
-		set<list<ObjectGuid>>("possible targets", list<ObjectGuid>());
-		tick();
-
-        tickWithLootAvailable();
-
-        set<bool>("can loot", true);
-        tick();
-
-        assertActions(">S:add gathering loot>S:loot>S:open loot");
     }
 
     void eatDrink()

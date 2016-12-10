@@ -26,10 +26,12 @@ bool MovementAction::MoveNear(WorldObject* target, float distance)
     float followAngle = GetFollowAngle();
     for (float angle = followAngle; angle <= followAngle + 2 * M_PI; angle += M_PI / 4)
     {
-        bool moved = MoveTo(target->GetMapId(),
-            target->GetPositionX() + cos(angle) * distance,
-            target->GetPositionY()+ sin(angle) * distance,
-            target->GetPositionZ());
+        float x = target->GetPositionX() + cos(angle) * distance,
+             y = target->GetPositionY()+ sin(angle) * distance,
+             z = target->GetPositionZ();
+        if (!bot->IsWithinLOS(x, y, z))
+            continue;
+        bool moved = MoveTo(target->GetMapId(), x, y, z);
         if (moved)
             return true;
     }
@@ -38,7 +40,9 @@ bool MovementAction::MoveNear(WorldObject* target, float distance)
 
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z)
 {
-    bot->UpdateGroundPositionZ(x, y, z);
+    if (!bot->IsUnderWater())
+        bot->UpdateGroundPositionZ(x, y, z);
+
     if (!IsMovingAllowed(mapId, x, y, z))
         return false;
 
@@ -335,7 +339,8 @@ bool MoveToLootAction::Execute(Event event)
     if (!loot.IsLootPossible(bot))
         return false;
 
-    return MoveNear(loot.GetWorldObject(bot));
+    WorldObject *wo = loot.GetWorldObject(bot);
+    return MoveNear(wo);
 }
 
 bool MoveOutOfEnemyContactAction::Execute(Event event)

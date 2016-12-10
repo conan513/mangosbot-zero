@@ -3,6 +3,14 @@
 #include "AddLootAction.h"
 
 #include "../../LootObjectStack.h"
+#include "../../PlayerbotAIConfig.h"
+
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "CellImpl.h"
+
+using namespace ai;
+using namespace MaNGOS;
 
 using namespace ai;
 
@@ -49,7 +57,11 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 {
     LootObject loot(bot, guid);
 
-    if (loot.IsEmpty() || !loot.GetWorldObject(bot))
+    WorldObject *wo = loot.GetWorldObject(bot);
+    if (loot.IsEmpty() || !wo)
+        return false;
+
+    if (!bot->IsWithinLOSInMap(wo))
         return false;
 
     if (loot.skillId == SKILL_NONE)
@@ -57,6 +69,21 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
 
     if (!loot.IsLootPossible(bot))
         return false;
+
+    if (bot->GetDistance2d(wo) > sPlayerbotAIConfig.tooCloseDistance)
+    {
+        list<Unit*> targets;
+        MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, sPlayerbotAIConfig.lootDistance);
+        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+        Cell::VisitAllObjects(wo, searcher, sPlayerbotAIConfig.spellDistance);
+        if (!targets.empty())
+        {
+            ostringstream out;
+            out << "Kill that " << targets.front()->GetName() << " so I can loot freely";
+            ai->TellMaster(out.str());
+            return false;
+        }
+    }
 
     return AddAllLootAction::AddLoot(guid);
 }

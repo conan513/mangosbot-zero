@@ -1,6 +1,7 @@
 #include "../botpch.h"
 #include "LootObjectStack.h"
 #include "playerbot.h"
+#include "PlayerbotAIConfig.h"
 
 using namespace ai;
 using namespace std;
@@ -141,6 +142,9 @@ bool LootObject::IsLootPossible(Player* bot)
     PlayerbotAI* ai = bot->GetPlayerbotAI();
 
     if (reqItem && !bot->HasItemCount(reqItem, 1))
+        return false;
+
+    if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
         return false;
 
     if (skillId == SKILL_NONE)

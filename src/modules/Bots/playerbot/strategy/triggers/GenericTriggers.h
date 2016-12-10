@@ -395,10 +395,23 @@ namespace ai
     class TimerTrigger : public Trigger
     {
     public:
-        TimerTrigger(PlayerbotAI* ai, int checkInterval = 5) : Trigger(ai, "timer", checkInterval) {}
+        TimerTrigger(PlayerbotAI* ai) : Trigger(ai, "timer")
+        {
+            lastCheck = 0;
+        }
 
     public:
-        virtual bool IsActive() { return true; }
+        virtual bool IsActive()
+        {
+            if (time(0) != lastCheck)
+            {
+                lastCheck = time(0);
+                return true;
+            }
+        }
+
+    private:
+        time_t lastCheck;
     };
 
 	class TankAoeTrigger : public NoAttackersTrigger
