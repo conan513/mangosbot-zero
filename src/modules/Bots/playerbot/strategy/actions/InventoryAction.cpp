@@ -220,7 +220,7 @@ list<Item*> InventoryAction::parseItems(string text)
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    FindUsableNamedItemVisitor visitor(bot, text);
+    FindNamedItemVisitor visitor(bot, text);
     IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
     found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
 
