@@ -74,8 +74,9 @@ void Engine::Reset()
     do
     {
         action = queue.Pop();
+        if (!action) break;
         delete action;
-    } while (action);
+    } while (true);
 
     for (list<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
@@ -214,6 +215,10 @@ bool Engine::DoNextAction(Unit* unit, int depth)
 
     if (!actionExecuted)
         LogAction("no actions executed");
+
+    queue.RemoveExpired();
+    if (queue.Size() > 10)
+        sLog.outError("Queue Size=%d", queue.Size());
 
     return actionExecuted;
 }
