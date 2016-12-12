@@ -217,9 +217,6 @@ bool Engine::DoNextAction(Unit* unit, int depth)
         LogAction("no actions executed");
 
     queue.RemoveExpired();
-    if (queue.Size() > 10)
-        sLog.outError("Queue Size=%d", queue.Size());
-
     return actionExecuted;
 }
 
