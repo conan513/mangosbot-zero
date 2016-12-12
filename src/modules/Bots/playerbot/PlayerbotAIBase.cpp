@@ -26,10 +26,12 @@ void PlayerbotAIBase::UpdateAI(uint32 elapsed)
 void PlayerbotAIBase::SetNextCheckDelay(const uint32 delay)
 {
     if (nextAICheckDelay < delay)
-        nextAICheckDelay = delay;
+        sLog.outDebug("Setting lesser delay %d -> %d", nextAICheckDelay, delay);
+
+    nextAICheckDelay = delay;
 
     if (nextAICheckDelay > sPlayerbotAIConfig.globalCoolDown)
-        sLog.outDetail( "set next check delay: %d", nextAICheckDelay);
+        sLog.outDebug( "set next check delay: %d", nextAICheckDelay);
 }
 
 void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
@@ -37,7 +39,7 @@ void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
     nextAICheckDelay += delay;
 
     if (nextAICheckDelay > sPlayerbotAIConfig.globalCoolDown)
-        sLog.outDetail( "increase next check delay: %d", nextAICheckDelay);
+        sLog.outDebug( "increase next check delay: %d", nextAICheckDelay);
 }
 
 bool PlayerbotAIBase::CanUpdateAI()
