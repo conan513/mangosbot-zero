@@ -895,15 +895,18 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     SpellCastTargets targets;
     WorldObject* faceTo = target;
 
-    if (pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION ||
-            pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-    {
-        targets.setSource(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
-    }
-    else if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
+    if (pSpellInfo->Targets & TARGET_FLAG_ITEM)
     {
         spell->m_CastItem = aiObjectContext->GetValue<Item*>("item for spell", spellId)->Get();
         targets.setItemTarget(spell->m_CastItem);
+    }
+    else if (pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+    {
+        targets.setDestination(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+    }
+    else if (pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+    {
+        targets.setDestination(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
     }
     else
     {
