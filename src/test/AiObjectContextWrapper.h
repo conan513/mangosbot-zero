@@ -96,6 +96,12 @@ namespace ai
         MockUnitListValue(PlayerbotAI* const ai) : ManualSetValue<list<ObjectGuid>>(ai, list<ObjectGuid>()) {}
     };
 
+    class MockPositionValue : public ManualSetValue<WorldLocation>
+    {
+    public:
+        MockPositionValue(PlayerbotAI* const ai) : ManualSetValue<WorldLocation>(ai, WorldLocation()) {}
+    };
+
     class MockSpellIdValue : public CalculatedValue<uint32>, public Qualified
     {
     public:
@@ -172,6 +178,9 @@ namespace ai
             creators["threat"] = &MockValueContext::stats;
             creators["bag space"] = &MockValueContext::stats;
             creators["speed"] = &MockValueContext::stats;
+
+            creators["aoe count"] = &MockValueContext::stats;
+            creators["aoe position"] = &MockValueContext::position;
         }
 
     private:
@@ -188,6 +197,7 @@ namespace ai
         static UntypedValue* party_member_to_dispel(PlayerbotAI* ai) { return new MockPartyMemberToDispel(ai); }
         static UntypedValue* units(PlayerbotAI* ai) { return new MockUnitListValue(ai); }
         static UntypedValue* spell_id(PlayerbotAI* ai) { return new MockSpellIdValue(ai); }
+        static UntypedValue* position(PlayerbotAI* ai) { return new MockPositionValue(ai); }
     };
 
     class AiObjectContextWrapper : public AiObjectContext

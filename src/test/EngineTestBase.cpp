@@ -252,6 +252,15 @@ void EngineTestBase::tickWithAttackerCount(int count)
     set<uint8>("attacker count", 1);
 }
 
+void EngineTestBase::tickWithAoeCount(int count)
+{
+    set<uint8>("aoe count", count);
+    set<uint8>("attacker count", count);
+	tick();
+    set<uint8>("aoe count", 0);
+    set<uint8>("attacker count", 1);
+}
+
 void EngineTestBase::tickWithMyAttackerCount(int count)
 {
     set<uint8>("my attacker count", count);
@@ -506,7 +515,7 @@ void EngineTestBase::runStressTest()
     std::cout << "Spell Cast:\n" << ai->buffer << "\n\n";
     CPPUNIT_ASSERT(ai->buffer.find(",,,,,,,") == string::npos);
 
-    set<uint8>("attacker count", 5);
+    set<uint8>("aoe count", 5);
     ai->buffer = "";
     ai->spellCooldowns.clear();
     ticks(count);

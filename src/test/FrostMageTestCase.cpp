@@ -105,7 +105,7 @@ protected:
         engine->addStrategy("frost aoe");
 
 		tick();
-		tickWithAttackerCount(4);
+		tickWithAoeCount(4);
 		tick();
 
 		assertActions(">T:frostbolt>T:blizzard>T:shoot");

@@ -74,13 +74,13 @@ protected:
     {
         addAura("defensive stance");
 
-		tickWithAttackerCount(3);
-		tickWithAttackerCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
 
 		spellAvailable("cleave");
-		tickWithAttackerCount(2);
-		tickWithAttackerCount(2);
-		tickWithAttackerCount(2);
+		tickWithAoeCount(2);
+		tickWithAoeCount(2);
+		tickWithAoeCount(2);
 
         assertActions(">T:shockwave>T:thunder clap>T:demoralizing shout>T:cleave>T:devastate");
     }

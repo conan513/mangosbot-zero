@@ -55,7 +55,7 @@ protected:
 
         addAura("aspect of the hawk");
         set<Unit*>("tank target", MockedTargets::GetCurrentTarget());
-        tickWithAttackerCount(7);
+        tickWithAoeCount(7);
 
         assertActions(">S:say::aoe");
     }

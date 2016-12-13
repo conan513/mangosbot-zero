@@ -87,8 +87,8 @@ protected:
     {
         engine->addStrategy("fire aoe");
 
-		tickWithAttackerCount(3);
-		tickWithAttackerCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
 
 		assertActions(">T:living bomb>T:flamestrike");
     }

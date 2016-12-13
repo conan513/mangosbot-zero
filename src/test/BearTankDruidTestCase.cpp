@@ -193,10 +193,10 @@ protected:
     {
         addAura("dire bear form");
 		tickInMeleeRange();
-		tickWithAttackerCount(2);
-		tickWithAttackerCount(3);
+		tickWithAoeCount(2);
+		tickWithAoeCount(3);
         spellAvailable("swipe (bear)");
-		tickWithAttackerCount(3);
+		tickWithAoeCount(3);
 
 		assertActions(">T:lacerate>T:swipe (bear)>T:demoralizing roar>T:swipe (bear)");
     }

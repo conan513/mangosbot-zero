@@ -42,6 +42,7 @@
 #include "HasTotemValue.h"
 #include "LeastHpTargetValue.h"
 #include "AoeHealValues.h"
+#include "AoeValues.h"
 #include "RtiValue.h"
 #include "PositionValue.h"
 #include "ThreatValues.h"
@@ -146,6 +147,9 @@ namespace ai
             creators["speed"] = &ValueContext::speed;
             creators["last said"] = &ValueContext::last_said;
             creators["last emote"] = &ValueContext::last_emote;
+
+            creators["aoe count"] = &ValueContext::aoe_count;
+            creators["aoe position"] = &ValueContext::aoe_position;
         }
 
     private:
@@ -230,5 +234,7 @@ namespace ai
         static UntypedValue* speed(PlayerbotAI* ai) { return new SpeedValue(ai); }
         static UntypedValue* last_said(PlayerbotAI* ai) { return new LastSaidValue(ai); }
         static UntypedValue* last_emote(PlayerbotAI* ai) { return new LastEmoteValue(ai); }
+        static UntypedValue* aoe_count(PlayerbotAI* ai) { return new AoeCountValue(ai); }
+        static UntypedValue* aoe_position(PlayerbotAI* ai) { return new AoePositionValue(ai); }
     };
 };

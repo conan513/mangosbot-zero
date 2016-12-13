@@ -70,9 +70,9 @@ protected:
     {
         engine->addStrategy("aoe");
 
-        tickWithAttackerCount(2);
-        tickWithAttackerCount(3);
-        tickWithAttackerCount(4);
+        tickWithAoeCount(2);
+        tickWithAoeCount(3);
+        tickWithAoeCount(4);
 
         set<Unit*>("attacker without aura", "corruption", MockedTargets::GetAttackerWithoutAura());
         tick();
