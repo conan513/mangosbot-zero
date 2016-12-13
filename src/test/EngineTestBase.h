@@ -51,6 +51,7 @@ protected:
 	void tickWithRage(int amount);
 	void tickWithEnergy(int amount);
 	void tickWithAttackerCount(int count);
+	void tickWithAoeCount(int count);
 	void tickWithMyAttackerCount(int count);
 	void tickWithLowHealth(int amount);
 	void tickWithPartyLowHealth(int amount);

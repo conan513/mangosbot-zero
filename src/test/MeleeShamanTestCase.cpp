@@ -71,9 +71,9 @@ protected:
         engine->addStrategy("melee aoe");
 
         tickInMeleeRange();
-        tickWithAttackerCount(3);
-        tickWithAttackerCount(3);
-        tickWithAttackerCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
 
         assertActions(">S:searing totem>S:strength of earth totem>S:magma totem>T:fire nova");
     }

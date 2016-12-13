@@ -11,9 +11,10 @@ bool FollowAction::Execute(Event event)
 {
     Formation* formation = AI_VALUE(Formation*, "formation");
     string target = formation->GetTargetName();
+    bool moved = false;
     if (!target.empty())
     {
-        return Follow(AI_VALUE(Unit*, target));
+        moved = Follow(AI_VALUE(Unit*, target));
     }
     else
     {
@@ -21,8 +22,11 @@ bool FollowAction::Execute(Event event)
         if (Formation::IsNullLocation(loc) || loc.mapid == -1)
             return false;
 
-        return MoveTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+        moved = MoveTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
     }
+
+    if (moved) ai->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+    return moved;
 }
 
 bool FollowAction::isUseful()

@@ -15,6 +15,7 @@ public:
 	ActionNode* Pop();
     ActionBasket* Peek();
 	int Size();
+	void RemoveExpired();
 private:
 	std::list<ActionBasket*> actions;
 };

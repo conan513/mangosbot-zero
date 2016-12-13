@@ -125,7 +125,7 @@ protected:
         engine->addStrategy("cat aoe");
 
 		tickInMeleeRange();
-		tickWithAttackerCount(3);
+		tickWithAoeCount(3);
 
 		assertActions(">T:rake>T:swipe (cat)");
     }

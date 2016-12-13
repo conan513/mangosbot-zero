@@ -157,8 +157,8 @@ protected:
     void aoe()
     {
         engine->addStrategy("caster aoe");
-        tickWithAttackerCount(4);
-        tickWithAttackerCount(4);
+        tickWithAoeCount(4);
+        tickWithAoeCount(4);
 
 		assertActions(">T:starfall>T:hurricane");
     }

@@ -112,8 +112,8 @@ protected:
 		addTargetAura("hunter's mark");
 		addTargetAura("black arrow");
 		addTargetAura("serpent sting");
-        tickWithAttackerCount(3);
-		tickWithAttackerCount(4);
+		tickWithAoeCount(3);
+		tickWithAoeCount(4);
 
         set<Unit*>("attacker without aura", "serpent sting", MockedTargets::GetAttackerWithoutAura());
         tick();

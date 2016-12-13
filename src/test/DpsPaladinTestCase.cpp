@@ -62,8 +62,8 @@ protected:
 
 		tick();
 
-		tickWithAttackerCount(3);
-		tickWithAttackerCount(3);
+		tickWithAoeCount(3);
+		tickWithAoeCount(3);
 
 		tickWithTargetLowHealth(19);
 

@@ -111,9 +111,9 @@ protected:
 
         tickInMeleeRange();
 
-        tickWithAttackerCount(3);
-        tickWithAttackerCount(3);
-        tickWithAttackerCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
+        tickWithAoeCount(3);
 
         set<Unit*>("attacker without aura", "rend", MockedTargets::GetAttackerWithoutAura());
         tickInMeleeRange();

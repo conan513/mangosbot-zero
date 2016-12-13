@@ -152,7 +152,7 @@ protected:
 
     void aoe()
     {
-        tickWithAttackerCount(3);
+        tickWithAoeCount(3);
 
         assertActions(">S:healing stream totem");
     }
