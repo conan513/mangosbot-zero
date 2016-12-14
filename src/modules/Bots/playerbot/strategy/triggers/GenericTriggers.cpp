@@ -186,7 +186,7 @@ bool IsNotFacingTargetTrigger::IsActive()
 
 bool HasCcTargetTrigger::IsActive()
 {
-    return AI_VALUE(uint8, "attacker count") > 2 && AI_VALUE2(Unit*, "cc target", getName()) &&
+    return AI_VALUE(uint8, "attacker count") > 1 && AI_VALUE2(Unit*, "cc target", getName()) &&
         !AI_VALUE2(Unit*, "current cc target", getName());
 }
 
