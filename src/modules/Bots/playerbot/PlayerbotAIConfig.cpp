@@ -51,17 +51,17 @@ bool PlayerbotAIConfig::Initialize()
 
     sightDistance = config.GetFloatDefault("AiPlayerbot.SightDistance", 50.0f);
     spellDistance = config.GetFloatDefault("AiPlayerbot.SpellDistance", 25.0f);
-    shootDistance = config.GetFloatDefault("AiPlayerbot.ShootDistance", 20.0f);
+    shootDistance = config.GetFloatDefault("AiPlayerbot.ShootDistance", 11.0f);
     reactDistance = config.GetFloatDefault("AiPlayerbot.ReactDistance", 150.0f);
     grindDistance = config.GetFloatDefault("AiPlayerbot.GrindDistance", 100.0f);
     lootDistance = config.GetFloatDefault("AiPlayerbot.LootDistance", 15.0f);
-    fleeDistance = config.GetFloatDefault("AiPlayerbot.FleeDistance", 15.0f);
+    fleeDistance = config.GetFloatDefault("AiPlayerbot.FleeDistance", 5.0f);
     tooCloseDistance = config.GetFloatDefault("AiPlayerbot.TooCloseDistance", 5.0f);
     meleeDistance = config.GetFloatDefault("AiPlayerbot.MeleeDistance", 0.5f);
     followDistance = config.GetFloatDefault("AiPlayerbot.FollowDistance", 1.5f);
     whisperDistance = config.GetFloatDefault("AiPlayerbot.WhisperDistance", 6000.0f);
     contactDistance = config.GetFloatDefault("AiPlayerbot.ContactDistance", 0.5f);
-    aoeRadius = config.GetFloatDefault("AiPlayerbot.AoeRadius", 15.0f);
+    aoeRadius = config.GetFloatDefault("AiPlayerbot.AoeRadius", 7.0f);
 
     criticalHealth = config.GetIntDefault("AiPlayerbot.CriticalHealth", 20);
     lowHealth = config.GetIntDefault("AiPlayerbot.LowHealth", 50);
