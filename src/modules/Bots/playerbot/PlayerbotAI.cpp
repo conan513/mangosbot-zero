@@ -145,7 +145,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed)
     }
 
     Pet* pet = bot->GetPet();
-    if (pet && pet->getPetType() == HUNTER_PET)
+    if (pet && pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
     {
         pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
     }
