@@ -407,17 +407,20 @@ string PlayerbotHolder::ListBots(Player* master)
     classNames[CLASS_SHAMAN] = "Shaman";
     classNames[CLASS_WARLOCK] = "Warlock";
     classNames[CLASS_WARRIOR] = "Warrior";
-    ostringstream out;
-    bool first = true;
-    out << "Bot roster: ";
+
+    map<string, string> online;
+    list<string> names;
+    map<string, string> classes;
+
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
         string name = bot->GetName();
         bots.insert(name);
 
-        if (first) first = false; else out << ", ";
-        out << "+" << name << " " << classNames[bot->getClass()];
+        names.push_back(name);
+        online[name] = "+";
+        classes[name] = classNames[bot->getClass()];
     }
 
     if (master)
@@ -433,12 +436,25 @@ string PlayerbotHolder::ListBots(Player* master)
                 string name = fields[1].GetString();
                 if (bots.find(name) == bots.end() && name != master->GetSession()->GetPlayerName())
                 {
-                    if (first) first = false; else out << ", ";
-                    out << "-" << name << " " << classNames[cls];
+                    names.push_back(name);
+                    online[name] = "-";
+                    classes[name] = classNames[cls];
                 }
             } while (results->NextRow());
 			delete results;
         }
+    }
+
+    names.sort();
+
+    ostringstream out;
+    bool first = true;
+    out << "Bot roster: ";
+    for (list<string>::iterator i = names.begin(); i != names.end(); ++i)
+    {
+        if (first) first = false; else out << ", ";
+        string name = *i;
+        out << online[name] << name << " " << classes[name];
     }
 
     return out.str();
