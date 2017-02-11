@@ -57,6 +57,7 @@
 #include "Formations.h"
 #include "ItemUsageValue.h"
 #include "LastSaidValue.h"
+#include "OutfitListValue.h"
 
 namespace ai
 {
@@ -150,6 +151,7 @@ namespace ai
 
             creators["aoe count"] = &ValueContext::aoe_count;
             creators["aoe position"] = &ValueContext::aoe_position;
+            creators["outfit list"] = &ValueContext::outfit_list_value;
         }
 
     private:
@@ -236,5 +238,6 @@ namespace ai
         static UntypedValue* last_emote(PlayerbotAI* ai) { return new LastEmoteValue(ai); }
         static UntypedValue* aoe_count(PlayerbotAI* ai) { return new AoeCountValue(ai); }
         static UntypedValue* aoe_position(PlayerbotAI* ai) { return new AoePositionValue(ai); }
+        static UntypedValue* outfit_list_value(PlayerbotAI* ai) { return new OutfitListValue(ai); }
     };
 };

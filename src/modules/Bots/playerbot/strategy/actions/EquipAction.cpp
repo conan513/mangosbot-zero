@@ -10,14 +10,17 @@ bool EquipAction::Execute(Event event)
 {
     string text = event.getParam();
     ItemIds ids = chat->parseItems(text);
+    EquipItems(ids);
+    return true;
+}
 
+void EquipAction::EquipItems(ItemIds ids)
+{
     for (ItemIds::iterator i =ids.begin(); i != ids.end(); i++)
     {
         FindItemByIdVisitor visitor(*i);
         EquipItem(&visitor);
     }
-
-    return true;
 }
 
 void EquipAction::EquipItem(FindItemVisitor* visitor)

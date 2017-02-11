@@ -62,6 +62,13 @@ void PlayerbotDbStore::Save(PlayerbotAI *ai)
     Value<LootStrategy*>* lootStrategy = ai->GetAiObjectContext()->GetValue<LootStrategy*>("loot strategy");
     ostringstream outLoot; outLoot << "ll " << lootStrategy->Get()->GetName();
     SaveValue(guid, "ll", outLoot.str());
+
+    list<string>& outfits = ai->GetAiObjectContext()->GetValue<list<string>&>("outfit list")->Get();
+    for (list<string>::iterator i = outfits.begin(); i != outfits.end(); ++i)
+    {
+        ostringstream outOutfit; outOutfit << "outfit " << *i;
+        SaveValue(guid, "outfit", outOutfit.str());
+    }
 }
 
 string PlayerbotDbStore::FormatStrategies(string type, list<string> strategies)

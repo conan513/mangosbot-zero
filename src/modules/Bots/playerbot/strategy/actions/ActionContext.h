@@ -14,8 +14,10 @@
 #include "PositionAction.h"
 #include "AttackAction.h"
 #include "CheckMailAction.h"
+#include "OutfitAction.h"
 #include "RevealGatheringItemAction.h"
 #include "SayAction.h"
+#include "OutfitAction.h"
 
 namespace ai
 {
@@ -68,6 +70,7 @@ namespace ai
             creators["check mail"] = &ActionContext::check_mail;
             creators["say"] = &ActionContext::say;
             creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
+            creators["outfit"] = &ActionContext::outfit;
         }
 
     private:
@@ -113,6 +116,7 @@ namespace ai
         static Action* set_facing(PlayerbotAI* ai) { return new SetFacingTargetAction(ai); }
         static Action* say(PlayerbotAI* ai) { return new SayAction(ai); }
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
+        static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
     };
 
 };
