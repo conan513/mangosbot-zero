@@ -38,12 +38,29 @@ bool OutfitAction::Execute(Event event)
 
         name = param.substr(0, space);
         ItemIds outfit = Find(name);
-        if (items.size() == 0)
+        string command = param.substr(space + 1);
+        if (command == "equip")
         {
             ostringstream out;
             out << "Equipping outfit " << name;
             ai->TellMaster(out);
             EquipItems(outfit);
+            return true;
+        }
+        else if (command == "reset")
+        {
+            ostringstream out;
+            out << "Resetting outfit " << name;
+            ai->TellMaster(out);
+            Save(name, ItemIds());
+            return true;
+        }
+        else if (command == "update")
+        {
+            ostringstream out;
+            out << "Updating to current items outfit " << name;
+            ai->TellMaster(out);
+            Update(name);
             return true;
         }
 
@@ -164,4 +181,16 @@ ItemIds OutfitAction::parseItems(string text)
     }
 
     return itemIds;
+}
+
+void OutfitAction::Update(string name)
+{
+    ListItemsVisitor visitor;
+    IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
+
+    ItemIds items;
+    for (map<uint32, int>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
+        items.insert(i->first);
+
+    Save(name, items);
 }
