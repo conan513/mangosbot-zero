@@ -1,0 +1,22 @@
+#include "botpch.h"
+#include "../../playerbot.h"
+#include "NearestFriendlyPlayersValue.h"
+
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "CellImpl.h"
+
+using namespace ai;
+using namespace MaNGOS;
+
+void NearestFriendlyPlayersValue::FindUnits(list<Unit*> &targets)
+{
+    AnyFriendlyUnitInObjectRangeCheck u_check(bot, range);
+    UnitListSearcher<AnyFriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    Cell::VisitAllObjects(bot, searcher, range);
+}
+
+bool NearestFriendlyPlayersValue::AcceptUnit(Unit* unit)
+{
+    return dynamic_cast<Player*>(unit);
+}
