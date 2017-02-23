@@ -12,10 +12,10 @@ namespace ai
         virtual bool IsActive();
     };
 
-    class LivingBombTrigger : public DebuffTrigger {
+ /*   class LivingBombTrigger : public DebuffTrigger {
     public:
         LivingBombTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "living bomb") {}
-	};
+	};*/
 
     class FireballTrigger : public DebuffTrigger {
     public:
@@ -27,20 +27,20 @@ namespace ai
         PyroblastTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "pyroblast") {}
     };
 
-    class HotStreakTrigger : public HasAuraTrigger {
+/*   class HotStreakTrigger : public HasAuraTrigger {
     public:
         HotStreakTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "hot streak") {}
-    };
+    };*/
 
-    class MissileBarrageTrigger : public HasAuraTrigger {
+/*    class MissileBarrageTrigger : public HasAuraTrigger {
     public:
         MissileBarrageTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "missile barrage") {}
-    };
+    };*/
 
-    class ArcaneBlastTrigger : public BuffTrigger {
+/*    class ArcaneBlastTrigger : public BuffTrigger {
     public:
         ArcaneBlastTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "arcane blast") {}
-    };
+    };*/
 
     class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
     {

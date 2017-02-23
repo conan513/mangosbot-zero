@@ -12,8 +12,8 @@ public:
     DpsHunterStrategyActionNodeFactory()
     {
         creators["aimed shot"] = &aimed_shot;
-        creators["chimera shot"] = &chimera_shot;
-        creators["explosive shot"] = &explosive_shot;
+      //  creators["chimera shot"] = &chimera_shot;
+        creators["multi-shot"] = &multi_shot;
         creators["concussive shot"] = &concussive_shot;
         creators["viper sting"] = &viper_sting;
     }
@@ -32,18 +32,18 @@ private:
             /*A*/ NextAction::array(0, new NextAction("chimera shot", 10.0f), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* chimera_shot(PlayerbotAI* ai)
+//    static ActionNode* chimera_shot(PlayerbotAI* ai)
+//    {
+//        return new ActionNode ("chimera shot",
+//            /*P*/ NULL,
+//            /*A*/ NextAction::array(0, new NextAction("arcane shot", 10.0f), NULL),
+//            /*C*/ NULL);
+//    }
+    static ActionNode* multi_shot(PlayerbotAI* ai)
     {
-        return new ActionNode ("chimera shot",
+        return new ActionNode ("multi-shot",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("arcane shot", 10.0f), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* explosive_shot(PlayerbotAI* ai)
-    {
-        return new ActionNode ("explosive shot",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("aimed shot"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("auto shot"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* concussive_shot(PlayerbotAI* ai)
@@ -63,7 +63,11 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* ai) : GenericHunterStrategy(ai
 
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), NULL);
+    return NextAction::array(0, new NextAction("aimed shot", 11.0f), new NextAction("auto shot", 10.0f),
+		new NextAction("auto shot", 10.0f),
+		new NextAction("multi-shot", 10.0f),
+		new NextAction("auto shot", 10.0f),
+		new NextAction("auto shot", 10.0f), NULL);
 }
 
 void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

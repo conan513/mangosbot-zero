@@ -14,8 +14,8 @@ public:
         creators["shield wall"] = &shield_wall;
         creators["rend"] = &rend;
         creators["revenge"] = &revenge;
-        creators["devastate"] = &devastate;
-        creators["shockwave"] = &shockwave;
+        creators["sunder armor"] = &sunder_armor;
+     //   creators["shockwave"] = &shockwave;
         creators["taunt"] = &taunt;
     }
 private:
@@ -47,20 +47,20 @@ private:
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* devastate(PlayerbotAI* ai)
+    static ActionNode* sunder_armor(PlayerbotAI* ai)
     {
-        return new ActionNode ("devastate",
+        return new ActionNode ("sunder armor",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("sunder armor"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* shockwave(PlayerbotAI* ai)
-    {
-        return new ActionNode ("shockwave",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("cleave"), NULL),
-            /*C*/ NULL);
-    }
+//   static ActionNode* shockwave(PlayerbotAI* ai)
+//    {
+//        return new ActionNode ("shockwave",
+//            /*P*/ NULL,
+//            /*A*/ NextAction::array(0, new NextAction("cleave"), NULL),
+//            /*C*/ NULL);
+//    }
     static ActionNode* taunt(PlayerbotAI* ai)
     {
         return new ActionNode ("taunt",
@@ -77,7 +77,7 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrate
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("devastate", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("sunder armor", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL);
 }
 
 void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -104,9 +104,9 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"critical health",
 		NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3), NULL)));
 
-	triggers.push_back(new TriggerNode(
+/*	triggers.push_back(new TriggerNode(
 		"medium aoe",
-		NextAction::array(0, new NextAction("shockwave", ACTION_HIGH + 2), NULL)));
+		NextAction::array(0, new NextAction("shockwave", ACTION_HIGH + 2), NULL)));*/
 
 	triggers.push_back(new TriggerNode(
         "light aoe",

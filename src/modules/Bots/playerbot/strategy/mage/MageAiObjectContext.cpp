@@ -96,16 +96,16 @@ namespace ai
                 creators["counterspell"] = &TriggerFactoryInternal::counterspell;
                 creators["polymorph"] = &TriggerFactoryInternal::polymorph;
                 creators["spellsteal"] = &TriggerFactoryInternal::spellsteal;
-                creators["hot streak"] = &TriggerFactoryInternal::hot_streak;
-                creators["living bomb"] = &TriggerFactoryInternal::living_bomb;
-                creators["missile barrage"] = &TriggerFactoryInternal::missile_barrage;
-                creators["arcane blast"] = &TriggerFactoryInternal::arcane_blast;
+              //  creators["hot streak"] = &TriggerFactoryInternal::hot_streak;
+              //  creators["living bomb"] = &TriggerFactoryInternal::living_bomb;
+              //  creators["missile barrage"] = &TriggerFactoryInternal::missile_barrage;
+              //  creators["arcane blast"] = &TriggerFactoryInternal::arcane_blast;
                 creators["counterspell on enemy healer"] = &TriggerFactoryInternal::counterspell_enemy_healer;
 
             }
 
         private:
-            static Trigger* hot_streak(PlayerbotAI* ai) { return new HotStreakTrigger(ai); }
+           // static Trigger* hot_streak(PlayerbotAI* ai) { return new HotStreakTrigger(ai); }
             static Trigger* fireball(PlayerbotAI* ai) { return new FireballTrigger(ai); }
             static Trigger* pyroblast(PlayerbotAI* ai) { return new PyroblastTrigger(ai); }
             static Trigger* combustion(PlayerbotAI* ai) { return new CombustionTrigger(ai); }
@@ -118,9 +118,9 @@ namespace ai
             static Trigger* counterspell(PlayerbotAI* ai) { return new CounterspellInterruptSpellTrigger(ai); }
             static Trigger* polymorph(PlayerbotAI* ai) { return new PolymorphTrigger(ai); }
             static Trigger* spellsteal(PlayerbotAI* ai) { return new SpellstealTrigger(ai); }
-            static Trigger* living_bomb(PlayerbotAI* ai) { return new LivingBombTrigger(ai); }
-            static Trigger* missile_barrage(PlayerbotAI* ai) { return new MissileBarrageTrigger(ai); }
-            static Trigger* arcane_blast(PlayerbotAI* ai) { return new ArcaneBlastTrigger(ai); }
+          //  static Trigger* living_bomb(PlayerbotAI* ai) { return new LivingBombTrigger(ai); }
+          //  static Trigger* missile_barrage(PlayerbotAI* ai) { return new MissileBarrageTrigger(ai); }
+          //  static Trigger* arcane_blast(PlayerbotAI* ai) { return new ArcaneBlastTrigger(ai); }
             static Trigger* counterspell_enemy_healer(PlayerbotAI* ai) { return new CounterspellEnemyHealerTrigger(ai); }
         };
     };
@@ -164,21 +164,21 @@ namespace ai
                 creators["ice block"] = &AiObjectContextInternal::ice_block;
                 creators["polymorph"] = &AiObjectContextInternal::polymorph;
                 creators["spellsteal"] = &AiObjectContextInternal::spellsteal;
-                creators["living bomb"] = &AiObjectContextInternal::living_bomb;
-                creators["dragon's breath"] = &AiObjectContextInternal::dragons_breath;
+              //  creators["living bomb"] = &AiObjectContextInternal::living_bomb;
+              //  creators["dragon's breath"] = &AiObjectContextInternal::dragons_breath;
                 creators["blast wave"] = &AiObjectContextInternal::blast_wave;
-                creators["invisibility"] = &AiObjectContextInternal::invisibility;
+             //   creators["invisibility"] = &AiObjectContextInternal::invisibility;
                 creators["evocation"] = &AiObjectContextInternal::evocation;
-                creators["arcane blast"] = &AiObjectContextInternal::arcane_blast;
-                creators["arcane barrage"] = &AiObjectContextInternal::arcane_barrage;
+             //   creators["arcane blast"] = &AiObjectContextInternal::arcane_blast;
+             //   creators["arcane barrage"] = &AiObjectContextInternal::arcane_barrage;
                 creators["arcane missiles"] = &AiObjectContextInternal::arcane_missiles;
                 creators["counterspell on enemy healer"] = &AiObjectContextInternal::counterspell_on_enemy_healer;
             }
 
         private:
             static Action* arcane_missiles(PlayerbotAI* ai) { return new CastArcaneMissilesAction(ai); }
-            static Action* arcane_barrage(PlayerbotAI* ai) { return new CastArcaneBarrageAction(ai); }
-            static Action* arcane_blast(PlayerbotAI* ai) { return new CastArcaneBlastAction(ai); }
+           // static Action* arcane_barrage(PlayerbotAI* ai) { return new CastArcaneBarrageAction(ai); }
+           // static Action* arcane_blast(PlayerbotAI* ai) { return new CastArcaneBlastAction(ai); }
             static Action* frostbolt(PlayerbotAI* ai) { return new CastFrostboltAction(ai); }
             static Action* blizzard(PlayerbotAI* ai) { return new CastBlizzardAction(ai); }
             static Action* frost_nova(PlayerbotAI* ai) { return new CastFrostNovaAction(ai); }
@@ -205,10 +205,10 @@ namespace ai
             static Action* ice_block(PlayerbotAI* ai) { return new CastIceBlockAction(ai); }
             static Action* polymorph(PlayerbotAI* ai) { return new CastPolymorphAction(ai); }
             static Action* spellsteal(PlayerbotAI* ai) { return new CastSpellstealAction(ai); }
-            static Action* living_bomb(PlayerbotAI* ai) { return new CastLivingBombAction(ai); }
-            static Action* dragons_breath(PlayerbotAI* ai) { return new CastDragonsBreathAction(ai); }
+           // static Action* living_bomb(PlayerbotAI* ai) { return new CastLivingBombAction(ai); }
+           // static Action* dragons_breath(PlayerbotAI* ai) { return new CastDragonsBreathAction(ai); }
             static Action* blast_wave(PlayerbotAI* ai) { return new CastBlastWaveAction(ai); }
-            static Action* invisibility(PlayerbotAI* ai) { return new CastInvisibilityAction(ai); }
+           // static Action* invisibility(PlayerbotAI* ai) { return new CastInvisibilityAction(ai); }
             static Action* evocation(PlayerbotAI* ai) { return new CastEvocationAction(ai); }
             static Action* counterspell_on_enemy_healer(PlayerbotAI* ai) { return new CastCounterspellOnEnemyHealerAction(ai); }
         };

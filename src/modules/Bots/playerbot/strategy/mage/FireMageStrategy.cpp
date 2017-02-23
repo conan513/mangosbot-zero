@@ -18,9 +18,9 @@ void FireMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "pyroblast",
         NextAction::array(0, new NextAction("pyroblast", 10.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
+ /*   triggers.push_back(new TriggerNode(
         "hot streak",
-        NextAction::array(0, new NextAction("pyroblast", 25.0f), NULL)));
+        NextAction::array(0, new NextAction("pyroblast", 25.0f), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "combustion",
@@ -37,8 +37,8 @@ void FireMageAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "medium aoe",
         NextAction::array(0, new NextAction("flamestrike", 20.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
+/*    triggers.push_back(new TriggerNode(
         "living bomb",
-        NextAction::array(0, new NextAction("living bomb", 25.0f), NULL)));
+        NextAction::array(0, new NextAction("living bomb", 25.0f), NULL)));*/
 }
 
