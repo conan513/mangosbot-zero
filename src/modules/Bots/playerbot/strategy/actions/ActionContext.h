@@ -18,6 +18,7 @@
 #include "RevealGatheringItemAction.h"
 #include "SayAction.h"
 #include "OutfitAction.h"
+#include "RandomBotUpdateAction.h"
 
 namespace ai
 {
@@ -71,6 +72,7 @@ namespace ai
             creators["say"] = &ActionContext::say;
             creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
             creators["outfit"] = &ActionContext::outfit;
+            creators["random bot update"] = &ActionContext::random_bot_update;
         }
 
     private:
@@ -117,6 +119,7 @@ namespace ai
         static Action* say(PlayerbotAI* ai) { return new SayAction(ai); }
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
+        static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
     };
 
 };

@@ -34,6 +34,7 @@ class WorldPacketHandlerTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( uninvite );
       CPPUNIT_TEST( security_check );
       CPPUNIT_TEST( guild_accept );
+      CPPUNIT_TEST( random_bot_update );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -234,6 +235,14 @@ protected:
         tick();
 
         assertActions(">S:guild accept");
+    }
+
+    void random_bot_update()
+    {
+        trigger("random bot update");
+        tick();
+
+        assertActions(">S:random bot update");
     }
 
 };

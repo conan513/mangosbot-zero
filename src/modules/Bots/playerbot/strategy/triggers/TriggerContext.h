@@ -92,6 +92,8 @@ namespace ai
             creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
             creators["invalid target"] = &TriggerContext::invalid_target;
             creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
+
+            creators["random bot update"] = &TriggerContext::random_bot_update_trigger;
         }
 
     private:
@@ -157,6 +159,7 @@ namespace ai
         static Trigger* PartyMemberCriticalHealth(PlayerbotAI* ai) { return new PartyMemberCriticalHealthTrigger(ai); }
         static Trigger* no_pet(PlayerbotAI* ai) { return new NoPetTrigger(ai); }
         static Trigger* has_attackers(PlayerbotAI* ai) { return new HasAttackersTrigger(ai); }
+        static Trigger* random_bot_update_trigger(PlayerbotAI* ai) { return new RandomBotUpdateTrigger(ai); }
 
     };
 };

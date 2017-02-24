@@ -48,6 +48,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void Refresh(Player* bot);
         void RandomTeleportForLevel(Player* bot);
         int GetMaxAllowedBotCount();
+        bool ProcessBot(Player* player);
 
 	protected:
 	    virtual void OnBotLoginInternal(Player * const bot) {}

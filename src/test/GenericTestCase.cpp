@@ -133,7 +133,6 @@ protected:
 
         assertActions(">S:drop target");
     }
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( GenericTestCase );
