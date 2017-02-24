@@ -18,5 +18,6 @@ void NearestFriendlyPlayersValue::FindUnits(list<Unit*> &targets)
 
 bool NearestFriendlyPlayersValue::AcceptUnit(Unit* unit)
 {
-    return dynamic_cast<Player*>(unit);
+    ObjectGuid guid = unit->GetObjectGuid();
+    return guid.IsPlayer() && guid != ai->GetBot()->GetObjectGuid();
 }
