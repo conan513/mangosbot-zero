@@ -58,6 +58,7 @@
 #include "ItemUsageValue.h"
 #include "LastSaidValue.h"
 #include "NearestFriendlyPlayersValue.h"
+#include "NearestNonBotPlayersValue.h"
 #include "OutfitListValue.h"
 #include "RandomBotUpdateValue.h"
 
@@ -157,6 +158,7 @@ namespace ai
             creators["outfit list"] = &ValueContext::outfit_list_value;
 
             creators["random bot update"] = &ValueContext::random_bot_update_value;
+            creators["nearest non bot players"] = &ValueContext::nearest_non_bot_players;
         }
 
     private:
@@ -246,5 +248,6 @@ namespace ai
         static UntypedValue* aoe_position(PlayerbotAI* ai) { return new AoePositionValue(ai); }
         static UntypedValue* outfit_list_value(PlayerbotAI* ai) { return new OutfitListValue(ai); }
         static UntypedValue* random_bot_update_value(PlayerbotAI* ai) { return new RandomBotUpdateValue(ai); }
+        static UntypedValue* nearest_non_bot_players(PlayerbotAI* ai) { return new NearestNonBotPlayersValue(ai); }
     };
 };

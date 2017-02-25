@@ -35,6 +35,7 @@ class WorldPacketHandlerTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( security_check );
       CPPUNIT_TEST( guild_accept );
       CPPUNIT_TEST( random_bot_update );
+      CPPUNIT_TEST( delay );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -243,6 +244,14 @@ protected:
         tick();
 
         assertActions(">S:random bot update");
+    }
+
+    void delay()
+    {
+        trigger("no non bot players around");
+        tick();
+
+        assertActions(">S:delay");
     }
 
 };

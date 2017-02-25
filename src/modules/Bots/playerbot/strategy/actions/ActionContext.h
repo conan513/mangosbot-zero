@@ -14,6 +14,7 @@
 #include "PositionAction.h"
 #include "AttackAction.h"
 #include "CheckMailAction.h"
+#include "DelayAction.h"
 #include "OutfitAction.h"
 #include "RevealGatheringItemAction.h"
 #include "SayAction.h"
@@ -73,6 +74,7 @@ namespace ai
             creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
             creators["outfit"] = &ActionContext::outfit;
             creators["random bot update"] = &ActionContext::random_bot_update;
+            creators["delay"] = &ActionContext::delay;
         }
 
     private:
@@ -120,6 +122,7 @@ namespace ai
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
+        static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
     };
 
 };
