@@ -847,7 +847,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
                 continue;
 
 			const SpellEntry *enchantSpell = sSpellStore.LookupEntry(enchant->spellid[0]);
-            if (enchantSpell->spellLevel && enchantSpell->spellLevel > level)
+            if (!enchantSpell || (enchantSpell->spellLevel && enchantSpell->spellLevel > level))
                 continue;
 
             uint8 sp = 0, ap = 0, tank = 0;
