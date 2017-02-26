@@ -102,9 +102,9 @@
 #endif
 
 
-#define REALMD_CONFIG_NAME             "realmd.conf"
-#define MANGOSD_CONFIG_NAME            "mangosd.conf"
-#define AUCTIONHOUSEBOT_CONFIG_NAME    "ahbot.conf"
+#define REALMD_CONFIG_NAME             "Settings/login.conf"
+#define MANGOSD_CONFIG_NAME            "Settings/world.conf"
+#define AUCTIONHOUSEBOT_CONFIG_NAME    "Settings/ahbot.conf"
 
 #define MANGOSD_CONFIG_LOCATION         SYSCONFDIR MANGOSD_CONFIG_NAME
 #define REALMD_CONFIG_LOCATION          SYSCONFDIR REALMD_CONFIG_NAME
