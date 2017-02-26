@@ -29,15 +29,14 @@ Unit* PartyMemberValue::FindPartyMember(list<Player*>* party, FindPlayerPredicat
 Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate)
 {
     Player* master = GetMaster();
-    Group* group = bot->GetGroup();
-    if (!group)
-        return NULL;
+    list<ObjectGuid> nearestPlayers = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
 
     list<Player*> healers, tanks, others, masters;
-    masters.push_back(master);
-    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+    if (master) masters.push_back(master);
+    for (list<ObjectGuid>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i)
     {
-        Player* player = gref->getSource();
+        Player* player = dynamic_cast<Player*>(ai->GetUnit(*i));
+        if (!player || player == bot) continue;
 
         if (ai->IsHeal(player))
             healers.push_back(player);
@@ -66,8 +65,6 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate)
 
 bool PartyMemberValue::Check(Unit* player)
 {
-
-
     return player && player != bot && player->GetMapId() == bot->GetMapId() &&
         bot->GetDistance(player) < sPlayerbotAIConfig.spellDistance &&
         bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
@@ -75,15 +72,14 @@ bool PartyMemberValue::Check(Unit* player)
 
 bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)
 {
-
-    Group* group = bot->GetGroup();
+    list<ObjectGuid> nearestPlayers = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
     ObjectGuid targetGuid = target ? target->GetObjectGuid() : bot->GetObjectGuid();
     ObjectGuid corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetObjectGuid() : ObjectGuid();
 
-    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+    for (list<ObjectGuid>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i)
     {
-        Player* player = gref->getSource();
-        if (player == bot)
+        Player* player = dynamic_cast<Player*>(ai->GetUnit(*i));
+        if (!player || player == bot)
             continue;
 
         if (player->IsNonMeleeSpellCasted(true))

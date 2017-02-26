@@ -46,6 +46,13 @@ public:
             return;
         }
 
+        if (*ai->GetAiObjectContext()->GetValue<uint8>("aoe count") > 2)
+        {
+            WorldLocation aoe = *ai->GetAiObjectContext()->GetValue<WorldLocation>("aoe position");
+            if (creature->GetDistance2d(aoe.coord_x, aoe.coord_y) <= sPlayerbotAIConfig.aoeRadius)
+                return;
+        }
+
         int tankCount, dpsCount;
         GetPlayerCount(creature, &tankCount, &dpsCount);
         if (!tankCount || !dpsCount)

@@ -69,6 +69,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( tell_attackers );
       CPPUNIT_TEST( formation );
       CPPUNIT_TEST( sendmail );
+      CPPUNIT_TEST( outfit );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -457,6 +458,10 @@ protected:
         assertActions(">S:sendmail");
     }
 
+    void outfit()
+    {
+        assertParametrizedCommand("outfit", "outfit");
+    }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ChatCommandTestCase );
