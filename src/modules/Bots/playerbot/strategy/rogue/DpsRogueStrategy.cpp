@@ -12,7 +12,7 @@ public:
     {
         creators["melee"] = &melee;
 		creators["riposte"] = &riposte;
-        creators["mutilate"] = &mutilate;
+       // creators["mutilate"] = &mutilate;
         creators["sinister strike"] = &sinister_strike;
         creators["kick"] = &kick;
         creators["kidney shot"] = &kidney_shot;
@@ -28,18 +28,18 @@ private:
             /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* mutilate(PlayerbotAI* ai)
-    {
-        return new ActionNode ("mutilate",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
-            /*C*/ NULL);
-    }
+ //   static ActionNode* mutilate(PlayerbotAI* ai)
+ //   {
+ //       return new ActionNode ("mutilate",
+ //           /*P*/ NULL,
+ //           /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
+ //           /*C*/ NULL);
+ //   }
     static ActionNode* sinister_strike(PlayerbotAI* ai)
     {
         return new ActionNode ("sinister strike",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* kick(PlayerbotAI* ai)
@@ -93,16 +93,7 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
 
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("slice and dice", ACTION_HIGH),
-		new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("rupture", ACTION_NORMAL),
-		new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("sinister strike", ACTION_NORMAL),
-		new NextAction("slice and dice", ACTION_HIGH),
-		new NextAction("sinister strike", ACTION_NORMAL), NULL);
+    return NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -53,7 +53,7 @@ private:
 	{
 		return new ActionNode("mortal strike",
 			/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("bloodthirst"), NULL),
+			/*A*/ NULL,
 			/*C*/ NULL);
 	}
 	static ActionNode* whirlwind(PlayerbotAI* ai)
@@ -100,11 +100,8 @@ DpsWarriorStrategy::DpsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy
 
 NextAction** DpsWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("bloodthirst", ACTION_NORMAL + 1),
-		new NextAction("mortal stike", ACTION_NORMAL + 1),
-		new NextAction("whirlwind", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 1), new NextAction("whirlwind", ACTION_NORMAL + 1), NULL);
 }
-
 void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);

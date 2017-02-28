@@ -55,11 +55,11 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrategy
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("melee", ACTION_NORMAL + 1),
-	new NextAction("seal of the crusader", ACTION_NORMAL + 1), new NextAction("judgement", ACTION_NORMAL + 1),
+	/*new NextAction("seal of the crusader", ACTION_NORMAL + 1), new NextAction("judgement", ACTION_NORMAL + 1),
 		new NextAction("seal of command", ACTION_NORMAL + 1),
 		new NextAction("judgement", ACTION_NORMAL + 1),
 		new NextAction("seal of command", ACTION_NORMAL + 1),
-		new NextAction("judgement", ACTION_NORMAL + 1), NULL);
+		new NextAction("judgement", ACTION_NORMAL + 1),*/ NULL);
 }
 
 void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

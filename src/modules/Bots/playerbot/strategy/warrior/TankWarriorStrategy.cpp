@@ -14,7 +14,7 @@ public:
         creators["shield wall"] = &shield_wall;
         creators["rend"] = &rend;
         creators["revenge"] = &revenge;
-        creators["sunder armor"] = &sunder_armor;
+	//	creators["sunder armor"] = &sunder_armor;
      //   creators["shockwave"] = &shockwave;
         creators["taunt"] = &taunt;
     }
@@ -23,13 +23,13 @@ private:
     {
         return new ActionNode ("melee",
             /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
-            /*A*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("sunder armor"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* shield_wall(PlayerbotAI* ai)
     {
         return new ActionNode ("shield wall",
-            /*P*/ NULL,
+			/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NextAction::array(0, new NextAction("shield block"), NULL),
             /*C*/ NULL);
     }
@@ -43,16 +43,16 @@ private:
     static ActionNode* revenge(PlayerbotAI* ai)
     {
         return new ActionNode ("revenge",
-            /*P*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* sunder_armor(PlayerbotAI* ai)
+   static ActionNode* sunder_armor(PlayerbotAI* ai)
     {
         return new ActionNode ("sunder armor",
-            /*P*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-            /*C*/ NULL);
+			/*C*/ NextAction::array(0, new NextAction("melee"), NULL));
     }
 //   static ActionNode* shockwave(PlayerbotAI* ai)
 //    {
@@ -77,7 +77,8 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrate
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("sunder armor", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("sunder armor", ACTION_HIGH + 9),
+		new NextAction("revenge", ACTION_NORMAL + 1), NULL);
 }
 
 void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -104,9 +105,9 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"critical health",
 		NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3), NULL)));
 
-/*	triggers.push_back(new TriggerNode(
+	triggers.push_back(new TriggerNode(
 		"medium aoe",
-		NextAction::array(0, new NextAction("shockwave", ACTION_HIGH + 2), NULL)));*/
+		NextAction::array(0, new NextAction("cleave", ACTION_HIGH + 2), NULL)));
 
 	triggers.push_back(new TriggerNode(
         "light aoe",
@@ -121,6 +122,6 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		NextAction::array(0, new NextAction("concussion blow", ACTION_INTERRUPT), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "sword and board",
-        NextAction::array(0, new NextAction("shield slam", ACTION_HIGH + 3), NULL)));
+        "sunder armor",
+        NextAction::array(0, new NextAction("sunder armor", ACTION_HIGH + 9), NULL)));
 }
