@@ -71,7 +71,7 @@ namespace ai
                 creators["shield bash"] = &TriggerFactoryInternal::shield_bash;
                 creators["disarm"] = &TriggerFactoryInternal::disarm;
                 creators["concussion blow"] = &TriggerFactoryInternal::concussion_blow;
-             //   creators["sword and board"] = &TriggerFactoryInternal::SwordAndBoard;
+				creators["sunder armor"] = &TriggerFactoryInternal::sunder_armor;
                 creators["shield bash on enemy healer"] = &TriggerFactoryInternal::shield_bash_on_enemy_healer;
 
             }
@@ -87,7 +87,7 @@ namespace ai
             static Trigger* shield_bash(PlayerbotAI* ai) { return new ShieldBashInterruptSpellTrigger(ai); }
             static Trigger* disarm(PlayerbotAI* ai) { return new DisarmDebuffTrigger(ai); }
             static Trigger* concussion_blow(PlayerbotAI* ai) { return new ConcussionBlowTrigger(ai); }
-         //   static Trigger* SwordAndBoard(PlayerbotAI* ai) { return new SwordAndBoardTrigger(ai); }
+            static Trigger* sunder_armor(PlayerbotAI* ai) { return new SunderArmorDebuffTrigger(ai); }
             static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new ShieldBashInterruptEnemyHealerSpellTrigger(ai); }
         };
     };
