@@ -31,6 +31,18 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate)
     Player* master = GetMaster();
     list<ObjectGuid> nearestPlayers = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
 
+    Group* group = bot->GetGroup();
+    if (group)
+    {
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            if( ref->getSource() == bot)
+                continue;
+
+            nearestPlayers.push_back(ref->getSource()->GetObjectGuid());
+        }
+    }
+
     list<Player*> healers, tanks, others, masters;
     if (master) masters.push_back(master);
     for (list<ObjectGuid>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i)
