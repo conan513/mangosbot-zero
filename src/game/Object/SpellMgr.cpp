@@ -908,6 +908,18 @@ bool IsSingleTargetSpell(SpellEntry const* spellInfo)
     if (spellInfo->SpellVisual == 3239)
         { return true; }
 
+    // DRUID SPELLS
+    switch (spellInfo->Id)
+    {
+        case 339:                                           // Druid Roots Rank 1
+        case 1062:                                          // Druid Roots Rank 2
+        case 5195:                                          // Druid Roots Rank 3
+        case 5196:                                          // Druid Roots Rank 4
+        case 9852:                                          // Druid Roots Rank 5
+        case 9853:                                          // Druid Roots Rank 6
+            return true;
+    }
+
     // exceptions (have spellInfo->AttributesEx & (1<<18) but not single targeted)
     switch (spellInfo->Id)
     {
