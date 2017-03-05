@@ -62,7 +62,7 @@ namespace ai
             TriggerFactoryInternal()
             {
                 creators["hamstring"] = &TriggerFactoryInternal::hamstring;
-             //   creators["victory rush"] = &TriggerFactoryInternal::victory_rush;
+                creators["pummel"] = &TriggerFactoryInternal::pummel;
                 creators["death wish"] = &TriggerFactoryInternal::death_wish;
                 creators["battle shout"] = &TriggerFactoryInternal::battle_shout;
                 creators["rend"] = &TriggerFactoryInternal::rend;
@@ -78,13 +78,13 @@ namespace ai
 
         private:
             static Trigger* hamstring(PlayerbotAI* ai) { return new HamstringTrigger(ai); }
-          //  static Trigger* victory_rush(PlayerbotAI* ai) { return new VictoryRushTrigger(ai); }
+            static Trigger* pummel(PlayerbotAI* ai) { return new PummelInterruptSpellTrigger(ai); }
             static Trigger* death_wish(PlayerbotAI* ai) { return new DeathWishTrigger(ai); }
             static Trigger* battle_shout(PlayerbotAI* ai) { return new BattleShoutTrigger(ai); }
             static Trigger* rend(PlayerbotAI* ai) { return new RendDebuffTrigger(ai); }
             static Trigger* rend_on_attacker(PlayerbotAI* ai) { return new RendDebuffOnAttackerTrigger(ai); }
             static Trigger* bloodrage(PlayerbotAI* ai) { return new BloodrageDebuffTrigger(ai); }
-            static Trigger* shield_bash(PlayerbotAI* ai) { return new ShieldBashInterruptSpellTrigger(ai); }
+            static Trigger* shield_bash(PlayerbotAI* ai) { return new ShieldBashInterruptSpellTrigger(ai); }			
             static Trigger* disarm(PlayerbotAI* ai) { return new DisarmDebuffTrigger(ai); }
             static Trigger* concussion_blow(PlayerbotAI* ai) { return new ConcussionBlowTrigger(ai); }
             static Trigger* sunder_armor(PlayerbotAI* ai) { return new SunderArmorDebuffTrigger(ai); }
@@ -116,12 +116,13 @@ namespace ai
                 creators["mocking blow"] = &AiObjectContextInternal::mocking_blow;
                 creators["death wish"] = &AiObjectContextInternal::death_wish;
                 creators["berserker rage"] = &AiObjectContextInternal::berserker_rage;
-             //   creators["victory rush"] = &AiObjectContextInternal::victory_rush;
+                creators["pummel"] = &AiObjectContextInternal::pummel;
                 creators["execute"] = &AiObjectContextInternal::execute;
                 creators["defensive stance"] = &AiObjectContextInternal::defensive_stance;
 				creators["berserker stance"] = &AiObjectContextInternal::berserker_stance;
                 creators["hamstring"] = &AiObjectContextInternal::hamstring;
                 creators["shield bash"] = &AiObjectContextInternal::shield_bash;
+				creators["shield slam"] = &AiObjectContextInternal::shield_slam;
                 creators["shield block"] = &AiObjectContextInternal::shield_block;
                 creators["bloodrage"] = &AiObjectContextInternal::bloodrage;
                 creators["battle stance"] = &AiObjectContextInternal::battle_stance;
@@ -167,7 +168,7 @@ namespace ai
             static Action* mocking_blow(PlayerbotAI* ai) { return new CastMockingBlowAction(ai); }
             static Action* death_wish(PlayerbotAI* ai) { return new CastDeathWishAction(ai); }
             static Action* berserker_rage(PlayerbotAI* ai) { return new CastBerserkerRageAction(ai); }
-         //   static Action* victory_rush(PlayerbotAI* ai) { return new CastVictoryRushAction(ai); }
+            static Action* pummel(PlayerbotAI* ai) { return new CastPummelAction(ai); }
             static Action* execute(PlayerbotAI* ai) { return new CastExecuteAction(ai); }
             static Action* defensive_stance(PlayerbotAI* ai) { return new CastDefensiveStanceAction(ai); }
 			static Action* berserker_stance(PlayerbotAI* ai) { return new CastBerserkerStanceAction(ai); }

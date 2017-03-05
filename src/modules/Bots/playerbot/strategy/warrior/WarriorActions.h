@@ -128,6 +128,11 @@ namespace ai
 		CastShieldSlamAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "shield slam") {}
 	};
 
+	class CastPummelAction : public CastMeleeSpellAction {
+	public:
+		CastPummelAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "pummel") {}
+	};
+
     // after dodge
     BEGIN_MELEE_SPELL_ACTION(CastRevengeAction, "revenge")
         virtual NextAction** getPrerequisites();
@@ -150,6 +155,12 @@ namespace ai
 
     BEGIN_DEBUFF_ACTION(CastSunderArmorAction, "sunder armor") // 5 times
     END_SPELL_ACTION()
+
+		class CastSunderArmorOnAttackerAction : public CastDebuffSpellOnAttackerAction
+	{
+	public:
+		CastSunderArmorOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "sunder armor") {}
+	};
 
     class CastDemoralizingShoutAction : public CastDebuffSpellAction {
     public:

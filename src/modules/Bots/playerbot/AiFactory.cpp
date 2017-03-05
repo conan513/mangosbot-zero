@@ -110,7 +110,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 {
     int tab = GetPlayerSpecTab(player);
 
-    engine->addStrategies("racials", "chat", "default", "aoe", "potions", "cast time", "conserve mana", "duel", "pvp", NULL);
+    engine->addStrategies("racials", "chat", "default", "potions", "cast time", "conserve mana", "duel", "pvp", NULL);
 
     switch (player->getClass())
     {

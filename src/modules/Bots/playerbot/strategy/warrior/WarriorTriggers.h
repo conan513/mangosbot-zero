@@ -15,6 +15,12 @@ namespace ai
         RendDebuffOnAttackerTrigger(PlayerbotAI* ai) : DebuffOnAttackerTrigger(ai, "rend") {}
     };
 
+	class SunderArmorOnAttackerTrigger : public DebuffOnAttackerTrigger
+	{
+	public:
+		SunderArmorOnAttackerTrigger(PlayerbotAI* ai) : DebuffOnAttackerTrigger(ai, "sunder armor") {}
+	};
+
 	class RevengeAvailableTrigger : public SpellCanBeCastTrigger
 	{
 	public:
@@ -38,6 +44,12 @@ namespace ai
     public:
         ShieldBashInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "shield bash") {}
     };
+
+	class PummelInterruptSpellTrigger : public InterruptSpellTrigger
+	{
+	public:
+		PummelInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "pummel") {}
+	};
 
 /*    class VictoryRushTrigger : public HasAuraTrigger
     {
