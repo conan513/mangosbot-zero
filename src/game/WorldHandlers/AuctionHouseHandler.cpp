@@ -210,28 +210,11 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
 {
     Unit* auctioneer;
 
-    // GM case
-    if (guid == GetPlayer()->GetObjectGuid())
+    auctioneer = GetPlayer();
+    if (!auctioneer)
     {
-        // command case will return only if player have real access to command
-        // using special access modes (1,-1) done at mode set in command, so not need recheck
-        if (GetPlayer()->GetAuctionAccessMode() == 0 && !ChatHandler(GetPlayer()).FindCommand("auction"))
-        {
-            DEBUG_LOG("%s attempt open auction in cheating way.", guid.GetString().c_str());
-            return NULL;
-        }
-
-        auctioneer = GetPlayer();
-    }
-    // auctioneer case
-    else
-    {
-        auctioneer = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
-        if (!auctioneer)
-        {
-            DEBUG_LOG("Auctioneer %s accessed in cheating way.", guid.GetString().c_str());
-            return NULL;
-        }
+        DEBUG_LOG("Auctioneer %s accessed in cheating way.", guid.GetString().c_str());
+        return NULL;
     }
 
     // always return pointer
