@@ -68,11 +68,11 @@ namespace ai
 		CastAdrenalineRushAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "adrenaline rush") {}
 	};
 
-	class CastKillingSpreeAction : public CastBuffSpellAction
+/*	class CastKillingSpreeAction : public CastBuffSpellAction
 	{
 	public:
 		CastKillingSpreeAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "killing spree") {}
-	};
+	};*/
 
     class CastKickOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
     {

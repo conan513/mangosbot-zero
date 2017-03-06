@@ -22,8 +22,8 @@ namespace ai
 		virtual bool IsActive();
 	};
 
-    DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light", "judgement of light")
-    DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")
+    DEBUFF_TRIGGER(JudgementTrigger, "judgement", "judgement")
+  //  DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")
 
     BUFF_ON_PARTY_TRIGGER(BlessingOnPartyTrigger, "blessing of", "blessing of kings on party")
     BUFF_TRIGGER(BlessingTrigger, "blessing of sanctuary", "blessing of sanctuary")
@@ -40,11 +40,11 @@ namespace ai
         HammerOfJusticeSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "hammer of justice") {}
     };
 
-    class ArtOfWarTrigger : public HasAuraTrigger
+ /*   class ArtOfWarTrigger : public HasAuraTrigger
     {
     public:
         ArtOfWarTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "the art of war") {}
-    };
+    };*/
 
     class ShadowResistanceAuraTrigger : public BuffTrigger
     {

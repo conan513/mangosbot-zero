@@ -13,15 +13,15 @@ namespace ai
     BEGIN_RANGED_SPELL_ACTION(CastArcaneShotAction, "arcane shot")
     END_SPELL_ACTION()
 
-    BEGIN_RANGED_SPELL_ACTION(CastExplosiveShotAction, "explosive shot")
-    END_SPELL_ACTION()
+  /*  BEGIN_RANGED_SPELL_ACTION(CastExplosiveShotAction, "explosive shot")
+    END_SPELL_ACTION()*/
 
 
     BEGIN_RANGED_SPELL_ACTION(CastAimedShotAction, "aimed shot")
     END_SPELL_ACTION()
 
-    BEGIN_RANGED_SPELL_ACTION(CastChimeraShotAction, "chimera shot")
-    END_SPELL_ACTION()
+  /*  BEGIN_RANGED_SPELL_ACTION(CastChimeraShotAction, "chimera shot")
+    END_SPELL_ACTION()*/
 
     BEGIN_RANGED_SPELL_ACTION(CastConcussiveShotAction, "concussive shot")
     END_SPELL_ACTION()

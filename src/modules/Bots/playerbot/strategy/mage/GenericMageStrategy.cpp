@@ -17,7 +17,7 @@ public:
         creators["icy veins"] = &icy_veins;
         creators["combustion"] = &combustion;
         creators["evocation"] = &evocation;
-        creators["dragon's breath"] = &dragons_breath;
+     //   creators["dragon's breath"] = &dragons_breath;
         creators["blast wave"] = &blast_wave;
         creators["remove curse"] = &remove_curse;
         creators["remove curse on party"] = &remove_curse_on_party;
@@ -72,13 +72,13 @@ private:
             /*A*/ NextAction::array(0, new NextAction("mana potion"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* dragons_breath(PlayerbotAI* ai)
-    {
-        return new ActionNode ("dragon's breath",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("blast wave"), NULL),
-            /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), NULL));
-    }
+//    static ActionNode* dragons_breath(PlayerbotAI* ai)
+//    {
+//        return new ActionNode ("dragon's breath",
+//            /*P*/ NULL,
+//            /*A*/ NextAction::array(0, new NextAction("blast wave"), NULL),
+//            /*C*/ NextAction::array(0, new NextAction("flamestrike", 71.0f), NULL));
+//    }
     static ActionNode* blast_wave(PlayerbotAI* ai)
     {
         return new ActionNode ("blast wave",
@@ -139,9 +139,9 @@ void GenericMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"spellsteal",
 		NextAction::array(0, new NextAction("spellsteal", 40.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
+/*    triggers.push_back(new TriggerNode(
         "medium threat",
-        NextAction::array(0, new NextAction("invisibility", 60.0f), NULL)));
+        NextAction::array(0, new NextAction("invisibility", 60.0f), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "low mana",

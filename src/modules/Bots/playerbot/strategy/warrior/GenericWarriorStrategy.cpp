@@ -63,6 +63,10 @@ void GenericWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "shield bash",
         NextAction::array(0, new NextAction("shield bash", ACTION_INTERRUPT + 4), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"pummel",
+		NextAction::array(0, new NextAction("pummel", ACTION_INTERRUPT + 4), NULL)));
+
     triggers.push_back(new TriggerNode(
         "shield bash on enemy healer",
         NextAction::array(0, new NextAction("shield bash on enemy healer", ACTION_INTERRUPT + 3), NULL)));
