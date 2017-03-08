@@ -717,6 +717,8 @@ bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
                     // dummy aura can be positive or negative dependent from casted spell
                     switch (spellproto->Id)
                     {
+                        case 25040:                         //Mark of Nature
+                            return false;
                         case 13139:                         // net-o-matic special effect
                         case 18172:                         // Quest Kodo Roundup player debuff
                         case 23445:                         // evil twin
@@ -1935,6 +1937,13 @@ void SpellMgr::ModDBCSpellAttributes()
 
         switch(spell_id)
         {
+            // Mark of Nature 
+            case 25040:
+                spellInfo->Attributes |= SPELL_ATTR_UNK23, SPELL_ATTR_UNK26, SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
+                spellInfo->AttributesEx2 |= SPELL_ATTR_EX2_UNK0, SPELL_ATTR_EX2_CANT_REFLECTED;
+                spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_DEATH_PERSISTENT;
+                break;
+
             // Execute spell id 20647 is used to actually notify the client of the damage done.
             // If MeleeSpellHitResult method is executed for this spell id, it means that the spellId sent by the client for execute did already passed.
             case 20647:
