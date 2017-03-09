@@ -12,7 +12,7 @@ public:
     {
         creators["melee"] = &melee;
 		creators["riposte"] = &riposte;
-       // creators["mutilate"] = &mutilate;
+        creators["mutilate"] = &mutilate;
         creators["sinister strike"] = &sinister_strike;
         creators["kick"] = &kick;
         creators["kidney shot"] = &kidney_shot;
@@ -25,16 +25,16 @@ private:
     {
         return new ActionNode ("melee",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
- //   static ActionNode* mutilate(PlayerbotAI* ai)
- //   {
- //       return new ActionNode ("mutilate",
- //           /*P*/ NULL,
- //           /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
- //           /*C*/ NULL);
- //   }
+    static ActionNode* mutilate(PlayerbotAI* ai)
+    {
+        return new ActionNode ("mutilate",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
+            /*C*/ NULL);
+    }
     static ActionNode* sinister_strike(PlayerbotAI* ai)
     {
         return new ActionNode ("sinister strike",
@@ -93,7 +93,7 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
 
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL), NULL);
+    return NextAction::array(0, new NextAction("sinister strike", ACTION_HIGH + 3), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -103,6 +103,10 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "combo points available",
         NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 2), NULL)));
+
+/*	triggers.push_back(new TriggerNode(
+		"slice and dice",
+		NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 2), NULL)));*/
 
 	triggers.push_back(new TriggerNode(
 		"medium threat",
@@ -119,6 +123,10 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"kick on enemy healer",
 		NextAction::array(0, new NextAction("kick on enemy healer", ACTION_INTERRUPT + 1), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"light aoe",
+		NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
         "behind target",
