@@ -210,7 +210,7 @@ protected:
         set<bool>("combat", "self target", false);
         tickWithNoTarget();
 
-        assertActions(">S:stay>S:check mount state>S:check mount state>Grind:attack anything>Grind:attack anything>S:check mount state");
+        assertActions(">S:stay>S:check mount state>S:stay>Grind:attack anything>Grind:attack anything>S:stay");
     }
 
     void grindIfNoMana()

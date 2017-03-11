@@ -59,6 +59,7 @@
 #include "LastSaidValue.h"
 #include "NearestFriendlyPlayersValue.h"
 #include "NearestNonBotPlayersValue.h"
+#include "NewPlayerNearbyValue.h"
 #include "OutfitListValue.h"
 #include "RandomBotUpdateValue.h"
 
@@ -159,9 +160,13 @@ namespace ai
 
             creators["random bot update"] = &ValueContext::random_bot_update_value;
             creators["nearest non bot players"] = &ValueContext::nearest_non_bot_players;
+            creators["new player nearby"] = &ValueContext::new_player_nearby;
+            creators["already seen players"] = &ValueContext::already_seen_players;
         }
 
     private:
+        static UntypedValue* already_seen_players(PlayerbotAI* ai) { return new AlreadySeenPlayersValue(ai); }
+        static UntypedValue* new_player_nearby(PlayerbotAI* ai) { return new NewPlayerNearbyValue(ai); }
         static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }
         static UntypedValue* formation(PlayerbotAI* ai) { return new FormationValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }
