@@ -15,6 +15,7 @@
 #include "AttackAction.h"
 #include "CheckMailAction.h"
 #include "DelayAction.h"
+#include "GreetAction.h"
 #include "OutfitAction.h"
 #include "RevealGatheringItemAction.h"
 #include "SayAction.h"
@@ -75,9 +76,11 @@ namespace ai
             creators["outfit"] = &ActionContext::outfit;
             creators["random bot update"] = &ActionContext::random_bot_update;
             creators["delay"] = &ActionContext::delay;
+            creators["greet"] = &ActionContext::greet;
         }
 
     private:
+        static Action* greet(PlayerbotAI* ai) { return new GreetAction(ai); }
         static Action* check_mail(PlayerbotAI* ai) { return new CheckMailAction(ai); }
         static Action* drop_target(PlayerbotAI* ai) { return new DropTargetAction(ai); }
         static Action* attack_duel_opponent(PlayerbotAI* ai) { return new AttackDuelOpponentAction(ai); }

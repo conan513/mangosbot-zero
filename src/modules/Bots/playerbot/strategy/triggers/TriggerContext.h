@@ -95,6 +95,7 @@ namespace ai
 
             creators["random bot update"] = &TriggerContext::random_bot_update_trigger;
             creators["no non bot players around"] = &TriggerContext::no_non_bot_players_around;
+            creators["new player nearby"] = &TriggerContext::new_player_nearby;
         }
 
     private:
@@ -162,6 +163,7 @@ namespace ai
         static Trigger* has_attackers(PlayerbotAI* ai) { return new HasAttackersTrigger(ai); }
         static Trigger* random_bot_update_trigger(PlayerbotAI* ai) { return new RandomBotUpdateTrigger(ai); }
         static Trigger* no_non_bot_players_around(PlayerbotAI* ai) { return new NoNonBotPlayersAroundTrigger(ai); }
+        static Trigger* new_player_nearby(PlayerbotAI* ai) { return new NewPlayerNearbyTrigger(ai); }
 
     };
 };

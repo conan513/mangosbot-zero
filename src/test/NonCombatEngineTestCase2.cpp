@@ -15,6 +15,7 @@ class NonCombatEngineTestCase2 : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( ready_check );
       CPPUNIT_TEST( reveal );
       CPPUNIT_TEST( gather );
+      CPPUNIT_TEST( greet );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -68,6 +69,15 @@ protected:
         tickWithTrigger("timer");
 
         assertActions(">S:add gathering loot");
-    }};
+    }
+
+    void greet()
+    {
+        engine->addStrategy("emote");
+        tickWithTrigger("new player nearby");
+
+        assertActions(">S:greet");
+    }
+};
 
 CPPUNIT_TEST_SUITE_REGISTRATION( NonCombatEngineTestCase2 );
