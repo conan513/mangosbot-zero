@@ -181,6 +181,10 @@ namespace ai
 
             creators["aoe count"] = &MockValueContext::stats;
             creators["aoe position"] = &MockValueContext::position;
+            creators["nearest non bot players"] = &MockValueContext::units;
+            creators["new player nearby"] = &MockValueContext::mock;
+            creators["already seen players"] = &MockValueContext::units;
+            creators["nearest friendly players"] = &MockValueContext::units;
         }
 
     private:
@@ -263,6 +267,9 @@ namespace ai
               GetValue<uint8>("threat")->Set(0);
               GetValue<uint8>("bag space")->Set(0);
               GetValue<uint8>("speed", "current target")->Set(80);
+              list<ObjectGuid> players;
+              players.push_back(ObjectGuid());
+              GetValue<list<ObjectGuid> >("nearest non bot players")->Set(players);
           }
 
     public:

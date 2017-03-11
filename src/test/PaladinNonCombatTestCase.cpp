@@ -75,7 +75,7 @@ protected:
     void cureMagic()
     {
         cureKind(DISPEL_MAGIC);
-        assertActions(">S:cleanse>P:cleanse magic on party>S:check mount state>S:check mount state");
+        assertActions(">S:cleanse>P:cleanse magic on party>S:check mount state");
     }
 
     void cureKind(DispelType type)

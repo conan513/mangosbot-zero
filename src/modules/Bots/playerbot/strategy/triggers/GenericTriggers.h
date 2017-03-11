@@ -408,6 +408,7 @@ namespace ai
                 lastCheck = time(0);
                 return true;
             }
+            return false;
         }
 
     private:
@@ -554,6 +555,18 @@ namespace ai
         virtual bool IsActive()
         {
             return AI_VALUE(list<ObjectGuid>, "nearest non bot players").empty();
+        }
+    };
+
+    class NewPlayerNearbyTrigger : public RandomTrigger
+    {
+    public:
+        NewPlayerNearbyTrigger(PlayerbotAI* ai) : RandomTrigger(ai, "new player nearby", 7) {}
+
+    public:
+        virtual bool IsActive()
+        {
+            return AI_VALUE(ObjectGuid, "new player nearby");
         }
     };
 }
