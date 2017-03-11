@@ -89,6 +89,7 @@ namespace ai
                 creators["feint"] = &AiObjectContextInternal::feint;
                 creators["backstab"] = &AiObjectContextInternal::backstab;
                 creators["expose armor"] = &AiObjectContextInternal::expose_armor;
+				creators["blade flurry"] = &AiObjectContextInternal::blade_flurry;
                 creators["kick on enemy healer"] = &AiObjectContextInternal::kick_on_enemy_healer;
             }
 
@@ -106,6 +107,7 @@ namespace ai
             static Action* feint(PlayerbotAI* ai) { return new CastFeintAction(ai); }
             static Action* backstab(PlayerbotAI* ai) { return new CastBackstabAction(ai); }
             static Action* expose_armor(PlayerbotAI* ai) { return new CastExposeArmorAction(ai); }
+			static Action*blade_flurry(PlayerbotAI* ai) { return new CastBladeFlurryAction(ai); }
             static Action* kick_on_enemy_healer(PlayerbotAI* ai) { return new CastKickOnEnemyHealerAction(ai); }
         };
     };
