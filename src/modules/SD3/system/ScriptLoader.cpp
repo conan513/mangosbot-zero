@@ -473,6 +473,7 @@ void AddSC_boss_onyxia();                            // onyxias_lair
 void AddSC_instance_onyxias_lair();
 void AddSC_npc_onyxian_warder();
 void AddSC_instance_razorfen_downs();                // razorfen_downs
+void AddSC_boss_coldbringerAI();                     //amnennar_the_coldbringer
 void AddSC_razorfen_downs();
 void AddSC_instance_razorfen_kraul();                // razorfen_kraul
 void AddSC_razorfen_kraul();
@@ -563,6 +564,7 @@ void AddKalimdorScripts()
     AddSC_npc_onyxian_warder();
     AddSC_instance_razorfen_downs();                        // razorfen_downs
     AddSC_razorfen_downs();
+    AddSC_boss_coldbringerAI();                             //amnennar_the_coldbringer
     AddSC_instance_razorfen_kraul();                        // razorfen_kraul
     AddSC_razorfen_kraul();
     AddSC_boss_ayamiss();                                   // ruins_of_ahnqiraj
