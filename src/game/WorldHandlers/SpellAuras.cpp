@@ -2982,7 +2982,6 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
 {
     if (!Real)
         { return; }
-
     Unit* target = GetTarget();
 
     if (apply)
@@ -2992,6 +2991,10 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
             // some spell have charges by functionality not have its in spell data
             case 28200:                                    // Ascendance (Talisman of Ascendance trinket)
                 GetHolder()->SetAuraCharges(6);
+                break;
+
+            case 8167:                                     // Poison Clensing Totem NEED TO FIX
+                target->CastSpell(target, 8168, true, 0, this);
                 break;
             case 8179:                                     // Grounding Totem
                 target->CastSpell(target, 8178, true, 0, this);
@@ -3024,19 +3027,31 @@ void Aura::HandlePeriodicTriggerSpell(bool apply, bool /*Real*/)
 
     Unit* target = GetTarget();
 
-    if (!apply)
+    if (apply)
     {
         switch (GetId())
         {
-            case 29213:                                     // Curse of the Plaguebringer
-                if (m_removeMode != AURA_REMOVE_BY_DISPEL)
-                    // Cast Wrath of the Plaguebringer if not dispelled
-                    { target->CastSpell(target, 29214, true, 0, this); }
-                return;
-            default:
-                break;
+        case 8179:                                     // Grounding Totem
+            target->CastSpell(target, 8178, true, 0, this);
+            break;
+        case 8167:                                     // Poison Clensing Totem NEED TO FIX
+            target->CastSpell(target, 8168, true, 0, this);
+            break;
         }
     }
+    else
+        switch (GetId())
+        {
+        case 29213:                                     // Curse of the Plaguebringer
+            if (m_removeMode != AURA_REMOVE_BY_DISPEL)
+                // Cast Wrath of the Plaguebringer if not dispelled
+            {
+                target->CastSpell(target, 29214, true, 0, this);
+            }
+            return;
+        default:
+            break;
+        }
 }
 
 void Aura::HandlePeriodicTriggerSpellWithValue(bool apply, bool /*Real*/)
