@@ -13,6 +13,7 @@ public:
         creators["hamstring"] = &hamstring;
         creators["heroic strike"] = &heroic_strike;
         creators["battle shout"] = &battle_shout;
+		
     }
 private:
     static ActionNode* hamstring(PlayerbotAI* ai)
@@ -35,7 +36,8 @@ private:
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
-    }
+	}
+	
 };
 
 GenericWarriorStrategy::GenericWarriorStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
@@ -53,11 +55,18 @@ void GenericWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "rend",
-        NextAction::array(0, new NextAction("rend", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("rend", ACTION_NORMAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "bloodrage",
         NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 1), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"high rage available",
+		NextAction::array(0, new NextAction("bloodthirst", ACTION_NORMAL + 2), 
+			new NextAction("whirlwind", ACTION_NORMAL + 2),
+			new NextAction("revenge", ACTION_NORMAL + 2),
+			new NextAction("heroic strike", ACTION_NORMAL + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "shield bash",
