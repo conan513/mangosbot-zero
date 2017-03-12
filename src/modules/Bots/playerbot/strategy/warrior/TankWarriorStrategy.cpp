@@ -31,43 +31,43 @@ private:
     static ActionNode* shield_wall(PlayerbotAI* ai)
     {
         return new ActionNode ("shield wall",
-			/*P*/ NULL,
+			/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NextAction::array(0, new NextAction("shield block"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* shield_slam(PlayerbotAI* ai)
     {
         return new ActionNode ("shield slam",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("revenge"), NULL),
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* revenge(PlayerbotAI* ai)
     {
         return new ActionNode ("revenge",
-            /*P*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NULL,
             /*C*/ NULL);
     }
    static ActionNode* sunder_armor(PlayerbotAI* ai)
     {
         return new ActionNode ("sunder armor",
-            /*P*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NextAction::array(0, new NextAction("revenge"), NULL),
 			/*C*/ NULL);
     }
    static ActionNode* shield_block(PlayerbotAI* ai)
     {
         return new ActionNode ("shield block",
-            /*P*/ NULL, 
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
             /*A*/ NULL,
             /*C*/ NextAction::array(0, new NextAction("revenge"), NULL));
     }
     static ActionNode* taunt(PlayerbotAI* ai)
     {
         return new ActionNode ("taunt",
-            /*P*/ NULL,
-            /*A*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("sunder armor"), NULL),
             /*C*/ NULL);
     }
 //	static ActionNode* thunder_clap(PlayerbotAI* ai)
@@ -86,7 +86,15 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrate
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-	return NextAction::array(0, new NextAction("revenge", ACTION_NORMAL + 5),NULL);
+	return NextAction::array(0, 
+		new NextAction("revenge", ACTION_NORMAL + 6),
+		new NextAction("shield slam", ACTION_NORMAL + 5),
+		new NextAction("shield block", ACTION_NORMAL + 4),
+		new NextAction("sunder armor", ACTION_NORMAL + 3),
+		new NextAction("heroic strike", ACTION_NORMAL + 2),
+		new NextAction("melee", ACTION_NORMAL),
+		NULL);
+
 }
 
 void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -94,9 +102,9 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     GenericWarriorStrategy::InitTriggers(triggers);
 
 
-    triggers.push_back(new TriggerNode(
+/*    triggers.push_back(new TriggerNode(
         "high rage available",
-        NextAction::array(0, new NextAction("heroic strike", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("heroic strike", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "disarm",
@@ -132,13 +140,13 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "revenge",
-        NextAction::array(0, new NextAction("revenge", ACTION_NORMAL + 3), NULL)));
+        NextAction::array(0, new NextAction("revenge", ACTION_NORMAL + 6), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"has aggro",
-		NextAction::array(0, new NextAction("shield block", ACTION_NORMAL + 1), new NextAction("revenge", ACTION_NORMAL + 1), NULL)));
+		NextAction::array(0, new NextAction("shield block", ACTION_NORMAL + 4), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"sunder armor",
-		NextAction::array(0, new NextAction("sunder armor", ACTION_HIGH + 2), NULL)));
+		NextAction::array(0, new NextAction("sunder armor", ACTION_NORMAL + 2), NULL)));
 }

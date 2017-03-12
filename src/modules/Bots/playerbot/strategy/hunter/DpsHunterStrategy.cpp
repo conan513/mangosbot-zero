@@ -29,7 +29,7 @@ private:
     {
         return new ActionNode ("aimed shot",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("chimera shot", 10.0f), NULL),
+            /*A*/ NextAction::array(0, new NextAction("multi-shot", 10.0f), NULL),
             /*C*/ NULL);
     }
 //    static ActionNode* chimera_shot(PlayerbotAI* ai)
@@ -51,7 +51,7 @@ private:
         return new ActionNode ("concussive shot",
             /*P*/ NULL,
             /*A*/ NULL,
-            /*C*/ NextAction::array(0, new NextAction("wyvern sting", 11.0f), NULL));
+            /*C*/ NULL);
     }
 
 };
@@ -63,20 +63,16 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* ai) : GenericHunterStrategy(ai
 
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("aimed shot", 11.0f), new NextAction("auto shot", 10.0f),
-		new NextAction("auto shot", 10.0f),
-		new NextAction("multi-shot", 10.0f),
-		new NextAction("auto shot", 10.0f),
-		new NextAction("auto shot", 10.0f), NULL);
+    return NextAction::array(0, new NextAction("aimed shot", 11.0f), NULL);
 }
 
 void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericHunterStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
+/*    triggers.push_back(new TriggerNode(
         "black arrow",
-        NextAction::array(0, new NextAction("black arrow", 51.0f), NULL)));
+        NextAction::array(0, new NextAction("black arrow", 51.0f), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "low mana",

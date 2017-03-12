@@ -100,11 +100,11 @@ namespace ai
 		CastWrathAction(PlayerbotAI* ai) : CastSpellAction(ai, "wrath") {}
 	};
 
-	class CastStarfallAction : public CastSpellAction
+/*	class CastStarfallAction : public CastSpellAction
 	{
 	public:
 		CastStarfallAction(PlayerbotAI* ai) : CastSpellAction(ai, "starfall") {}
-	};
+	};*/
 
 	class CastHurricaneAction : public CastSpellAction
 	{

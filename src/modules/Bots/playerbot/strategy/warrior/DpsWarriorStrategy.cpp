@@ -14,7 +14,7 @@ public:
         creators["melee"] = &melee;
         creators["charge"] = &charge;
         creators["bloodthirst"] = &bloodthirst;
-        creators["rend"] = &rend;
+       // creators["rend"] = &rend;
         creators["mortal strike"] = &mortal_strike;
 		creators["whirlwind"] = &whirlwind;
         creators["death wish"] = &death_wish;
@@ -53,23 +53,23 @@ private:
 	{
 		return new ActionNode("mortal strike",
 			/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-			/*A*/ NULL,
+			/*A*/ NextAction::array(0, new NextAction("heroic strike"), NULL),
 			/*C*/ NULL);
 	}
 	static ActionNode* whirlwind(PlayerbotAI* ai)
 	{
 		return new ActionNode("whirlwind",
 			/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("melee"), NULL),
+			/*A*/ NextAction::array(0, new NextAction("bloodthirst"), NULL),  
 			/*C*/ NULL);
 	}
-    static ActionNode* rend(PlayerbotAI* ai)
-    {
-        return new ActionNode ("rend",
-            /*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-            /*A*/ NULL,
-            /*C*/ NULL);
-    }
+//    static ActionNode* rend(PlayerbotAI* ai)
+//    {
+//        return new ActionNode ("rend",
+//            /*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
+//            /*A*/ NULL,
+//            /*C*/ NULL);
+//    }
     static ActionNode* mocking_blow(PlayerbotAI* ai)
     {
         return new ActionNode ("mocking blow",
@@ -100,7 +100,7 @@ DpsWarriorStrategy::DpsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy
 
 NextAction** DpsWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 1), new NextAction("whirlwind", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 1), new NextAction("whirlwind", ACTION_HIGH + 1), NULL);
 }
 void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
@@ -130,15 +130,16 @@ void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 void DpsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "rend on attacker",
-        NextAction::array(0, new NextAction("rend on attacker", ACTION_HIGH + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "light aoe",
-        NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), new NextAction("demoralizing shout", ACTION_HIGH + 2), NULL)));
+/*        "rend on attacker",
+        NextAction::array(0, new NextAction("rend on attacker", ACTION_HIGH + 1), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "medium aoe",
+        NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 2), 
+			new NextAction("demoralizing shout", ACTION_HIGH + 2),
+			new NextAction("cleave", ACTION_HIGH + 2), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "light aoe",
         NextAction::array(0, new NextAction("cleave", ACTION_HIGH + 3), NULL)));
 }
