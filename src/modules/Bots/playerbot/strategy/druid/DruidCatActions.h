@@ -1,11 +1,11 @@
 #pragma once
 
 namespace ai {
-	class CastFeralChargeCatAction : public CastReachTargetSpellAction
+	/*class CastFeralChargeCatAction : public CastReachTargetSpellAction
 	{
 	public:
 		CastFeralChargeCatAction(PlayerbotAI* ai) : CastReachTargetSpellAction(ai, "feral charge - cat", 1.5f) {}
-	};
+	};*/
 
 	class CastCowerAction : public CastBuffSpellAction
 	{
@@ -38,10 +38,10 @@ namespace ai {
 		CastClawAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "claw") {}
 	};
 
-	class CastMangleCatAction : public CastMeleeSpellAction {
+/*	class CastMangleCatAction : public CastMeleeSpellAction {
 	public:
 		CastMangleCatAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "mangle (cat)") {}
-	};
+	};*/
 
 	class CastSwipeCatAction : public CastMeleeSpellAction {
 	public:

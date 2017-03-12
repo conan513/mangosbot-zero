@@ -107,7 +107,7 @@ namespace ai {
         virtual bool IsActive() { return !ai->HasAura("cat form", bot); }
     };
 
-    class EclipseSolarTrigger : public HasAuraTrigger
+  /*  class EclipseSolarTrigger : public HasAuraTrigger
     {
     public:
         EclipseSolarTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "eclipse (solar)") {}
@@ -117,7 +117,7 @@ namespace ai {
     {
     public:
         EclipseLunarTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "eclipse (lunar)") {}
-    };
+    };*/
 
     class BashInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
     {

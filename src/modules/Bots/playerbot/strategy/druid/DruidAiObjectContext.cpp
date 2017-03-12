@@ -89,14 +89,14 @@ namespace ai
                 creators["bear form"] = &TriggerFactoryInternal::bear_form;
                 creators["cat form"] = &TriggerFactoryInternal::cat_form;
                 creators["tree form"] = &TriggerFactoryInternal::tree_form;
-                creators["eclipse (solar)"] = &TriggerFactoryInternal::eclipse_solar;
-                creators["eclipse (lunar)"] = &TriggerFactoryInternal::eclipse_lunar;
+               // creators["eclipse (solar)"] = &TriggerFactoryInternal::eclipse_solar;
+               // creators["eclipse (lunar)"] = &TriggerFactoryInternal::eclipse_lunar;
                 creators["bash on enemy healer"] = &TriggerFactoryInternal::bash_on_enemy_healer;
             }
 
         private:
-            static Trigger* eclipse_solar(PlayerbotAI* ai) { return new EclipseSolarTrigger(ai); }
-            static Trigger* eclipse_lunar(PlayerbotAI* ai) { return new EclipseLunarTrigger(ai); }
+           // static Trigger* eclipse_solar(PlayerbotAI* ai) { return new EclipseSolarTrigger(ai); }
+           // static Trigger* eclipse_lunar(PlayerbotAI* ai) { return new EclipseLunarTrigger(ai); }
             static Trigger* Thorns(PlayerbotAI* ai) { return new ThornsTrigger(ai); }
             static Trigger* bash(PlayerbotAI* ai) { return new BashInterruptSpellTrigger(ai); }
             static Trigger* faerie_fire_feral(PlayerbotAI* ai) { return new FaerieFireFeralTrigger(ai); }
@@ -131,7 +131,7 @@ namespace ai
             AiObjectContextInternal()
             {
                 creators["feral charge - bear"] = &AiObjectContextInternal::feral_charge_bear;
-                creators["feral charge - cat"] = &AiObjectContextInternal::feral_charge_cat;
+                //creators["feral charge - cat"] = &AiObjectContextInternal::feral_charge_cat;
                 creators["swipe (bear)"] = &AiObjectContextInternal::swipe_bear;
                 creators["faerie fire (feral)"] = &AiObjectContextInternal::faerie_fire_feral;
                 creators["faerie fire"] = &AiObjectContextInternal::faerie_fire;
@@ -141,7 +141,7 @@ namespace ai
                 creators["cat form"] = &AiObjectContextInternal::cat_form;
                 creators["tree form"] = &AiObjectContextInternal::tree_form;
                 creators["caster form"] = &AiObjectContextInternal::caster_form;
-                creators["mangle (bear)"] = &AiObjectContextInternal::mangle_bear;
+                //creators["mangle (bear)"] = &AiObjectContextInternal::mangle_bear;
                 creators["maul"] = &AiObjectContextInternal::maul;
                 creators["bash"] = &AiObjectContextInternal::bash;
                 creators["swipe"] = &AiObjectContextInternal::swipe;
@@ -151,14 +151,14 @@ namespace ai
                 creators["entangling roots"] = &AiObjectContextInternal::entangling_roots;
                 creators["entangling roots on cc"] = &AiObjectContextInternal::entangling_roots_on_cc;
                 creators["wrath"] = &AiObjectContextInternal::wrath;
-                creators["starfall"] = &AiObjectContextInternal::starfall;
+                //creators["starfall"] = &AiObjectContextInternal::starfall;
                 creators["insect swarm"] = &AiObjectContextInternal::insect_swarm;
                 creators["moonfire"] = &AiObjectContextInternal::moonfire;
                 creators["starfire"] = &AiObjectContextInternal::starfire;
                 creators["nature's grasp"] = &AiObjectContextInternal::natures_grasp;
                 creators["claw"] = &AiObjectContextInternal::claw;
-                creators["mangle (cat)"] = &AiObjectContextInternal::mangle_cat;
-                creators["swipe (cat)"] = &AiObjectContextInternal::swipe_cat;
+                //creators["mangle (cat)"] = &AiObjectContextInternal::mangle_cat;
+                //creators["swipe (cat)"] = &AiObjectContextInternal::swipe_cat;
                 creators["rake"] = &AiObjectContextInternal::rake;
                 creators["ferocious bite"] = &AiObjectContextInternal::ferocious_bite;
                 creators["rip"] = &AiObjectContextInternal::rip;
@@ -182,7 +182,7 @@ namespace ai
                 creators["rebirth"] = &AiObjectContextInternal::rebirth;
                 creators["revive"] = &AiObjectContextInternal::revive;
                 creators["barskin"] = &AiObjectContextInternal::barskin;
-                creators["lacerate"] = &AiObjectContextInternal::lacerate;
+                //creators["lacerate"] = &AiObjectContextInternal::lacerate;
                 creators["hurricane"] = &AiObjectContextInternal::hurricane;
                 creators["innervate"] = &AiObjectContextInternal::innervate;
                 creators["tranquility"] = &AiObjectContextInternal::tranquility;
@@ -192,7 +192,7 @@ namespace ai
         private:
             static Action* tranquility(PlayerbotAI* ai) { return new CastTranquilityAction(ai); }
             static Action* feral_charge_bear(PlayerbotAI* ai) { return new CastFeralChargeBearAction(ai); }
-            static Action* feral_charge_cat(PlayerbotAI* ai) { return new CastFeralChargeCatAction(ai); }
+            //static Action* feral_charge_cat(PlayerbotAI* ai) { return new CastFeralChargeCatAction(ai); }
             static Action* swipe_bear(PlayerbotAI* ai) { return new CastSwipeBearAction(ai); }
             static Action* faerie_fire_feral(PlayerbotAI* ai) { return new CastFaerieFireFeralAction(ai); }
             static Action* faerie_fire(PlayerbotAI* ai) { return new CastFaerieFireAction(ai); }
@@ -201,7 +201,7 @@ namespace ai
             static Action* cat_form(PlayerbotAI* ai) { return new CastCatFormAction(ai); }
             static Action* tree_form(PlayerbotAI* ai) { return new CastTreeFormAction(ai); }
             static Action* caster_form(PlayerbotAI* ai) { return new CastCasterFormAction(ai); }
-            static Action* mangle_bear(PlayerbotAI* ai) { return new CastMangleBearAction(ai); }
+            //static Action* mangle_bear(PlayerbotAI* ai) { return new CastMangleBearAction(ai); }
             static Action* maul(PlayerbotAI* ai) { return new CastMaulAction(ai); }
             static Action* bash(PlayerbotAI* ai) { return new CastBashAction(ai); }
             static Action* swipe(PlayerbotAI* ai) { return new CastSwipeAction(ai); }
@@ -212,13 +212,13 @@ namespace ai
             static Action* entangling_roots(PlayerbotAI* ai) { return new CastEntanglingRootsAction(ai); }
             static Action* entangling_roots_on_cc(PlayerbotAI* ai) { return new CastEntanglingRootsCcAction(ai); }
             static Action* wrath(PlayerbotAI* ai) { return new CastWrathAction(ai); }
-            static Action* starfall(PlayerbotAI* ai) { return new CastStarfallAction(ai); }
+           // static Action* starfall(PlayerbotAI* ai) { return new CastStarfallAction(ai); }
             static Action* insect_swarm(PlayerbotAI* ai) { return new CastInsectSwarmAction(ai); }
             static Action* moonfire(PlayerbotAI* ai) { return new CastMoonfireAction(ai); }
             static Action* starfire(PlayerbotAI* ai) { return new CastStarfireAction(ai); }
             static Action* natures_grasp(PlayerbotAI* ai) { return new CastNaturesGraspAction(ai); }
             static Action* claw(PlayerbotAI* ai) { return new CastClawAction(ai); }
-            static Action* mangle_cat(PlayerbotAI* ai) { return new CastMangleCatAction(ai); }
+           // static Action* mangle_cat(PlayerbotAI* ai) { return new CastMangleCatAction(ai); }
             static Action* swipe_cat(PlayerbotAI* ai) { return new CastSwipeCatAction(ai); }
             static Action* rake(PlayerbotAI* ai) { return new CastRakeAction(ai); }
             static Action* ferocious_bite(PlayerbotAI* ai) { return new CastFerociousBiteAction(ai); }
@@ -243,7 +243,7 @@ namespace ai
             static Action* rebirth(PlayerbotAI* ai) { return new CastRebirthAction(ai); }
             static Action* revive(PlayerbotAI* ai) { return new CastReviveAction(ai); }
             static Action* barskin(PlayerbotAI* ai) { return new CastBarskinAction(ai); }
-            static Action* lacerate(PlayerbotAI* ai) { return new CastLacerateAction(ai); }
+            //static Action* lacerate(PlayerbotAI* ai) { return new CastLacerateAction(ai); }
             static Action* hurricane(PlayerbotAI* ai) { return new CastHurricaneAction(ai); }
             static Action* innervate(PlayerbotAI* ai) { return new CastInnervateAction(ai); }
             static Action* bash_on_enemy_healer(PlayerbotAI* ai) { return new CastBashOnEnemyHealerAction(ai); }
