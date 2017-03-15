@@ -2983,6 +2983,8 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
     if (!Real)
         { return; }
     Unit* target = GetTarget();
+    Unit* caster = GetCaster();
+    Unit* owner = caster->GetCharmerOrOwner();
 
     if (apply)
     {
@@ -2991,11 +2993,13 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
             // some spell have charges by functionality not have its in spell data
             case 28200:                                    // Ascendance (Talisman of Ascendance trinket)
                 GetHolder()->SetAuraCharges(6);
-                break;
-
-            case 8167:                                     // Poison Clensing Totem NEED TO FIX
-                target->CastSpell(target, 8168, true, 0, this);
-                break;
+                return;
+            case 8172:                                     // Diease Cleansing Totem NEED TO ADD TIMER
+                target->CastSpell(owner, 8171, true, 0, this);
+                return;
+            case 8167:                                     // Poison Cleansing Totem NEED TO ADD TIMER
+                target->CastSpell(owner, 8168, true, 0, this);
+                return;
             case 8179:                                     // Grounding Totem
                 target->CastSpell(target, 8178, true, 0, this);
                 return;
@@ -3026,17 +3030,26 @@ void Aura::HandlePeriodicTriggerSpell(bool apply, bool /*Real*/)
     m_isPeriodic = apply;
 
     Unit* target = GetTarget();
+    Unit* caster = GetCaster();
+    Unit* owner = caster->GetCharmerOrOwner();
+    SpellEntry const *triggeredSpellInfo = sSpellStore.LookupEntry(GetId());
 
-    if (apply)
+    if (apply, m_isPeriodic = apply)
     {
         switch (GetId())
         {
+        case 8172:                                     // Diease Cleansing Totem
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(owner, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
+            break;
         case 8179:                                     // Grounding Totem
-            target->CastSpell(target, 8178, true, 0, this);
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(target, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
             break;
         case 8167:                                     // Poison Clensing Totem NEED TO FIX
-            target->CastSpell(target, 8168, true, 0, this);
-            break;
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(owner, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
+            return;
         }
     }
     else
