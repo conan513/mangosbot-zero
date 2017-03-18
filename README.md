@@ -1,6 +1,6 @@
-+# Come and join to the Single Player Project Discord Server!
- +![logo](http://i.imgur.com/Rn2rKfy.png) 
- +## --> https://discord.gg/TpxqWWT <--
+# Come and join to the Single Player Project Discord Server!
+[logo](http://i.imgur.com/Rn2rKfy.png) 
+## --> https://discord.gg/TpxqWWT <--
 
 
 <table border=0 cellpadding=0 cellspacing=0 valign='top'><tr>
