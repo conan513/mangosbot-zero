@@ -1,5 +1,5 @@
 # Come and join to the Single Player Project Discord Server!
-[logo](http://i.imgur.com/Rn2rKfy.png) 
+![logo](http://i.imgur.com/Rn2rKfy.png) 
 ## --> https://discord.gg/TpxqWWT <--
 
 
