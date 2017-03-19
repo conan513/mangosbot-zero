@@ -20,7 +20,6 @@ bool GreetAction::Execute(Event event)
     if (!bot->isInFront(player, sPlayerbotAIConfig.sightDistance, M_PI / 3.0f))
     {
         bot->SetFacingToObject(player);
-        bot->Whisper("Hello", LANG_UNIVERSAL, guid);
         return true;
     }
 
