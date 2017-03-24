@@ -19,12 +19,8 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     GenericPaladinStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
-        "judgement of light",
-        NextAction::array(0, new NextAction("judgement of light", ACTION_NORMAL + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "medium mana",
-        NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 3), NULL)));
+        "judgement",
+        NextAction::array(0, new NextAction("judgement", ACTION_NORMAL + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "righteous fury",
@@ -40,7 +36,7 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "lose aggro",
-        NextAction::array(0, new NextAction("hand of reckoning", ACTION_HIGH + 7), NULL)));
+        NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 7), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"holy shield",

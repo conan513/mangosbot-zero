@@ -84,11 +84,6 @@ namespace ai
 		CastMarkOfTheWildOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "mark of the wild") {}
 	};
 
-	class CastSurvivalInstinctsAction : public CastBuffSpellAction {
-	public:
-		CastSurvivalInstinctsAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "survival instincts") {}
-	};
-
 	class CastThornsAction : public CastBuffSpellAction {
 	public:
 		CastThornsAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "thorns") {}
@@ -98,12 +93,6 @@ namespace ai
 	{
 	public:
 		CastWrathAction(PlayerbotAI* ai) : CastSpellAction(ai, "wrath") {}
-	};
-
-	class CastStarfallAction : public CastSpellAction
-	{
-	public:
-		CastStarfallAction(PlayerbotAI* ai) : CastSpellAction(ai, "starfall") {}
 	};
 
 	class CastHurricaneAction : public CastSpellAction
