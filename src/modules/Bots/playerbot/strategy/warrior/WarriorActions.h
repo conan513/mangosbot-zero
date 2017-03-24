@@ -64,6 +64,11 @@ namespace ai
 		CastWhirlwindAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "whirlwind") {}
 	};
 
+	class CastSweepingStrikesAction : public CastMeleeSpellAction {
+	public:
+		CastSweepingStrikesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "sweeping strikes") {}
+	};
+
     // battle, berserker
     class CastExecuteAction : public CastMeleeSpellAction {
     public:
