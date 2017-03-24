@@ -120,5 +120,5 @@ void DpsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "medium aoe",
-        NextAction::array(0, new NextAction("sweeping strikes", ACTION_HIGH + 3), NULL)));
+        NextAction::array(0, new NextAction("sweeping strikes", ACTION_HIGH + 3), new NextAction("recklessness", ACTION_HIGH + 2), NULL)));
 }

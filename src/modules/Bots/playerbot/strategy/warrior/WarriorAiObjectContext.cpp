@@ -147,6 +147,7 @@ namespace ai
                 creators["concussion blow"] = &AiObjectContextInternal::concussion_blow;
                 creators["shield bash on enemy healer"] = &AiObjectContextInternal::shield_bash_on_enemy_healer;
 				creators["sweeping strikes"] = &AiObjectContextInternal::sweeping_strikes;
+				creators["recklessness"] = &AiObjectContextInternal::recklessness;
             }
 
         private:
@@ -187,6 +188,7 @@ namespace ai
             static Action* thunder_clap(PlayerbotAI* ai) { return new CastThunderClapAction(ai); }
             static Action* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new CastShieldBashOnEnemyHealerAction(ai); }
 			static Action* sweeping_strikes(PlayerbotAI* ai) { return new CastSweepingStrikesAction(ai); }
+			static Action* recklessness(PlayerbotAI* ai) { return new CastRecklessnessAction(ai); }
         };
     };
 };

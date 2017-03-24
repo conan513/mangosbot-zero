@@ -116,6 +116,11 @@ namespace ai
         CastBloodrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "bloodrage") {}
     };
 
+	class CastRecklessnessAction : public CastBuffSpellAction {
+	public:
+		CastRecklessnessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "recklessness") {}
+	};
+
     // defensive
     class CastDevastateAction : public CastDefensiveMeleeSpellAction {
     public:
