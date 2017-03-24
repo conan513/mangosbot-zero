@@ -30,7 +30,7 @@ private:
     static ActionNode* melee(PlayerbotAI* ai)
     {
         return new ActionNode ("melee",
-            /*P*/ NextAction::array(0, new NextAction("feral charge - cat"), NULL),
+            /*P*/ NextAction::array(0, new NextAction("reach melee"), NULL),
             /*A*/ NULL,
             /*C*/ NULL);
     }
@@ -112,13 +112,17 @@ void CatDpsDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "entangling roots",
         NextAction::array(0, new NextAction("entangling roots on cc", ACTION_HIGH + 1), NULL)));
+	
+	triggers.push_back(new TriggerNode(
+		"low health",
+		NextAction::array(0, new NextAction("barkskin", ACTION_HIGH + 1), NULL)));
 
 }
 
 void CatAoeDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
 	triggers.push_back(new TriggerNode(
-		"medium aoe",
-		NextAction::array(0, new NextAction("swipe (cat)", ACTION_HIGH + 2), NULL)));
+		"high aoe",
+		NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 2), NULL)));
 }
 
