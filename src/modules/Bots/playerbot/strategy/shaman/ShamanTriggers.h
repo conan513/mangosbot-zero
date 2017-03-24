@@ -60,18 +60,6 @@ namespace ai
         SearingTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "searing totem", 1) {}
     };
 
-    class WindShearInterruptSpellTrigger : public InterruptSpellTrigger
-    {
-    public:
-        WindShearInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "wind shear") {}
-    };
-
-    class WaterShieldTrigger : public BuffTrigger
-    {
-    public:
-        WaterShieldTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water shield") {}
-    };
-
     class LightningShieldTrigger : public BuffTrigger
     {
     public:
@@ -124,42 +112,6 @@ namespace ai
         }
     };
 
-    class CleanseSpiritPoisonTrigger : public NeedCureTrigger
-    {
-    public:
-        CleanseSpiritPoisonTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cleanse spirit", DISPEL_POISON) {}
-    };
-
-    class PartyMemberCleanseSpiritPoisonTrigger : public PartyMemberNeedCureTrigger
-    {
-    public:
-        PartyMemberCleanseSpiritPoisonTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cleanse spirit", DISPEL_POISON) {}
-    };
-
-    class CleanseSpiritCurseTrigger : public NeedCureTrigger
-    {
-    public:
-        CleanseSpiritCurseTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cleanse spirit", DISPEL_CURSE) {}
-    };
-
-    class PartyMemberCleanseSpiritCurseTrigger : public PartyMemberNeedCureTrigger
-    {
-    public:
-        PartyMemberCleanseSpiritCurseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cleanse spirit", DISPEL_CURSE) {}
-    };
-
-    class CleanseSpiritDiseaseTrigger : public NeedCureTrigger
-    {
-    public:
-        CleanseSpiritDiseaseTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cleanse spirit", DISPEL_DISEASE) {}
-    };
-
-    class PartyMemberCleanseSpiritDiseaseTrigger : public PartyMemberNeedCureTrigger
-    {
-    public:
-        PartyMemberCleanseSpiritDiseaseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cleanse spirit", DISPEL_DISEASE) {}
-    };
-
     class ShockTrigger : public DebuffTrigger {
     public:
         ShockTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "earth shock") {}
@@ -169,53 +121,5 @@ namespace ai
     class FrostShockSnareTrigger : public SnareTargetTrigger {
     public:
         FrostShockSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "frost shock") {}
-    };
-
-    class HeroismTrigger : public BoostTrigger
-    {
-    public:
-        HeroismTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "heroism") {}
-    };
-
-    class BloodlustTrigger : public BoostTrigger
-    {
-    public:
-        BloodlustTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "bloodlust") {}
-    };
-
-    class MaelstromWeaponTrigger : public HasAuraTrigger
-    {
-    public:
-        MaelstromWeaponTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "maelstrom weapon") {}
-    };
-
-    class WindShearInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
-    {
-    public:
-        WindShearInterruptEnemyHealerSpellTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "wind shear") {}
-    };
-
-    class CurePoisonTrigger : public NeedCureTrigger
-    {
-    public:
-        CurePoisonTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cure poison", DISPEL_POISON) {}
-    };
-
-    class PartyMemberCurePoisonTrigger : public PartyMemberNeedCureTrigger
-    {
-    public:
-        PartyMemberCurePoisonTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cure poison", DISPEL_POISON) {}
-    };
-
-    class CureDiseaseTrigger : public NeedCureTrigger
-    {
-    public:
-        CureDiseaseTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cure disease", DISPEL_DISEASE) {}
-    };
-
-    class PartyMemberCureDiseaseTrigger : public PartyMemberNeedCureTrigger
-    {
-    public:
-        PartyMemberCureDiseaseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cure disease", DISPEL_DISEASE) {}
     };
 }
