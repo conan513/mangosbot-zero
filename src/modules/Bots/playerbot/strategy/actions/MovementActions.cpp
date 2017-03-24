@@ -330,6 +330,9 @@ bool MoveRandomAction::Execute(Event event)
             continue;
 
         z = 0.05f + ground;
+        if (abs(z - bot->GetPositionZ()) > sPlayerbotAIConfig.tooCloseDistance)
+            continue;
+
         WorldLocation loc(bot->GetMapId(), x, y, z);
         locs.push_back(loc);
     }
