@@ -127,10 +127,6 @@ void GenericMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "polymorph",
         NextAction::array(0, new NextAction("polymorph", 30.0f), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"spellsteal",
-		NextAction::array(0, new NextAction("spellsteal", 40.0f), NULL)));
-
     triggers.push_back(new TriggerNode(
         "low mana",
         NextAction::array(0, new NextAction("evocation", ACTION_EMERGENCY + 5), NULL)));

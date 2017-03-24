@@ -156,6 +156,7 @@ namespace ai
                 creators["evocation"] = &AiObjectContextInternal::evocation;
                 creators["arcane missiles"] = &AiObjectContextInternal::arcane_missiles;
                 creators["counterspell on enemy healer"] = &AiObjectContextInternal::counterspell_on_enemy_healer;
+				creators["arcane explosion"] = &AiObjectContextInternal::arcane_explosion;
             }
 
         private:
@@ -187,6 +188,7 @@ namespace ai
             static Action* blast_wave(PlayerbotAI* ai) { return new CastBlastWaveAction(ai); }
             static Action* evocation(PlayerbotAI* ai) { return new CastEvocationAction(ai); }
             static Action* counterspell_on_enemy_healer(PlayerbotAI* ai) { return new CastCounterspellOnEnemyHealerAction(ai); }
+			static Action* arcane_explosion(PlayerbotAI* ai) { return new CastArcaneExplosionAction(ai); }
         };
     };
 };
