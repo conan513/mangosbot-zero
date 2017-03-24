@@ -27,11 +27,6 @@ namespace ai {
 		CastCatFormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "cat form") {} 
 	};
 
-	class CastTreeFormAction : public CastBuffSpellAction {
-	public:
-		CastTreeFormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "tree of life") {}
-	};
-
 	class CastMoonkinFormAction : public CastBuffSpellAction { 
 	public: 
 		CastMoonkinFormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "moonkin form") {} 
@@ -43,7 +38,7 @@ namespace ai {
 
 		virtual bool isUseful() {
 			return ai->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form", 
-				"flight form", "swift flight form", "moonkin form", "tree of life", NULL);
+				"swift flight form", "moonkin form", NULL);
 		}
 		virtual bool isPossible() { return true; }
 		

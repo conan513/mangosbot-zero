@@ -16,7 +16,7 @@ namespace ai
             creators["seal of wisdom"] = &seal_of_wisdom;
             creators["seal of justice"] = &seal_of_justice;
             creators["hand of reckoning"] = &hand_of_reckoning;
-            creators["judgement of wisdom"] = &judgement_of_wisdom;
+            creators["judgement"] = &judgement;
             creators["divine shield"] = &divine_shield;
             creators["flash of light"] = &flash_of_light;
             creators["flash of light on party"] = &flash_of_light_on_party;
@@ -151,11 +151,11 @@ namespace ai
                 /*A*/ NextAction::array(0, new NextAction("judgement of justice"), NULL),
                 /*C*/ NULL);
         }
-        static ActionNode* judgement_of_wisdom(PlayerbotAI* ai)
+        static ActionNode* judgement(PlayerbotAI* ai)
         {
-            return new ActionNode ("judgement of wisdom",
+            return new ActionNode ("judgement",
                 /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("judgement of light"), NULL),
+                /*A*/ NULL,
                 /*C*/ NULL);
         }
         static ActionNode* divine_shield(PlayerbotAI* ai)

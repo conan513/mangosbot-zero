@@ -12,11 +12,6 @@ namespace ai
         virtual bool IsActive();
     };
 
-    class LivingBombTrigger : public DebuffTrigger {
-    public:
-        LivingBombTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "living bomb") {}
-	};
-
     class FireballTrigger : public DebuffTrigger {
     public:
         FireballTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "fireball") {}
@@ -25,21 +20,6 @@ namespace ai
     class PyroblastTrigger : public DebuffTrigger {
     public:
         PyroblastTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "pyroblast") {}
-    };
-
-    class HotStreakTrigger : public HasAuraTrigger {
-    public:
-        HotStreakTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "hot streak") {}
-    };
-
-    class MissileBarrageTrigger : public HasAuraTrigger {
-    public:
-        MissileBarrageTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "missile barrage") {}
-    };
-
-    class ArcaneBlastTrigger : public BuffTrigger {
-    public:
-        ArcaneBlastTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "arcane blast") {}
     };
 
     class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
@@ -76,12 +56,6 @@ namespace ai
     {
     public:
         PartyMemberRemoveCurseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "remove curse", DISPEL_CURSE) {}
-    };
-
-    class SpellstealTrigger : public TargetAuraDispelTrigger
-    {
-    public:
-        SpellstealTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "spellsteal", DISPEL_MAGIC) {}
     };
 
     class CounterspellEnemyHealerTrigger : public InterruptEnemyHealerTrigger

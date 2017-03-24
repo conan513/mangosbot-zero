@@ -12,15 +12,12 @@ public:
     {
         creators["melee"] = &melee;
         creators["feral charge - bear"] = &feral_charge_bear;
-        creators["swipe (bear)"] = &swipe_bear;
         creators["faerie fire (feral)"] = &faerie_fire_feral;
         creators["bear form"] = &bear_form;
         creators["dire bear form"] = &dire_bear_form;
-        creators["mangle (bear)"] = &mangle_bear;
         creators["maul"] = &maul;
         creators["bash"] = &bash;
         creators["swipe"] = &swipe;
-        creators["lacerate"] = &lacerate;
         creators["demoralizing roar"] = &demoralizing_roar;
     }
 private:
@@ -36,13 +33,6 @@ private:
         return new ActionNode ("feral charge - bear",
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("reach melee"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* swipe_bear(PlayerbotAI* ai)
-    {
-        return new ActionNode ("swipe (bear)",
-            /*P*/ NULL,
-            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* faerie_fire_feral(PlayerbotAI* ai)
@@ -66,13 +56,6 @@ private:
             /*A*/ NextAction::array(0, new NextAction("bear form"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* mangle_bear(PlayerbotAI* ai)
-    {
-        return new ActionNode ("mangle (bear)",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lacerate"), NULL),
-            /*C*/ NULL);
-    }
     static ActionNode* maul(PlayerbotAI* ai)
     {
         return new ActionNode ("maul",
@@ -92,13 +75,6 @@ private:
         return new ActionNode ("swipe",
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* lacerate(PlayerbotAI* ai)
-    {
-        return new ActionNode ("lacerate",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("maul"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* growl(PlayerbotAI* ai)
@@ -125,8 +101,7 @@ BearTankDruidStrategy::BearTankDruidStrategy(PlayerbotAI* ai) : FeralDruidStrate
 NextAction** BearTankDruidStrategy::getDefaultActions()
 {
     return NextAction::array(0,
-            new NextAction("lacerate", ACTION_NORMAL + 4),
-            new NextAction("mangle (bear)", ACTION_NORMAL + 3),
+            new NextAction("swipe", ACTION_NORMAL + 3),
             new NextAction("maul", ACTION_NORMAL + 2),
             new NextAction("faerie fire (feral)", ACTION_NORMAL + 1),
             new NextAction("melee", ACTION_NORMAL),
@@ -159,7 +134,7 @@ void BearTankDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "light aoe",
-        NextAction::array(0, new NextAction("swipe (bear)", ACTION_HIGH + 5), NULL)));
+        NextAction::array(0, new NextAction("swipe", ACTION_HIGH + 5), NULL)));
 
     triggers.push_back(new TriggerNode(
         "bash",

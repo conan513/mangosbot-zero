@@ -14,10 +14,10 @@ namespace ai {
 	};
 
 
-	class CastBerserkAction : public CastBuffSpellAction
+	class CastEnrageAction : public CastBuffSpellAction
 	{
 	public:
-		CastBerserkAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "berserk") {}
+		CastEnrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "enrage") {}
 	};
 
 	class CastTigersFuryAction : public CastBuffSpellAction
@@ -32,27 +32,21 @@ namespace ai {
 		CastRakeAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "rake") {}
 	};
 
-
 	class CastClawAction : public CastMeleeSpellAction {
 	public:
 		CastClawAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "claw") {}
 	};
 
-	class CastMangleCatAction : public CastMeleeSpellAction {
-	public:
-		CastMangleCatAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "mangle (cat)") {}
-	};
-
 	class CastSwipeCatAction : public CastMeleeSpellAction {
 	public:
-		CastSwipeCatAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "swipe (cat)") {}
+		CastSwipeCatAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "swipe") {}
 	};
+
 
 	class CastFerociousBiteAction : public CastMeleeSpellAction {
 	public:
 		CastFerociousBiteAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "ferocious bite") {}
 	};
-
 
 	class CastRipAction : public CastMeleeSpellAction {
 	public:

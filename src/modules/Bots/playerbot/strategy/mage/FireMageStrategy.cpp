@@ -7,20 +7,14 @@ using namespace ai;
 
 NextAction** FireMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("scorch", 7.0f), new NextAction("fireball", 6.0f), new NextAction("fire blast", 5.0f), NULL);
+    return NextAction::array(0, new NextAction("scorch", 7.0f),
+		new NextAction("fireball", 6.0f),
+		new NextAction("fire blast", 5.0f), NULL);
 }
 
 void FireMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
-
-    triggers.push_back(new TriggerNode(
-        "pyroblast",
-        NextAction::array(0, new NextAction("pyroblast", 10.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "hot streak",
-        NextAction::array(0, new NextAction("pyroblast", 25.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "combustion",
@@ -36,9 +30,5 @@ void FireMageAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "medium aoe",
         NextAction::array(0, new NextAction("flamestrike", 20.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "living bomb",
-        NextAction::array(0, new NextAction("living bomb", 25.0f), NULL)));
 }
 
