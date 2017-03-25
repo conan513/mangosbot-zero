@@ -42,6 +42,7 @@
 /**
  * ContentData
  * npc_chicken_cluck          100%    support for quest 3861 (Cluck!)
+ * target_dummy               100%    target dummy should not attack player and should now correctly taunt.
 #if defined (TBC) || defined (WOTLK) || defined (CATA)  
  * npc_air_force_bots          80%    support for misc (invisible) guard bots in areas where player allowed to fly. Summon guards after a preset time if tagged by spell
  * npc_dancing_flames         100%    midsummer event NPC
@@ -334,6 +335,7 @@ public:
             m_creature->SetRoot(true); //disable rotate
             m_creature->SetLootRecipient(m_creature->GetOwner());
             m_creature->SelectLevel();
+            m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_FLAG_STUNNED);
         }
 
         void EnterEvadeMode()

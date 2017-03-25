@@ -50,6 +50,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "MapManager.h"
+#include "Unit.h"
 
 #define NULL_AURA_SLOT 0xFF
 
@@ -2499,6 +2500,11 @@ void Aura::HandleModStealth(bool apply, bool Real)
 
             if (target->GetTypeId() == TYPEID_PLAYER)
                 { target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH); }
+
+            if (target->HasAura(1856 || 1857)) //improved code of rogue vanish.
+            {
+                target->GetHostileRefManager().deleteReferences();
+            }
 
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (target->GetVisibility() != VISIBILITY_OFF)
