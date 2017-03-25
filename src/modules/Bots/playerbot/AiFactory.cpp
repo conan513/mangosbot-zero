@@ -251,10 +251,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
         case CLASS_DRUID:
             if (tab == 1)
-                nonCombatEngine->addStrategy("tank aoe");
+                nonCombatEngine->addStrategies("tank aoe", "prowl", NULL);
             else
                 nonCombatEngine->addStrategies("dps assist", "cure", NULL);
             break;
+		case CLASS_ROGUE:
+			nonCombatEngine->addStrategy("stealth");
+			break;
         case CLASS_WARRIOR:
             if (tab == 2)
                 nonCombatEngine->addStrategy("tank aoe");
@@ -266,7 +269,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
     }
     nonCombatEngine->addStrategies("nc", "food", "stay", "chat",
-            "default", "quest", "loot", "gather", "duel", "emote", "lfg", NULL);
+            "default", "quest", "loot", "gather", "duel", "emote", NULL);
 
     if (sRandomPlayerbotMgr.IsRandomBot(player))
     {
