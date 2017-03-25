@@ -73,6 +73,7 @@ namespace ai
                 creators["concussion blow"] = &TriggerFactoryInternal::concussion_blow;
 				creators["sunder armor"] = &TriggerFactoryInternal::sunder_armor;
                 creators["shield bash on enemy healer"] = &TriggerFactoryInternal::shield_bash_on_enemy_healer;
+				creators["sweeping strikes"] = &TriggerFactoryInternal::sweeping_strikes;
 
             }
 
@@ -89,6 +90,7 @@ namespace ai
             static Trigger* concussion_blow(PlayerbotAI* ai) { return new ConcussionBlowTrigger(ai); }
 			static Trigger* sunder_armor(PlayerbotAI* ai) { return new SunderArmorDebuffTrigger(ai); }
             static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new ShieldBashInterruptEnemyHealerSpellTrigger(ai); }
+			static Trigger* sweeping_strikes(PlayerbotAI* ai) { return new SweepingStrikesTrigger(ai); }
         };
     };
 };
@@ -144,6 +146,8 @@ namespace ai
                 creators["cleave"] = &AiObjectContextInternal::cleave;
                 creators["concussion blow"] = &AiObjectContextInternal::concussion_blow;
                 creators["shield bash on enemy healer"] = &AiObjectContextInternal::shield_bash_on_enemy_healer;
+				creators["sweeping strikes"] = &AiObjectContextInternal::sweeping_strikes;
+				creators["recklessness"] = &AiObjectContextInternal::recklessness;
             }
 
         private:
@@ -183,7 +187,8 @@ namespace ai
             static Action* battle_shout(PlayerbotAI* ai) { return new CastBattleShoutAction(ai); }
             static Action* thunder_clap(PlayerbotAI* ai) { return new CastThunderClapAction(ai); }
             static Action* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new CastShieldBashOnEnemyHealerAction(ai); }
-
+			static Action* sweeping_strikes(PlayerbotAI* ai) { return new CastSweepingStrikesAction(ai); }
+			static Action* recklessness(PlayerbotAI* ai) { return new CastRecklessnessAction(ai); }
         };
     };
 };

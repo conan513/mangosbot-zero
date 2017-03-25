@@ -10,13 +10,13 @@ class HealShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
 public:
     HealShamanStrategyActionNodeFactory()
     {
-        creators["earthliving weapon"] = &earthliving_weapon;
+        creators["frostbrand Weapon"] = &frostbrand_weapon;
         creators["mana tide totem"] = &mana_tide_totem;
     }
 private:
-    static ActionNode* earthliving_weapon(PlayerbotAI* ai)
+    static ActionNode* frostbrand_weapon(PlayerbotAI* ai)
     {
-        return new ActionNode ("earthliving weapon",
+        return new ActionNode ("frostbrand Weapon",
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("flametongue weapon"), NULL),
             /*C*/ NULL);
@@ -46,7 +46,7 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "shaman weapon",
-        NextAction::array(0, new NextAction("earthliving weapon", 22.0f), NULL)));
+        NextAction::array(0, new NextAction("frostbrand Weapon", 22.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "low mana",

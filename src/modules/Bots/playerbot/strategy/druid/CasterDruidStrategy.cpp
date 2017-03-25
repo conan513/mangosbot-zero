@@ -120,6 +120,11 @@ void CasterDruidAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"high aoe",
 		NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), NULL)));
+	
+	triggers.push_back(new TriggerNode(
+		"low health",
+		NextAction::array(0, new NextAction("barkskin", ACTION_HIGH + 1), NULL)));
+
 }
 
 void CasterDruidDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

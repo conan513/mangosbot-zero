@@ -64,6 +64,11 @@ namespace ai
 		CastWhirlwindAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "whirlwind") {}
 	};
 
+	class CastSweepingStrikesAction : public CastMeleeSpellAction {
+	public:
+		CastSweepingStrikesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "sweeping strikes") {}
+	};
+
     // battle, berserker
     class CastExecuteAction : public CastMeleeSpellAction {
     public:
@@ -110,6 +115,11 @@ namespace ai
     public:
         CastBloodrageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "bloodrage") {}
     };
+
+	class CastRecklessnessAction : public CastBuffSpellAction {
+	public:
+		CastRecklessnessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "recklessness") {}
+	};
 
     // defensive
     class CastDevastateAction : public CastDefensiveMeleeSpellAction {

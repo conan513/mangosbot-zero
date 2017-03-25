@@ -63,6 +63,12 @@ namespace ai
         DeathWishTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "death wish") {}
     };
 
+	class SweepingStrikesTrigger : public BoostTrigger
+    {
+    public:
+		SweepingStrikesTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "sweeping strikes") {}
+    };
+
     class ShieldBashInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
     {
     public:
