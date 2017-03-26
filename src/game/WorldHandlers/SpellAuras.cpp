@@ -50,6 +50,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "MapManager.h"
+#include "Unit.h"
 
 #define NULL_AURA_SLOT 0xFF
 
@@ -2500,6 +2501,11 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetTypeId() == TYPEID_PLAYER)
                 { target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH); }
 
+            if (target->HasAura(1856 || 1857)) //improved code of rogue vanish.
+            {
+                target->GetHostileRefManager().deleteReferences();
+            }
+
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -2982,8 +2988,9 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
 {
     if (!Real)
         { return; }
-
     Unit* target = GetTarget();
+    Unit* caster = GetCaster();
+    Unit* owner = caster->GetCharmerOrOwner();
 
     if (apply)
     {
@@ -2992,7 +2999,13 @@ void Aura::HandleAuraProcTriggerSpell(bool apply, bool Real)
             // some spell have charges by functionality not have its in spell data
             case 28200:                                    // Ascendance (Talisman of Ascendance trinket)
                 GetHolder()->SetAuraCharges(6);
-                break;
+                return;
+            case 8172:                                     // Diease Cleansing Totem NEED TO ADD TIMER
+                target->CastSpell(owner, 8171, true, 0, this);
+                return;
+            case 8167:                                     // Poison Cleansing Totem NEED TO ADD TIMER
+                target->CastSpell(owner, 8168, true, 0, this);
+                return;
             case 8179:                                     // Grounding Totem
                 target->CastSpell(target, 8178, true, 0, this);
                 return;
@@ -3023,20 +3036,41 @@ void Aura::HandlePeriodicTriggerSpell(bool apply, bool /*Real*/)
     m_isPeriodic = apply;
 
     Unit* target = GetTarget();
+    Unit* caster = GetCaster();
+    Unit* owner = caster->GetCharmerOrOwner();
+    SpellEntry const *triggeredSpellInfo = sSpellStore.LookupEntry(GetId());
 
-    if (!apply)
+    if (apply, m_isPeriodic = apply)
     {
         switch (GetId())
         {
-            case 29213:                                     // Curse of the Plaguebringer
-                if (m_removeMode != AURA_REMOVE_BY_DISPEL)
-                    // Cast Wrath of the Plaguebringer if not dispelled
-                    { target->CastSpell(target, 29214, true, 0, this); }
-                return;
-            default:
-                break;
+        case 8172:                                     // Diease Cleansing Totem
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(owner, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
+            break;
+        case 8179:                                     // Grounding Totem
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(target, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
+            break;
+        case 8167:                                     // Poison Clensing Totem NEED TO FIX
+            MANGOS_ASSERT(triggeredSpellInfo);
+            target->CastSpell(owner, triggeredSpellInfo->EffectTriggerSpell[0], true, 0, this);
+            return;
         }
     }
+    else
+        switch (GetId())
+        {
+        case 29213:                                     // Curse of the Plaguebringer
+            if (m_removeMode != AURA_REMOVE_BY_DISPEL)
+                // Cast Wrath of the Plaguebringer if not dispelled
+            {
+                target->CastSpell(target, 29214, true, 0, this);
+            }
+            return;
+        default:
+            break;
+        }
 }
 
 void Aura::HandlePeriodicTriggerSpellWithValue(bool apply, bool /*Real*/)
