@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "WorldPacket.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "UpdateMask.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
@@ -36,10 +35,7 @@
 #include "Spell.h"
 #include "DynamicObject.h"
 #include "SpellAuras.h"
-#include "Group.h"
 #include "UpdateData.h"
-#include "MapManager.h"
-#include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "Pet.h"
 #include "GameObject.h"
@@ -52,7 +48,6 @@
 #include "BattleGround/BattleGroundWS.h"
 #include "Language.h"
 #include "SocialMgr.h"
-#include "VMapFactory.h"
 #include "Util.h"
 #include "TemporarySummon.h"
 #include "ScriptMgr.h"
@@ -662,6 +657,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
                 case 15998:                                 // Capture Worg Pup
+                case 19614:                                 // Despawn Caster
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         { return; }
@@ -749,6 +745,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     m_caster->CastSpell(unitTarget, spell_list[urand(0, 5)], true);
                     return;
+                }
+                case 18269:                                 // Kodo Kombobulator
+                {
+                    if (!unitTarget)
+                        { return; }
+
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                        { return; }
+
+                        ((Creature*)unitTarget)->ForcedDespawn();
+                        return;
                 }
                 case 18350:                                 // Dummy Trigger
                 {
@@ -2509,6 +2516,7 @@ void Spell::EffectPickPocket(SpellEffectIndex /*eff_idx*/)
         else
         {
             // Reveal action + get attack
+            m_caster->SendSpellMiss(unitTarget, m_spellInfo->Id, SPELL_MISS_RESIST); // Pickpocket resisted.
             m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
             unitTarget->AttackedBy(m_caster);
         }
@@ -4848,8 +4856,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     critter->SetCreatorGuid(m_caster->GetObjectGuid());
     critter->setFaction(m_caster->getFaction());
     critter->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
-
-    critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
+    critter->SelectLevel();                                 // some summoned critters have different from 1 DB data for level/hp
     critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->NpcFlags);
     // some mini-pets have quests
 
@@ -5083,7 +5090,7 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
             m_caster->GetNearPoint2D(fx, fy, dis + m_caster->GetObjectBoundingRadius(), m_caster->GetOrientation() + angle_offset);
 
             GridMapLiquidData liqData;
-            if (!m_caster->GetTerrain()->IsInWater(fx, fy, m_caster->GetPositionZ() + 1.f, &liqData))
+            if (!m_caster->GetMap()->GetTerrain()->IsInWater(fx, fy, m_caster->GetPositionZ() + 1.f, &liqData))
             {
                 SendCastResult(SPELL_FAILED_NOT_FISHABLE);
                 SendChannelUpdate(0);

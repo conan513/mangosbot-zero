@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@
 #include "Language.h"
 #include "World.h"
 #include "GameEventMgr.h"
-#include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "MapPersistentStateMgr.h"
 #include "AccountMgr.h"
@@ -52,17 +51,16 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "WaypointMovementGenerator.h"
-#include <cctype>
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <typeinfo>
 #include "Formulas.h"
-
+#include "G3D/Quat.h"                                       // for turning GO's
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "MoveMap.h"                                        // for mmap manager
 #include "PathFinder.h"                                     // for mmap commands
 #include "movement/MoveSplineInit.h"
+
+#include <fstream>
+#include <map>
+#include <typeinfo>
 
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 {
@@ -947,11 +945,27 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     if (!ExtractOptFloat(&args, o, m_session->GetPlayer()->GetOrientation()))
         { return false; }
 
-    Map* map = obj->GetMap();
-    map->Remove(obj, false);
+    // ok, let's rotate the GO around Z axis
+    // we first get the original rotation quaternion
+    // then we'll create a rotation quat describing the rotation around Z
+    G3D::Quat original_rot;
+    obj->GetQuaternion(original_rot);
 
-    obj->Relocate(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), o);
-    obj->UpdateRotationFields();
+    // the rotation amount around Z-axis
+    float deltaO = o - obj->GetOrientationFromQuat(original_rot);
+
+    // multiplying 2 quaternions gives the final rotation
+    // quaternion multiplication is not commutative!
+    G3D::Quat final_rot = G3D::Quat(0.0f, 0.0f, sin(deltaO/2), cos(deltaO/2)) * original_rot;
+
+    // quaternion multiplication gives a non-unit quat
+    final_rot.unitize();
+
+    Map* map = obj->GetMap();
+    map->Remove(obj, false); //mandatory to remove GO model from m_dyn_tree
+
+    obj->SetQuaternion(final_rot); // this will update internal model rotation matrices
+    obj->Relocate(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientationFromQuat(final_rot));
 
     map->Add(obj);
 
@@ -2379,7 +2393,14 @@ bool ChatHandler::HandlePInfoCommand(char* args)
 
         if (GetAccessLevel() >= security)
         {
-            email = fields[2].GetCppString();
+            if (security == SEC_ADMINISTRATOR)
+            {
+                email = fields[2].GetCppString();
+            }
+            else
+            {
+                email = "*hidden*";
+            }
             last_ip = fields[3].GetCppString();
             last_login = fields[4].GetCppString();
         }
@@ -2432,7 +2453,7 @@ bool ChatHandler::HandleTicketAcceptCommand(char* args)
     // ticket<end>
     if (!px)
         { return false; }
-    
+
     // ticket accept on
     if (strncmp(px, "on", 3) == 0)
     {
@@ -2807,13 +2828,13 @@ bool ChatHandler::HandleTickerSurveyClose(char *args)
         SendSysMessage(LANG_COMMAND_TICKET_CANT_CLOSE);
         return false;
     }
-        
+
     //This logic feels misplaced, but you can't have it in GMTicket?
     sTicketMgr.Delete(ticket->GetPlayerGuid());
     ticket = NULL;
-        
+
     PSendSysMessage(LANG_COMMAND_TICKETCLOSED_NAME, pPlayer->GetName());
-        
+
     return true;
 }
 
@@ -4183,20 +4204,20 @@ bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
         if (!skillInfo)
         { continue; }
 
-		if (skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY)
-		{
-			// Learn only the crafts that actually are crafts (MaNGOS ZERO)
-			if (skillInfo->id == SKILL_ENGINEERING || skillInfo->id == SKILL_BLACKSMITHING ||
-				skillInfo->id == SKILL_LEATHERWORKING || skillInfo->id == SKILL_ALCHEMY ||
-				skillInfo->id == SKILL_HERBALISM || skillInfo->id == SKILL_MINING ||
-				skillInfo->id == SKILL_TAILORING || skillInfo->id == SKILL_ENCHANTING ||
-				skillInfo->id == SKILL_SKINNING || skillInfo->id == SKILL_FIRST_AID ||
-				skillInfo->id == SKILL_COOKING || skillInfo->id == SKILL_FISHING)
-			{
-				HandleLearnSkillRecipesHelper(m_session->GetPlayer(), skillInfo->id);
-			}
-		}
-	}
+        if (skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY)
+        {
+            // Learn only the crafts that actually are crafts (MaNGOS ZERO)
+            if (skillInfo->id == SKILL_ENGINEERING || skillInfo->id == SKILL_BLACKSMITHING ||
+                skillInfo->id == SKILL_LEATHERWORKING || skillInfo->id == SKILL_ALCHEMY ||
+                skillInfo->id == SKILL_HERBALISM || skillInfo->id == SKILL_MINING ||
+                skillInfo->id == SKILL_TAILORING || skillInfo->id == SKILL_ENCHANTING ||
+                skillInfo->id == SKILL_SKINNING || skillInfo->id == SKILL_FIRST_AID ||
+                skillInfo->id == SKILL_COOKING || skillInfo->id == SKILL_FISHING)
+            {
+                HandleLearnSkillRecipesHelper(m_session->GetPlayer(), skillInfo->id);
+            }
+        }
+    }
 
     SendSysMessage(LANG_COMMAND_LEARN_ALL_CRAFT);
     return true;

@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
 #include "ObjectMgr.h"
@@ -32,7 +31,6 @@
 #include "PlayerDump.h"
 #include "SpellMgr.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "GameObject.h"
 #include "Chat.h"
 #include "Log.h"
@@ -235,6 +233,7 @@ bool ChatHandler::HandleReloadAllCommand(char* /*args*/)
     HandleReloadSkillFishingBaseLevelCommand((char*)"");
 
     HandleReloadAllAreaCommand((char*)"");
+    HandleReloadAutoBroadcastCommand((char*)"");
     HandleReloadAllEventAICommand((char*)"");
     HandleReloadAllLootCommand((char*)"");
     HandleReloadAllNpcCommand((char*)"");
@@ -391,6 +390,14 @@ bool ChatHandler::HandleReloadAreaTriggerTeleportCommand(char* /*args*/)
     sLog.outString("Re-Loading AreaTrigger teleport definitions...");
     sObjectMgr.LoadAreaTriggerTeleports();
     SendGlobalSysMessage("DB table `areatrigger_teleport` reloaded.", SEC_MODERATOR);
+    return true;
+}
+
+bool ChatHandler::HandleReloadAutoBroadcastCommand(char* /*args*/)
+{
+    sLog.outString("Re-Loading broadcast strings...");
+    sWorld.LoadBroadcastStrings();
+    SendGlobalSysMessage("Broadcast strings reloaded.", SEC_MODERATOR);
     return true;
 }
 

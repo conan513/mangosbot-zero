@@ -8,7 +8,7 @@
 PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
 {
     if (bot)
-        account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetGUID());
+        account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
 }
 
 PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* reason, bool ignoreGroup)
@@ -183,7 +183,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
     }
 
     string text = out.str();
-    uint64 guid = from->GetGUID();
+    uint64 guid = from->GetObjectGuid().GetRawValue();
     time_t lastSaid = whispers[guid][text];
     if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
     {

@@ -71,7 +71,7 @@ PlayerbotAI::PlayerbotAI(Player* bot) :
 {
 	this->bot = bot;
 
-	accountId = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetGUID());
+	accountId = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
 
     aiObjectContext = AiFactory::createAiObjectContext(bot, this);
 
@@ -580,7 +580,7 @@ namespace MaNGOS
         WorldObject const& GetFocusObject() const { return *i_obj; }
         bool operator()(Unit* u)
         {
-            return u->GetGUID() == i_guid && i_obj->IsWithinDistInMap(u, i_range);
+            return u->GetObjectGuid() == i_guid && i_obj->IsWithinDistInMap(u, i_range);
         }
     private:
         WorldObject const* i_obj;
@@ -595,7 +595,7 @@ namespace MaNGOS
         WorldObject const& GetFocusObject() const { return *i_obj; }
         bool operator()(GameObject* u)
         {
-            if (u && i_obj->IsWithinDistInMap(u, i_range) && u->isSpawned() && u->GetGOInfo() && u->GetGUID() == i_guid)
+            if (u && i_obj->IsWithinDistInMap(u, i_range) && u->isSpawned() && u->GetGOInfo() && u->GetObjectGuid() == i_guid)
                 return true;
 
             return false;
@@ -664,7 +664,7 @@ bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securit
     if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
     {
         whispers[text] = time(0);
-        bot->Whisper(text, LANG_UNIVERSAL, master->GetGUID());
+        bot->Whisper(text, LANG_UNIVERSAL, master->GetObjectGuid());
     }
     return true;
 }
@@ -676,7 +676,7 @@ bool PlayerbotAI::TellMaster(string text, PlayerbotSecurityLevel securityLevel)
 
     if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId())
     {
-        if (!bot->isInFront(master, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+        if (!bot->IsInFront(master, sPlayerbotAIConfig.sightDistance, M_PI / 2))
             bot->SetFacingTo(bot->GetAngle(master));
 
         bot->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -878,7 +878,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
 	bot->clearUnitState(UNIT_STAT_FOLLOW);
 
 	ObjectGuid oldSel = bot->GetSelectionGuid();
-	bot->SetSelectionGuid(target->GetGUID());
+	bot->SetSelectionGuid(target->GetObjectGuid());
 
     Spell *spell = new Spell(bot, pSpellInfo, false);
     if (bot->isMoving() && spell->GetCastTime())
@@ -943,7 +943,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     }
 
 
-    if (!bot->isInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2))
     {
         bot->SetFacingTo(bot->GetAngle(faceTo));
         spell->cancel();
@@ -954,7 +954,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
 
 	spell->prepare(&targets);
 	WaitForSpellCast(spell);
-    aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, target->GetGUID(), time(0));
+    aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, target->GetObjectGuid().GetRawValue(), time(0));
 
     if (oldSel)
         bot->SetSelectionGuid(oldSel);
@@ -1002,14 +1002,14 @@ void PlayerbotAI::InterruptSpell()
         bot->InterruptSpell((CurrentSpellTypes)type);
 
         WorldPacket data(SMSG_SPELL_FAILURE, 8 + 1 + 4 + 1);
-        data.appendPackGUID(bot->GetGUID());
+        data.appendPackGUID(bot->GetObjectGuid().GetRawValue());
         data << uint8(1);
         data << uint32(spell->m_spellInfo->Id);
         data << uint8(0);
         bot->SendMessageToSet(&data, true);
 
         data.Initialize(SMSG_SPELL_FAILED_OTHER, 8 + 1 + 4 + 1);
-        data.appendPackGUID(bot->GetGUID());
+        data.appendPackGUID(bot->GetObjectGuid().GetRawValue());
         data << uint8(1);
         data << uint32(spell->m_spellInfo->Id);
         data << uint8(0);

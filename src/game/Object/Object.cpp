@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,11 +36,6 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "MapManager.h"
-#include "Log.h"
-#include "Transports.h"
-#include "TargetedMovementGenerator.h"
-#include "WaypointMovementGenerator.h"
-#include "VMapFactory.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -136,18 +131,6 @@ void Object::SendForcedObjectUpdate()
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
-}
-
-void Object::BuildMovementUpdateBlock(UpdateData* data, uint8 flags) const
-{
-    ByteBuffer buf(500);
-
-    buf << uint8(UPDATETYPE_MOVEMENT);
-    buf << GetObjectGuid();
-
-    BuildMovementUpdate(&buf, flags);
-
-    data->AddUpdateBlock(buf);
 }
 
 void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
@@ -719,62 +702,6 @@ void Object::RemoveFlag(uint16 index, uint32 oldFlag)
     }
 }
 
-void Object::RemovePlayerSpecificFlag(uint16 index, uint32 oldFlag, Player* plr)
-{
-    /* Validate input */
-    MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
-
-    uint32 oldval, newval;
-
-    /* See if we already have custom flags set for the player */
-    if (m_plrSpecificFlags.find(plr->GetGUIDLow()) != m_plrSpecificFlags.end())
-        { oldval = m_plrSpecificFlags.find(plr->GetGUIDLow())->second; }
-    /* We don't already have flags, get them from the creature */
-    else
-        { oldval = m_uint32Values[index]; }
-
-    /* Set the new flag */
-    newval = oldval & ~oldval;
-
-    /* Make sure they're not the same */
-    if (oldval != newval)
-    {
-        /* Update existing flag */
-        m_plrSpecificFlags.find(plr->GetGUIDLow())->second = newval;
-
-        /* Push updates to client */
-        MarkForClientUpdate();
-    }
-}
-
-void Object::SetPlayerSpecificFlag(uint16 index, uint32 newFlag, Player* plr)
-{
-    /* Validate input */
-    MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
-
-    uint32 oldval, newval;
-
-    /* See if we already have custom flags set for the player */
-    if (m_plrSpecificFlags.find(plr->GetGUIDLow()) != m_plrSpecificFlags.end())
-        { oldval = m_plrSpecificFlags.find(plr->GetGUIDLow())->second; }
-    /* We don't already have flags, get them from the creature */
-    else
-        { oldval = m_uint32Values[index]; }
-
-    /* Set the new flag */
-    newval = oldval | newFlag;
-
-    /* Make sure they're not the same */
-    if (oldval != newval)
-    {
-        /* Update existing flag */
-        m_plrSpecificFlags.find(plr->GetGUIDLow())->second = newval;
-
-        /* Push updates to client */
-        MarkForClientUpdate();
-    }
-}
-
 void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 {
     MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
@@ -962,17 +889,17 @@ void WorldObject::SetOrientation(float orientation)
 
 uint32 WorldObject::GetZoneId() const
 {
-    return GetTerrain()->GetZoneId(m_position.x, m_position.y, m_position.z);
+    return GetMap()->GetTerrain()->GetZoneId(m_position.x, m_position.y, m_position.z);
 }
 
 uint32 WorldObject::GetAreaId() const
 {
-    return GetTerrain()->GetAreaId(m_position.x, m_position.y, m_position.z);
+    return GetMap()->GetTerrain()->GetAreaId(m_position.x, m_position.y, m_position.z);
 }
 
 void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
 {
-    GetTerrain()->GetZoneAndAreaId(zoneid, areaid, m_position.x, m_position.y, m_position.z);
+    GetMap()->GetTerrain()->GetZoneAndAreaId(zoneid, areaid, m_position.x, m_position.y, m_position.z);
 }
 
 InstanceData* WorldObject::GetInstanceData() const
@@ -1222,22 +1149,22 @@ bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
     return ((angle >= lborder) && (angle <= rborder));
 }
 
-bool WorldObject::isInFrontInMap(WorldObject const* target, float distance,  float arc) const
+bool WorldObject::IsInFrontInMap(WorldObject const* target, float distance,  float arc) const
 {
     return IsWithinDistInMap(target, distance) && HasInArc(arc, target);
 }
 
-bool WorldObject::isInBackInMap(WorldObject const* target, float distance, float arc) const
+bool WorldObject::IsInBackInMap(WorldObject const* target, float distance, float arc) const
 {
     return IsWithinDistInMap(target, distance) && !HasInArc(2 * M_PI_F - arc, target);
 }
 
-bool WorldObject::isInFront(WorldObject const* target, float distance,  float arc) const
+bool WorldObject::IsInFront(WorldObject const* target, float distance,  float arc) const
 {
     return IsWithinDist(target, distance) && HasInArc(arc, target);
 }
 
-bool WorldObject::isInBack(WorldObject const* target, float distance, float arc) const
+bool WorldObject::IsInBack(WorldObject const* target, float distance, float arc) const
 {
     return IsWithinDist(target, distance) && !HasInArc(2 * M_PI_F - arc, target);
 }
@@ -1294,7 +1221,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, Map* atMap 
             // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
             if (!((Creature const*)this)->CanFly())
             {
-                bool canSwim = ((Creature const*)this)->CanSwim();
+                bool canSwim = ((Creature const*)this)->CanSwim() && ((Creature const*)this)->IsInWater();
                 float ground_z = z;
                 float max_z = canSwim
                               ? atMap->GetTerrain()->GetWaterOrGroundLevel(x, y, z, &ground_z, !((Unit const*)this)->HasAuraType(SPELL_AURA_WATER_WALK))
@@ -1525,12 +1452,6 @@ void WorldObject::ResetMap()
     delete elunaEvents;
     elunaEvents = NULL;
 #endif
-}
-
-TerrainInfo const* WorldObject::GetTerrain() const
-{
-    MANGOS_ASSERT(m_currMap);
-    return m_currMap->GetTerrain();
 }
 
 void WorldObject::AddObjectToRemoveList()
@@ -1903,24 +1824,6 @@ void WorldObject::BuildUpdateData(UpdateDataMapType& update_players)
     ClearUpdateMask(false);
 }
 
-bool WorldObject::IsControlledByPlayer() const
-{
-    switch (GetTypeId())
-    {
-        case TYPEID_GAMEOBJECT:
-            return ((GameObject*)this)->GetOwnerGuid().IsPlayer();
-        case TYPEID_UNIT:
-        case TYPEID_PLAYER:
-            return ((Unit*)this)->IsCharmerOrOwnerPlayerOrPlayerItself();
-        case TYPEID_DYNAMICOBJECT:
-            return ((DynamicObject*)this)->GetCasterGuid().IsPlayer();
-        case TYPEID_CORPSE:
-            return true;
-        default:
-            return false;
-    }
-}
-
 bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* descr) const
 {
     sLog.outError("%s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);
@@ -1936,9 +1839,9 @@ void WorldObject::SetActiveObjectState(bool active)
         // player's update implemented in a different from other active worldobject's way
         // it's considired to use generic way in future
     {
-        if (isActiveObject() && !active)
+        if (IsActiveObject() && !active)
             { GetMap()->RemoveFromActive(this); }
-        else if (!isActiveObject() && active)
+        else if (IsActiveObject() && active)
             { GetMap()->AddToActive(this); }
     }
     m_isActiveObject = active;

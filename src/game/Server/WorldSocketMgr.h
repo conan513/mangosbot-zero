@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,54 +33,41 @@
 
 #include <ace/Basic_Types.h>
 #include <ace/Singleton.h>
-#include <ace/Thread_Mutex.h>
-
-#include <string>
+#include <ace/TSS_T.h>
+#include <ace/INET_Addr.h>
+#include <ace/Task.h>
+#include <ace/Acceptor.h>
 
 class WorldSocket;
-class ReactorRunnable;
-class ACE_Event_Handler;
 
-/// Manages all sockets connected to peers and network threads
-class WorldSocketMgr
+/// This is a pool of threads designed to be used by an ACE_TP_Reactor.
+/// Manages all sockets connected to peers
+
+class WorldSocketMgr : public ACE_Task_Base
 {
+    friend class ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>;
+    friend class WorldSocket;
     public:
-        friend class WorldSocket;
-        friend class ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>;
-
-        /// Start network, listen at address:port .
-        int StartNetwork(ACE_UINT16 port, std::string& address);
-
-        /// Stops all network threads, It will wait for all running threads .
+        int StartNetwork(ACE_INET_Addr& addr);
         void StopNetwork();
-
-        /// Wait untill all network threads have "joined" .
-        void Wait();
-
-        /// Make this class singleton .
-        static WorldSocketMgr* Instance();
 
     private:
         int OnSocketOpen(WorldSocket* sock);
-        int StartReactiveIO(ACE_UINT16 port, const char* address);
+        virtual int svc();
 
         WorldSocketMgr();
         virtual ~WorldSocketMgr();
 
-        ReactorRunnable* m_NetThreads;
-        size_t m_NetThreadsCount;
-
+    private:
         int m_SockOutKBuff;
         int m_SockOutUBuff;
         bool m_UseNoDelay;
 
-        std::string m_addr;
-        ACE_UINT16 m_port;
-
-        ACE_Event_Handler* m_Acceptor;
+        ACE_Reactor   *reactor_;
+        WorldAcceptor *acceptor_;
 };
 
-#define sWorldSocketMgr WorldSocketMgr::Instance()
+#define sWorldSocketMgr ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>::instance()
 
 #endif
 /// @}

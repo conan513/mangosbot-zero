@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,17 +31,14 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
 #include "Player.h"
 #include "Creature.h"
 #include "Spell.h"
 #include "Group.h"
 #include "SpellAuras.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "TemporarySummon.h"
-#include "Formulas.h"
 #include "Pet.h"
 #include "Util.h"
 #include "Totem.h"
@@ -51,8 +48,6 @@
 #include "MapPersistentStateMgr.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "DBCStores.h"
-#include "VMapFactory.h"
 #include "MovementGenerator.h"
 #include "movement/MoveSplineInit.h"
 #include "movement/MoveSpline.h"
@@ -67,7 +62,6 @@
 #endif
 
 #include <math.h>
-#include <stdarg.h>
 
 #ifdef WIN32
 inline uint32 getMSTime() { return GetTickCount(); }
@@ -1379,8 +1373,8 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, int32 damage, S
                 case 20467:    case 20963:    case 20964:    case 20965:    case 20966:
                 // Seal of Command PROC receive benefit from Spell Damage and Healing
                 case 20424:
-                //	Seal of Righteousness Dummy Proc receive benefit from Spell Damage and Healing
-                case 25735:	   case 25736:	  case 25737:    case 25738:    case 25739:     case 25740:
+                //    Seal of Righteousness Dummy Proc receive benefit from Spell Damage and Healing
+                case 25735:       case 25736:      case 25737:    case 25738:    case 25739:     case 25740:
                 case 25713:    case 25742:
                     {
                         damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE);
@@ -1518,7 +1512,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, CalcDamageInfo* damageInfo, Weapo
     }
 
     // Physical Immune check
-    if (damageInfo->target->IsImmunedToDamage(damageInfo->damageSchoolMask))
+    if (damageInfo->target->IsImmuneToDamage(damageInfo->damageSchoolMask))
     {
         damageInfo->HitInfo       |= HITINFO_NORMALSWING;
         damageInfo->TargetState    = VICTIMSTATE_IS_IMMUNE;
@@ -2732,7 +2726,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* pVictim, SpellEntry const* spell, bool 
         { return SPELL_MISS_NONE; }
 
     // Check for immune (use charges)
-    if (pVictim->IsImmunedToDamage(GetSpellSchoolMask(spell)) && !spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
+    if (pVictim->IsImmuneToDamage(GetSpellSchoolMask(spell)) && !spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
         { return SPELL_MISS_IMMUNE; }
 
     // Try victim reflect spell
@@ -3263,12 +3257,12 @@ bool Unit::isInAccessablePlaceFor(Creature const* c) const
 
 bool Unit::IsInWater() const
 {
-    return GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetMap()->GetTerrain()->IsInWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
 bool Unit::IsUnderWater() const
 {
-    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
+    return GetMap()->GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ());
 }
 
 void Unit::DeMorph()
@@ -6063,7 +6057,7 @@ int32 Unit::SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask)
     return AdvertisedBenefit;
 }
 
-bool Unit::IsImmunedToDamage(SpellSchoolMask shoolMask)
+bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask)
 {
     // If m_immuneToSchool type contain this school type, IMMUNE damage.
     SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
@@ -6877,14 +6871,14 @@ bool Unit::IsVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
     float visibleDistance = (u->GetTypeId() == TYPEID_PLAYER) ? MAX_PLAYER_STEALTH_DETECT_RANGE : ((Creature const*)u)->GetAttackDistance(this);
 
     // Always invisible from back (when stealth detection is on), also filter max distance cases
-    bool isInFront = viewPoint->isInFrontInMap(this, visibleDistance);
-    if (!isInFront)
+    bool IsInFront = viewPoint->IsInFrontInMap(this, visibleDistance);
+    if (!IsInFront)
         { return false; }
 
     // Calculation if target is in front
 
     // Visible distance based on stealth value (stealth rank 4 300MOD, 10.5 - 3 = 7.5)
-    visibleDistance = 10.5f - (GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) / 100.0f);
+    visibleDistance = (10.5f - (GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH) / 100.0f)) /2;
 
     // Visible distance is modified by
     //-Level Diff (every level diff = 1.0f in visible distance)
@@ -7325,7 +7319,7 @@ bool Unit::IsSecondChoiceTarget(Unit* pTarget, bool checkThreatArea)
     MANGOS_ASSERT(pTarget && GetTypeId() == TYPEID_UNIT);
 
     return
-        pTarget->IsImmunedToDamage(GetMeleeDamageSchoolMask()) ||
+        pTarget->IsImmuneToDamage(GetMeleeDamageSchoolMask()) ||
         pTarget->hasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_DAMAGE) ||
         (checkThreatArea && ((Creature*)this)->IsOutOfThreatArea(pTarget));
 }
@@ -8612,97 +8606,131 @@ void Unit::InterruptMoving(bool forceSendStop /*=false*/)
     StopMoving(forceSendStop || isMoving);
 }
 
-void Unit::SetFeared(bool apply, ObjectGuid casterGuid, uint32 spellID, uint32 time)
+void Unit::SetImmobilizedState(bool apply, bool stun)
 {
+    const uint32 immobilized = (UNIT_STAT_ROOT | UNIT_STAT_STUNNED);
+    const uint32 state = stun ? UNIT_STAT_STUNNED : UNIT_STAT_ROOT;
     if (apply)
     {
-        if (HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
-            { return; }
-
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
-
-        StopMoving(GetTypeId() == TYPEID_PLAYER);
-        GetMotionMaster()->MovementExpired(false);
-
-        CastStop(GetObjectGuid() == casterGuid ? spellID : 0);
-
-        if (GetTypeId() == TYPEID_UNIT)
-            SetTargetGuid(ObjectGuid());                    // creature feared loose its target
-
-        Unit* caster = IsInWorld() ?  GetMap()->GetUnit(casterGuid) : NULL;
-
-        GetMotionMaster()->MoveFleeing(caster, time);       // caster==NULL processed in MoveFleeing
+        addUnitState(state);
+        if (GetTypeId() != TYPEID_PLAYER)
+            StopMoving();
+        else
+        {
+            // Clear unit movement flags
+            ((Player*)this)->m_movementInfo.SetMovementFlags(MOVEFLAG_NONE);
+            if (stun)
+                SetStandState(UNIT_STAND_STATE_STAND); // in 1.5 client
+            SetRoot(true);
+        }
     }
     else
     {
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
-
-        GetMotionMaster()->MovementExpired(GetTypeId() == TYPEID_PLAYER);
-        if (GetTypeId() == TYPEID_PLAYER)
-            StopMoving(true);
-
-        if (GetTypeId() != TYPEID_PLAYER && IsAlive())
-        {
-            Creature* c = ((Creature*)this);
-            // restore appropriate movement generator
-            if (getVictim())
-            {
-                SetTargetGuid(getVictim()->GetObjectGuid());  // restore target
-                GetMotionMaster()->MoveChase(getVictim());
-            }
-            else
-                { GetMotionMaster()->Initialize(); }
-
-            // attack caster if can
-            if (Unit* caster = IsInWorld() ? GetMap()->GetUnit(casterGuid) : NULL)
-                { c->AttackedBy(caster); }
-        }
+        clearUnitState(state);
+        // Prevent giving ability to move if more immobilizers are active
+        if (!hasUnitState(immobilized) && (GetTypeId() == TYPEID_PLAYER))
+            SetRoot(false);
     }
+}
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        { ((Player*)this)->SetClientControl(this, !apply); }
+void Unit::SetFeared(bool apply, ObjectGuid casterGuid, uint32 spellID, uint32 time)
+{
+    SetIncapacitatedState(apply, UNIT_FLAG_FLEEING, casterGuid, spellID, time);
 }
 
 void Unit::SetConfused(bool apply, ObjectGuid casterGuid, uint32 spellID)
 {
+    SetIncapacitatedState(apply, UNIT_FLAG_CONFUSED, casterGuid, spellID);
+}
+
+void Unit::SetStunned(bool apply)
+{
+    SetIncapacitatedState(apply, UNIT_FLAG_STUNNED);
+}
+
+void Unit::SetIncapacitatedState(bool apply, uint32 state, ObjectGuid casterGuid, uint32 spellID, uint32 time)
+{
+    // We are interested only in a particular subset of flags:
+    const uint32 filter = (UNIT_FLAG_STUNNED | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
+    if (!state || !(state & filter) || (state & ~filter))
+        return;
+
+    Player* controller = GetCharmerOrOwnerPlayerOrPlayerItself();
+    const bool control = controller ? controller->IsClientControl(this) : false;
+    const bool movement = (state != UNIT_FLAG_STUNNED);
+    const bool stun = (state & UNIT_FLAG_STUNNED);
+    const bool fleeing = (state & UNIT_FLAG_FLEEING);
+
     if (apply)
     {
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-
-        StopMoving(GetTypeId() == TYPEID_PLAYER);
-        GetMotionMaster()->MovementExpired(false);
-
-        CastStop(GetObjectGuid() == casterGuid ? spellID : 0);
-
-        if (GetTypeId() == TYPEID_UNIT)
-           SetTargetGuid(ObjectGuid());
-
-        GetMotionMaster()->MoveConfused();
+        if (fleeing && HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        {
+            if (state == UNIT_FLAG_FLEEING)
+                return;
+            else
+                state &= ~UNIT_FLAG_FLEEING;
+        }
+        SetFlag(UNIT_FIELD_FLAGS, state);
     }
     else
+        RemoveFlag(UNIT_FIELD_FLAGS, state);
+
+    if (movement)
+        GetMotionMaster()->MovementExpired(false);
+    if (apply)
+        CastStop(GetObjectGuid() == casterGuid ? spellID : 0);
+
+    if (GetTypeId() == TYPEID_UNIT)
     {
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
-
-        GetMotionMaster()->MovementExpired(GetTypeId() == TYPEID_PLAYER);
-        if (GetTypeId() == TYPEID_PLAYER)
-           StopMoving(true);
-
-        if (GetTypeId() != TYPEID_PLAYER && IsAlive())
+        if (HasFlag(UNIT_FIELD_FLAGS, filter))
         {
-            // restore appropriate movement generator
-            if (getVictim())
+            if (!GetTargetGuid().IsEmpty()) // Incapacitated creature loses its target
+                SetTargetGuid(ObjectGuid());
+        }
+        else if (IsAlive())
+        {
+            if (Unit* victim = getVictim())
             {
-                SetTargetGuid(getVictim()->GetObjectGuid());
-                GetMotionMaster()->MoveChase(getVictim());
+                SetTargetGuid(victim->GetObjectGuid());  // Restore target
+                if (movement)
+                    GetMotionMaster()->MoveChase(victim); // Restore movement generator
             }
-            else
-             { GetMotionMaster()->Initialize(); }
+            else if (movement)
+                GetMotionMaster()->Initialize(); // Reset movement generator
+
+            if (!apply && fleeing)
+            {
+                // Attack the caster if can on fear expiration
+                if (Unit* caster = IsInWorld() ? GetMap()->GetUnit(casterGuid) : nullptr)
+                    ((Creature*)this)->AttackedBy(caster);
+            }
         }
     }
 
-    if (GetTypeId() == TYPEID_PLAYER)
-      { ((Player*)this)->SetClientControl(this, !apply); }
+    // Update stun if required:
+    if (stun)
+        SetImmobilizedState(apply, true);
+
+    if (!movement)
+        return;
+
+    // Check if we should return or remove player control after change
+    if (controller)
+    {
+        const bool remove = !controller->IsClientControl(this);
+        if (control && remove)
+            controller->SetClientControl(this, 0);
+        else if (!control && !remove)
+            controller->SetClientControl(this, 1);
+    }
+
+    // Update incapacitated movement if required:
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED))
+        GetMotionMaster()->MoveConfused();
+    else if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING))
+        GetMotionMaster()->MoveFleeing(IsInWorld() ? GetMap()->GetUnit(casterGuid) : nullptr, time);
 }
+
 
 void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid /*= ObjectGuid()*/)
 {

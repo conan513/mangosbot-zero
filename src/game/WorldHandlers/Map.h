@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,18 +35,15 @@
 #include "GridDefines.h"
 #include "Cell.h"
 #include "Object.h"
-#include "Timer.h"
 #include "SharedDefines.h"
 #include "GridMap.h"
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
-#include "Utilities/TypeList.h"
 #include "ScriptMgr.h"
 #include "CreatureLinkingMgr.h"
 #include "DynamicTree.h"
 
 #include <bitset>
-#include <list>
 
 struct CreatureInfo;
 class Creature;
@@ -63,6 +60,7 @@ class BattleGround;
 class GridMap;
 class GameObjectModel;
 class WeatherSystem;
+class Transport;
 
 namespace MaNGOS { struct ObjectUpdater; }
 
@@ -294,6 +292,8 @@ class Map : public GridRefManager<NGridType>
         bool GetRandomPointInTheAir(float& x, float& y, float& z, float radius);
         bool GetRandomPointUnderWater(float& x, float& y, float& z, float radius, GridMapLiquidData& liquid_status);
 
+        void LoadLocalTransports();
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -358,6 +358,7 @@ class Map : public GridRefManager<NGridType>
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
         std::set<WorldObject*> i_objectsToRemove;
+        std::set<Transport*> i_transports;
 
         typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
         ScriptScheduleMap m_scriptSchedule;

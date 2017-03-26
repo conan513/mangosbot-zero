@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 #include "SharedDefines.h"
 #include "Object.h"
 #include "LootMgr.h"
-#include "Database/DatabaseEnv.h"
 #include "Utilities/EventProcessor.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -491,16 +490,16 @@ enum GOState
 // from `gameobject`
 struct GameObjectData
 {
-    uint32 id;                                              // entry in gamobject_template
+    uint32 id;                                              // entry in gameobject_template
     uint32 mapid;
     float posX;
     float posY;
     float posZ;
     float orientation;
-    float rotation0;
-    float rotation1;
-    float rotation2;
-    float rotation3;
+    float rotation0;                                        // i component of rotation quaternion
+    float rotation1;                                        // j
+    float rotation2;                                        // k
+    float rotation3;                                        // w
     int32  spawntimesecs;
     uint32 animprogress;
     GOState go_state;
@@ -538,6 +537,12 @@ enum CapturePointSliderValue
 
 class Unit;
 class GameObjectModel;
+
+namespace G3D
+{
+    class Quat;
+};
+
 struct GameObjectDisplayInfoEntry;
 
 // 5 sec for bobber catch
@@ -559,13 +564,20 @@ class GameObject : public WorldObject
         bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang,
                     float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 animprogress = GO_ANIMPROGRESS_DEFAULT, GOState go_state = GO_STATE_READY);
         void Update(uint32 update_diff, uint32 p_time) override;
-        GameObjectInfo const* GetGOInfo() const;
+
+        GameObjectInfo const* GetGOInfo() const { return m_goInfo; }
+        void SetGOInfo(GameObjectInfo const* pg) { m_goInfo = pg; }
 
         bool IsTransport() const;
 
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
 
-        void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
+        // rotation methods
+        void GetQuaternion(G3D::Quat& q) const;
+        void SetQuaternion(G3D::Quat const& q);
+        float GetOrientationFromQuat(G3D::Quat const& q);
+
+        void SetDisplayId(uint32 model_id);
 
         // overwrite WorldObject function for proper name localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const override;
@@ -573,7 +585,7 @@ class GameObject : public WorldObject
         void SaveToDB();
         void SaveToDB(uint32 mapid);
         bool LoadFromDB(uint32 guid, Map* map);
-        void DeleteFromDB();
+        virtual void DeleteFromDB();
 
         void SetOwnerGuid(ObjectGuid ownerGuid)
         {
@@ -582,6 +594,11 @@ class GameObject : public WorldObject
         }
         ObjectGuid const& GetOwnerGuid() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
         Unit* GetOwner() const;
+
+        bool IsControlledByPlayer() const override
+        {
+            return GetOwnerGuid().IsPlayer();
+        }
 
         void SetSpellId(uint32 id)
         {
@@ -631,7 +648,7 @@ class GameObject : public WorldObject
         uint32 GetGoAnimProgress() const { return GetUInt32Value(GAMEOBJECT_ANIMPROGRESS); }
         void SetGoAnimProgress(uint32 animprogress) { SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, animprogress); }
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
-        void SetDisplayId(uint32 modelId);
+        void SetDisplayIdx(uint32 modelId);
 
         float GetObjectBoundingRadius() const override;     // overwrite WorldObject version
 

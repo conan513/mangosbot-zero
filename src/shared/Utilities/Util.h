@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -703,6 +703,12 @@ void utf8printf(FILE* out, const char* str, ...);
 /**
  * @brief
  *
+ * @param str
+ */
+void utf8print(void* /*arg*/, const char* str);
+/**
+ * @brief
+ *
  * @param out
  * @param str
  * @param ap
@@ -742,4 +748,16 @@ void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result);
 
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+
+/**
+* @brief Define iCoreNumber to be set for the currently defined core
+*
+* @return int
+*/
+int return_iCoreNumber();
+
+/**
+* @brief Display the startup banner
+*/
+void print_banner();
 #endif

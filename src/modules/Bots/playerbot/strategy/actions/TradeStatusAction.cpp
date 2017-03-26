@@ -22,7 +22,7 @@ bool TradeStatusAction::Execute(Event event)
 
     if (trader != master)
     {
-		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader->GetGUID());
+		bot->Whisper("I'm kind of busy now", LANG_UNIVERSAL, trader->GetObjectGuid());
     }
 
     if (trader != master || !ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master))
@@ -74,7 +74,7 @@ bool TradeStatusAction::Execute(Event event)
     }
     else if (status == TRADE_STATUS_BEGIN_TRADE)
     {
-        if (!bot->isInFront(trader, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+        if (!bot->IsInFront(trader, sPlayerbotAIConfig.sightDistance, M_PI / 2))
             bot->SetFacingToObject(trader);
         BeginTrade();
         return true;

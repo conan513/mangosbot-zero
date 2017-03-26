@@ -219,7 +219,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     if (player->GetGuildId())
     {
 		Guild* guild = sGuildMgr.GetGuildById(player->GetGuildId());
-		if (guild->GetLeaderGuid().GetRawValue() == player->GetGUID()) {
+		if (guild->GetLeaderGuid().GetRawValue() == player->GetObjectGuid().GetRawValue()) {
 			for (vector<Player*>::iterator i = players.begin(); i != players.end(); ++i)
 				sGuildTaskMgr.Update(*i, player);
 		}
@@ -686,9 +686,9 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* handler, cha
             }
             uint32 randomTime = urand(sPlayerbotAIConfig.minRandomBotRandomizeTime, sPlayerbotAIConfig.maxRandomBotRandomizeTime);
             CharacterDatabase.PExecute("update ai_playerbot_random_bots set validIn = '%u' where event = 'randomize' and bot = '%u'",
-                    randomTime, bot->GetGUID());
+                    randomTime, bot->GetGUIDLow());
             CharacterDatabase.PExecute("update ai_playerbot_random_bots set validIn = '%u' where event = 'logout' and bot = '%u'",
-                    sPlayerbotAIConfig.maxRandomBotInWorldTime, bot->GetGUID());
+                    sPlayerbotAIConfig.maxRandomBotInWorldTime, bot->GetGUIDLow());
         }
         return true;
     }
@@ -887,7 +887,7 @@ void RandomPlayerbotMgr::PrintStats()
 
 double RandomPlayerbotMgr::GetBuyMultiplier(Player* bot)
 {
-    uint32 id = bot->GetGUID();
+    uint32 id = bot->GetGUIDLow();
     uint32 value = GetEventValue(id, "buymultiplier");
     if (!value)
     {
@@ -901,7 +901,7 @@ double RandomPlayerbotMgr::GetBuyMultiplier(Player* bot)
 
 double RandomPlayerbotMgr::GetSellMultiplier(Player* bot)
 {
-    uint32 id = bot->GetGUID();
+    uint32 id = bot->GetGUIDLow();
     uint32 value = GetEventValue(id, "sellmultiplier");
     if (!value)
     {
@@ -915,13 +915,13 @@ double RandomPlayerbotMgr::GetSellMultiplier(Player* bot)
 
 uint32 RandomPlayerbotMgr::GetLootAmount(Player* bot)
 {
-    uint32 id = bot->GetGUID();
+    uint32 id = bot->GetGUIDLow();
     return GetEventValue(id, "lootamount");
 }
 
 void RandomPlayerbotMgr::SetLootAmount(Player* bot, uint32 value)
 {
-    uint32 id = bot->GetGUID();
+    uint32 id = bot->GetGUIDLow();
     SetEventValue(id, "lootamount", value, 24 * 3600);
 }
 

@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -98,6 +98,7 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 void WardenMac::InitializeModule()
 {
     sLog.outWarden("Initialize module");
+    Warden::InitializeModule();
 }
 
 struct keyData {
@@ -174,8 +175,6 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
 
-    _initialized = true;
-
     _previousTimestamp = WorldTimer::getMSTime();
 }
 
@@ -200,15 +199,12 @@ void WardenMac::RequestData()
     pkt.append(buff);
     _session->SendPacket(&pkt);
 
-    _dataSent = true;
+    Warden::RequestData();
 }
 
 void WardenMac::HandleData(ByteBuffer &buff)
 {
     sLog.outWarden("Handle data");
-
-    _dataSent = false;
-    _clientResponseTimer = 0;
 
     //uint16 Length;
     //buff >> Length;

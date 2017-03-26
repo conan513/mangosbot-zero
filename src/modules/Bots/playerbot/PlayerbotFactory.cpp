@@ -222,7 +222,7 @@ void PlayerbotFactory::InitPet()
             pet->AIM_Initialize();
             pet->InitPetCreateSpells();
             bot->SetPet(pet);
-            bot->SetPetGuid(pet->GetGUID());
+            bot->SetPetGuid(pet->GetObjectGuid());
 
             sLog.outDebug(  "Bot %s: assign pet %d (%d level)", bot->GetName(), co->Entry, bot->getLevel());
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -1566,5 +1566,5 @@ void PlayerbotFactory::InitGuild()
     }
 
     if (guild->GetMemberSize() < 10)
-        guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE));
+        guild->AddMember(bot->GetObjectGuid(), urand(GR_OFFICER, GR_INITIATE));
 }

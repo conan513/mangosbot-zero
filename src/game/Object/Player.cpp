@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@
 #include "CellImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
-#include "CreatureAI.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Guild.h"
@@ -413,6 +412,10 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
 
     m_modManaRegen = 0;
     m_modManaRegenInterrupt = 0;
+
+    m_rageDecayRate = 1.25f;
+    m_rageDecayMultiplier = 19.50f;
+
     for (int s = 0; s < MAX_SPELL_SCHOOL; s++)
         { m_SpellCritPercentage[s] = 0.0f; }
     m_regenTimer = 0;
@@ -901,9 +904,19 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
     uint32 absorb = 0;
     uint32 resist = 0;
     if (type == DAMAGE_LAVA)
-        { CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist); }
+    {
+        if (this->IsImmuneToDamage(SPELL_SCHOOL_MASK_FIRE))
+            return 0;
+
+        CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist);
+    }
     else if (type == DAMAGE_SLIME)
-        { CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist); }
+    {
+        if (this->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE))
+            return 0;
+
+        CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist);
+    }
 
     damage -= absorb + resist;
 
@@ -1326,13 +1339,21 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     UpdateEnchantTime(update_diff);
     UpdateHomebindTime(update_diff);
 
-    // Group update
-    SendUpdateToOutOfRangeGroupMembers();
-
+    // unsummon pet/charmed that lost owner
     Pet* pet = GetPet();
     if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (GetCharmGuid() && (pet->GetObjectGuid() != GetCharmGuid())))
-        { pet->Unsummon(PET_SAVE_REAGENTS, this); }
+      { pet->Unsummon(PET_SAVE_REAGENTS, this); }
 
+    Unit* charmed = GetCharm();
+    if (charmed && (GetCharmGuid() == charmed->GetObjectGuid()) && !IsWithinDistInMap(charmed, GetMap()->GetVisibilityDistance()))
+    {
+        Uncharm();
+        if(charmed->GetTypeId() == TYPEID_UNIT)
+          { ((Creature*)charmed)->ForcedDespawn(); }
+    }
+
+    // Group update
+    SendUpdateToOutOfRangeGroupMembers();
     if (IsHasDelayedTeleport())
         { TeleportTo(m_teleport_dest, m_teleport_options); }
 
@@ -1864,7 +1885,7 @@ void Player::RemoveFromWorld()
     // Notifies the client that he has left the raid group.
     // Only valid when the player is on the transport.
     if (GetTransport() && GetGroup() && GetGroup()->isRaidGroup())
-    {            
+    {
         WorldPacket data;
         // For client, sending an empty group list is enough to be ungroup.
         data.Initialize(SMSG_GROUP_LIST, 24);
@@ -1917,16 +1938,21 @@ void Player::RewardRage(uint32 damage, bool attacker)
 
 void Player::RegenerateAll()
 {
-    if (m_regenTimer != 0)
-        { return; }
+    if (
+        m_regenTimer != 0
+        || (GetPower(POWER_RAGE) < 1 && GetPowerType() == POWER_RAGE && GetHealth() == GetMaxHealth())
+        )
+    {
+        return;
+    }
 
     // Not in combat or they have regeneration
     if (!IsInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) ||
-        HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed())
+        HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed() || HasAuraType(SPELL_AURA_MOD_POWER_REGEN))
     {
         RegenerateHealth();
-        if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-            { Regenerate(POWER_RAGE); }
+        if ((!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN)) || HasAuraType(SPELL_AURA_MOD_POWER_REGEN))
+            Regenerate(POWER_RAGE);
     }
 
     Regenerate(POWER_ENERGY);
@@ -1961,8 +1987,7 @@ void Player::Regenerate(Powers power)
         }   break;
         case POWER_RAGE:                                    // Regenerate rage
         {
-            float RageDecreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
-            addvalue = 20 * RageDecreaseRate;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+            addvalue = (m_rageDecayRate * m_rageDecayMultiplier);
         }   break;
         case POWER_ENERGY:                                  // Regenerate energy (rogue)
         {
@@ -1991,15 +2016,20 @@ void Player::Regenerate(Powers power)
     {
         curValue += uint32(addvalue);
         if (curValue > maxValue)
-            { curValue = maxValue; }
+        {
+            curValue = maxValue;
+        }
     }
-    else
+    else if (!IsInCombat())
     {
         if (curValue <= uint32(addvalue))
             { curValue = 0; }
         else
             { curValue -= uint32(addvalue); }
     }
+    else
+        { return; }
+
     SetPower(power, curValue);
 }
 
@@ -2117,7 +2147,7 @@ GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameo
 
 bool Player::IsUnderWater() const
 {
-    return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ() + 2);
+    return GetMap()->GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ() + 2);
 }
 
 void Player::SetInWater(bool apply)
@@ -2949,7 +2979,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                 uint32 prev_spell_id = sSpellMgr.GetPrevSpellInChain(spell_id);  // get the previous spell in chain (if any)
                 if(!prev_spell_id)  //spell_id does not have ranks or is the first spell in chain; must add in spellbook
                     continue;
-                
+
                 if ((m_spells.find(prev_spell_id) == m_spells.end()))
                     continue;
 
@@ -2957,7 +2987,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
                 if (lowerRank->state == PLAYERSPELL_REMOVED || !lowerRank->active)
                     continue;
 
-                SpellEntry const *spell_old = sSpellStore.LookupEntry(prev_spell_id); 
+                SpellEntry const *spell_old = sSpellStore.LookupEntry(prev_spell_id);
                 SpellEntry const *spell_new = spellInfo;
 
                 if (sSpellMgr.IsRankedSpellNonStackableInSpellBook(spell_old))
@@ -3828,7 +3858,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
     CharacterDatabase.PExecute("DELETE FROM character_ticket "
                                "WHERE resolved = 0 AND guid = %u",
                                playerguid.GetCounter());
-    
+
     // for nonexistent account avoid update realm
     if (accountId == 0)
         { updateRealmChars = false; }
@@ -4121,11 +4151,11 @@ void Player::SetCanFly(bool /*enable*/)
 //         data.Initialize(SMSG_MOVE_SET_CAN_FLY, 12);
 //     else
 //         data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 12);
-// 
+//
 //     data << GetPackGUID();
 //     data << uint32(0);                                      // unk
 //     SendMessageToSet(&data, true);
-// 
+//
 //     data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
 //     data << GetPackGUID();
 //     m_movementInfo.Write(data);
@@ -4759,7 +4789,7 @@ float Player::GetMeleeCritFromAgility()
 {
     // from mangos 3462 for 1.12
     float val = 0.0f, classrate = 0.0f, levelfactor = 0.0f, fg = 0.0f;
-    
+
     fg = (0.35f*(float) (getLevel())) + 5.55f;
     levelfactor = (106.20f / fg) - 3;
 
@@ -5708,7 +5738,7 @@ void Player::CheckAreaExploreAndOutdoor()
         { return; }
 
     bool isOutdoor;
-    uint16 areaFlag = GetTerrain()->GetAreaFlag(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
+    uint16 areaFlag = GetMap()->GetTerrain()->GetAreaFlag(GetPositionX(), GetPositionY(), GetPositionZ(), &isOutdoor);
 
     if (isOutdoor)
     {
@@ -6535,7 +6565,7 @@ void Player::DuelComplete(DuelCompleteType type)
         duel->initiator->RemoveGameObject(obj, true);
     }
 
-    /* remove auras */ 
+    /* remove auras */
     // TODO: Needs a simpler method
     std::vector<uint32> auras2remove;
     SpellAuraHolderMap const& vAuras = duel->opponent->GetSpellAuraHolderMap();
@@ -7258,7 +7288,6 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         {
             DEBUG_LOG("       IS_GAMEOBJECT_GUID(guid)");
             GameObject* go = GetMap()->GetGameObject(guid);
-            GameObjectInfo const* goInfo = go->GetGOInfo();
 
             // not check distance for GO in case owned GO (fishing bobber case, for example)
             // And permit out of range GO with no owner in case fishing hole
@@ -7267,6 +7296,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 SendLootRelease(guid);
                 return;
             }
+
+            GameObjectInfo const* goInfo = go->GetGOInfo();
 
             loot = &go->loot;
 
@@ -7532,6 +7563,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                             { creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE); }
 
                         permission = OWNER_PERMISSION;
+
+                        // Inform Instance Data, may be scripts related to OnSkinning like The Beast in UBRS
+                        if (InstanceData* mapInstance = creature->GetInstanceData())
+                        {
+                            mapInstance->OnCreatureLooted(creature, LOOT_SKINNING);
+                        }
                     }
                 }
                 // set group rights only for loot_type != LOOT_SKINNING
@@ -9446,8 +9483,8 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                 if (IsNonMeleeSpellCasted(false))
                     { return EQUIP_ERR_CANT_DO_RIGHT_NOW; }
 
-                // prevent equip item in Spirit of Redemption (Aura: 27827)  
-                if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))  
+                // prevent equip item in Spirit of Redemption (Aura: 27827)
+                if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                     { return EQUIP_ERR_CANT_DO_RIGHT_NOW; }
             }
 
@@ -9809,7 +9846,7 @@ InventoryResult Player::CanUseItem(ItemPrototype const* pProto, bool direct_acti
             { return EQUIP_ERR_CANT_EQUIP_RANK; }
 
         // override mount level requirements with the settings from the configuration file
-        int requiredLevel = pProto->RequiredLevel;
+        uint32 requiredLevel = pProto->RequiredLevel;
         switch(pProto->ItemId) {
              case 1132: //regular mounts
              case 2411:
@@ -12311,42 +12348,54 @@ bool Player::CanRewardQuest(Quest const* pQuest, bool msg) const
 
 bool Player::CanRewardQuest(Quest const* pQuest, uint32 reward, bool msg) const
 {
-    // prevent receive reward with quest items in bank or for not completed quest
-    if (!CanRewardQuest(pQuest, msg))
-        { return false; }
+    bool result;
+    uint32 numOptionalRewards;
+    uint32 numRewards;
+    uint32 requiredSlots;
+    InventoryResult iRes;
 
-    if (pQuest->GetRewChoiceItemsCount() > 0)
+    requiredSlots = 0;
+    result = CanRewardQuest(pQuest, msg);
+    if (result)
     {
-        if (pQuest->RewChoiceItemId[reward])
-        {
-            ItemPosCountVec dest;
-            InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward]);
-            if (res != EQUIP_ERR_OK)
-            {
-                SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
-                return false;
-            }
-        }
-    }
+        ItemPosCountVec destActual;
+        numOptionalRewards = pQuest->GetRewChoiceItemsCount();
+        numRewards = pQuest->GetRewItemsCount();
+        if (numOptionalRewards > 0)
+            requiredSlots = numRewards + 1; // Only ONE optional reward can be selected
+        else
+            requiredSlots = numRewards;
 
-    if (pQuest->GetRewItemsCount() > 0)
-    {
-        for (uint32 i = 0; i < pQuest->GetRewItemsCount(); ++i)
+        if (numRewards > 0 || numOptionalRewards > 0)
         {
-            if (pQuest->RewItemId[i])
+            if (pQuest->RewChoiceItemId[reward])
             {
                 ItemPosCountVec dest;
-                InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewItemId[i], pQuest->RewItemCount[i]);
-                if (res != EQUIP_ERR_OK)
+                iRes = CanStoreNewItem(0, 0, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward]);
+                if (iRes != EQUIP_ERR_OK)
+                    goto CANT_EQUIP;
+            }
+            for (uint32 i = 0; i < numRewards; ++i)
+            {
+                if (pQuest->RewItemId[i])
                 {
-                    SendEquipError(res, NULL, NULL);
-                    return false;
+                    ItemPosCountVec dest;
+                    iRes = CanStoreNewItem(0, 0, dest, pQuest->RewItemId[i], pQuest->RewItemCount[i]);
+                    if (iRes != EQUIP_ERR_OK)
+                        goto CANT_EQUIP;
                 }
+            }
+            // We use 2586 (Gamemaster's Robes) as the item ID so that we can verify that the slots can be filled for all selected quest rewards
+            iRes = CanStoreNewItem(0, 0, destActual, 2586, requiredSlots);
+CANT_EQUIP:
+            if (iRes != EQUIP_ERR_OK)
+            {
+                SendEquipError(iRes, 0, 0);
+                result = false;
             }
         }
     }
-
-    return true;
+    return result;
 }
 
 void Player::SendPetTameFailure(PetTameFailureReason reason)
@@ -14431,7 +14480,7 @@ bool Player::isAllowedToLoot(Creature* creature)
                     /* If the assigned looter's GUID is equal to ours */
                     else if (creature->assignedLooter == GetGUIDLow())
                         { return true; }
-                    /* If the creature already has an assigned looter and that looter isn't us */                    
+                    /* If the creature already has an assigned looter and that looter isn't us */
                     else if (creature->assignedLooter != 0 && !hasSharedLoot && !hasStartingQuestLoot)
                         { return false; }
 
@@ -14439,10 +14488,10 @@ bool Player::isAllowedToLoot(Creature* creature)
 
                     /* This is the player that will be given permission to loot */
                     Player* final_looter = recipient;
-                    
+
                     /* Iterate through the valid party members */
                     Group::MemberSlotList slots = plr_group->GetMemberSlots();
-                    
+
                     for (Group::MemberSlotList::iterator itr = slots.begin(); itr != slots.end(); ++itr)
                     {
                         /* Get the player data */
@@ -14465,18 +14514,17 @@ bool Player::isAllowedToLoot(Creature* creature)
 
                     /* We have our looter, update their loot time */
                     final_looter->lastTimeLooted = time(NULL);
-                    
+
                     /* Update the creature with the looter that has been assigned to them */
                     creature->assignedLooter = final_looter->GetGUIDLow();
-                    final_looter->GetGroup()->SetLooterGuid(final_looter->GetGUID());
-                    
+                    final_looter->GetGroup()->SetLooterGuid(final_looter->GetObjectGuid());
+
                     /* Finally, return if we are the assigned looter */
                     return (final_looter->GetGUIDLow() == GetGUIDLow() || hasSharedLoot || hasStartingQuestLoot);
                     /* End of switch statement */
                 }
                 default:
                     // Something went wrong, avoid crash
-                    
                     return false;
             }
         }
@@ -16426,24 +16474,24 @@ void Player::TextEmote(const std::string& text)
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
-void Player::LogWhisper(const std::string& text, ObjectGuid receiver) 
+void Player::LogWhisper(const std::string& text, ObjectGuid receiver)
 {
     WhisperLoggingLevels loggingLevel = WhisperLoggingLevels(sWorld.getConfig(CONFIG_UINT32_LOG_WHISPERS));
 
     if (loggingLevel == WHISPER_LOGGING_NONE)
         return;
-    
+
     //Try to find ticket by either this player or the receiver
     GMTicket* ticket = sTicketMgr.GetGMTicket(GetObjectGuid());
     if (!ticket)
         ticket = sTicketMgr.GetGMTicket(receiver);
-    
+
     uint32 ticketId = 0;
     if (ticket)
         ticketId = ticket->GetId();
-    
+
     bool isSomeoneGM = false;
-    
+
     //Find out if at least one of them is a GM for ticket logging
     if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         isSomeoneGM = true;
@@ -16453,7 +16501,7 @@ void Player::LogWhisper(const std::string& text, ObjectGuid receiver)
         if (pRecvPlayer && pRecvPlayer->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
             isSomeoneGM = true;
     }
-    
+
     if ((loggingLevel == WHISPER_LOGGING_TICKETS && ticket && isSomeoneGM)
         || loggingLevel == WHISPER_LOGGING_EVERYTHING)
     {
@@ -16871,7 +16919,7 @@ void Player::HandleStealthedUnitsDetection()
                 (*i)->SendCreateUpdateToPlayer(this);
                 m_clientGUIDs.insert(i_guid);
 
-                DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(TemplateV): %s is detected in stealth by player %u. Distance = %f", i_guid.GetString().c_str(), GetGUIDLow(), GetDistance(*i));
+                DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(): %s is detected in stealth by player %u. Distance = %f", i_guid.GetString().c_str(), GetGUIDLow(), GetDistance(*i));
 
                 // target aura duration for caster show only if target exist at caster client
                 // send data at target visibility change (adding to client)
@@ -17703,18 +17751,16 @@ bool Player::IsVisibleGloballyFor(Player* u) const
     return true;
 }
 
-template<class T>
-inline void BeforeVisibilityDestroy(T* /*t*/, Player* /*p*/)
+inline void BeforeVisibilityDestroy(WorldObject* o, Player* p)
 {
+    if (Creature* t = o->ToCreature())
+    {
+        if (p->GetPetGuid() == t->GetObjectGuid() && t->IsPet())
+            { ((Pet*)t)->Unsummon(PET_SAVE_REAGENTS); }
+    }
 }
 
-template<>
-inline void BeforeVisibilityDestroy<Creature>(Creature* t, Player* p)
-{
-    if (p->GetPetGuid() == t->GetObjectGuid() && ((Creature*)t)->IsPet())
-        { ((Pet*)t)->Unsummon(PET_SAVE_REAGENTS); }
-}
-
+//2 params version (2p)
 void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target)
 {
     if (HaveAtClient(target))
@@ -17724,12 +17770,12 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             ObjectGuid t_guid = target->GetObjectGuid();
 
             if (target->GetTypeId() == TYPEID_UNIT)
-                { BeforeVisibilityDestroy<Creature>((Creature*)target, this); }
+                { BeforeVisibilityDestroy(target, this); }
 
             target->DestroyForPlayer(this);
             m_clientGUIDs.erase(t_guid);
 
-            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf: %s out of range for player %u. Distance = %f", t_guid.GetString().c_str(), GetGUIDLow(), GetDistance(target));
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(2p): %s out of range for player %u. Distance = %f", t_guid.GetString().c_str(), GetGUIDLow(), GetDistance(target));
         }
     }
     else
@@ -17740,7 +17786,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             if (target->GetTypeId() != TYPEID_GAMEOBJECT || !((GameObject*)target)->IsTransport())
                 { m_clientGUIDs.insert(target->GetObjectGuid()); }
 
-            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf: %s is visible now for player %u. Distance = %f", target->GetGuidStr().c_str(), GetGUIDLow(), GetDistance(target));
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(2p): %s is visible now for player %u. Distance = %f", target->GetGuidStr().c_str(), GetGUIDLow(), GetDistance(target));
 
             // target aura duration for caster show only if target exist at caster client
             // send data at target visibility change (adding to client)
@@ -17750,34 +17796,21 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
     }
 }
 
-template<class T>
-inline void UpdateVisibilityOf_helper(GuidSet& s64, T* target)
-{
-    s64.insert(target->GetObjectGuid());
-}
-
-template<>
-inline void UpdateVisibilityOf_helper(GuidSet& s64, GameObject* target)
-{
-    if (!target->IsTransport())
-        { s64.insert(target->GetObjectGuid()); }
-}
-
-template<class T>
-void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
+//4 params version (4p)
+void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
     if (HaveAtClient(target))
     {
         if (!target->IsVisibleForInState(this, viewPoint, true))
         {
-            BeforeVisibilityDestroy<T>(target, this);
+            BeforeVisibilityDestroy(target, this);
 
             ObjectGuid t_guid = target->GetObjectGuid();
 
             target->BuildOutOfRangeUpdateBlock(&data);
             m_clientGUIDs.erase(t_guid);
 
-            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(TemplateV): %s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(4p): %s is out of range for %s. Distance = %f", t_guid.GetString().c_str(), GetGuidStr().c_str(), GetDistance(target));
         }
     }
     else
@@ -17786,18 +17819,21 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateD
         {
             visibleNow.insert(target);
             target->BuildCreateUpdateBlockForPlayer(&data, this);
-            UpdateVisibilityOf_helper(m_clientGUIDs, target);
-
-            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(TemplateV): %s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
+            if (GameObject* g = target->ToGameObject())
+            {
+                if (!g->IsTransport())
+                {
+                    m_clientGUIDs.insert(g->GetObjectGuid());
+                }
+            }
+            else
+            {
+                m_clientGUIDs.insert(target->GetObjectGuid());
+            }
+            DEBUG_FILTER_LOG(LOG_FILTER_VISIBILITY_CHANGES, "UpdateVisibilityOf(4p): %s is visible now for %s. Distance = %f", target->GetGuidStr().c_str(), GetGuidStr().c_str(), GetDistance(target));
         }
     }
 }
-
-template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Player*        target, UpdateData& data, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Creature*      target, UpdateData& data, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*        target, UpdateData& data, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, std::set<WorldObject*>& visibleNow);
-template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
 void Player::InitPrimaryProfessions()
 {
@@ -18315,7 +18351,7 @@ float Player::GetReputationPriceDiscount(Creature const* pCreature) const
     FactionTemplateEntry const* vendor_faction = pCreature->getFactionTemplateEntry();
     if (!vendor_faction || !vendor_faction->faction)
         { return 1.0f; }
-    
+
     uint32 discount = 100;
     ReputationRank rank = GetReputationRank(vendor_faction->faction);   // get repution rank for that specific vendor faction
     if (rank >= REP_HONORED)                                            // give 10% reduction if rank is at least honored
@@ -18382,7 +18418,7 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel /*= NUL
                 {
                     // for riding spells, override the required level with the level from the configuration file
                     switch (spell_id) {
-                        case 33388: // Riding 
+                        case 33388: // Riding
                         case 33389: // Apprentice Riding
                             if (getLevel() < uint32(sWorld.getConfig(CONFIG_UINT32_MIN_TRAIN_MOUNT_LEVEL)))
                                 { return false; }
@@ -18826,6 +18862,14 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
 
     SpawnCorpseBones();
+}
+
+bool Player::IsClientControl(Unit* target) const
+{
+    return (target && !target->IsFleeing() && !target->IsConfused() && !target->IsTaxiFlying() &&
+        (target->GetTypeId() != TYPEID_PLAYER ||
+        !((Player*)target)->InBattleGround() || ((Player*)target)->GetBattleGround()->GetStatus() != STATUS_WAIT_LEAVE) &&
+        target->GetCharmerOrOwnerOrOwnGuid() == GetObjectGuid());
 }
 
 void Player::SetClientControl(Unit* target, uint8 allowMove)
@@ -19368,7 +19412,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
     // 14.57 can be calculated by resolving damageperc formula below to 0
     if (z_diff >= 14.57f && !IsDead() && !isGameMaster() && !HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
         !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-        !IsImmunedToDamage(SPELL_SCHOOL_MASK_NORMAL))
+        !IsImmuneToDamage(SPELL_SCHOOL_MASK_NORMAL))
     {
         // Safe fall, fall height reduction
         int32 safe_fall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
@@ -19803,13 +19847,13 @@ AreaLockStatus Player::GetAreaTriggerLockStatus(AreaTrigger const* at, uint32& m
                     miscRequirement = fault.param1;
                     return AREA_LOCKSTATUS_WRONG_TEAM;
                 }
-                
+
                 case CONDITION_PVP_RANK:
                 {
                     miscRequirement = fault.param1;
                     return AREA_LOCKSTATUS_NOT_ALLOWED;
                 }
-                
+
                 default:
                     return AREA_LOCKSTATUS_UNKNOWN_ERROR;
             }
