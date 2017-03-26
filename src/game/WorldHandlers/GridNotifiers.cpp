@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateData.h"
-#include "Item.h"
 #include "Map.h"
 #include "Transports.h"
 #include "ObjectAccessor.h"
@@ -50,13 +49,14 @@ void VisibleNotifier::Notify()
     // but exist one case when this possible and object not out of range: transports
     if (Transport* transport = player.GetTransport())
     {
-        for (Transport::PlayerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
+        for (UnitSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
         {
             if (i_clientGUIDs.find((*itr)->GetObjectGuid()) != i_clientGUIDs.end())
             {
                 // ignore far sight case
-                (*itr)->UpdateVisibilityOf(*itr, &player);
-                player.UpdateVisibilityOf(&player, *itr, i_data, i_visibleNow);
+                if(Player* p = (*itr)->ToPlayer())
+                  { p->UpdateVisibilityOf(p, &player); }
+                player.UpdateVisibilityOf(&player, (WorldObject*)(*itr), i_data, i_visibleNow);
                 i_clientGUIDs.erase((*itr)->GetObjectGuid());
             }
         }

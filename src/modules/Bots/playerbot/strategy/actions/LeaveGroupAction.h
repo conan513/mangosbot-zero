@@ -24,7 +24,7 @@ namespace ai
             if (sRandomPlayerbotMgr.IsRandomBot(bot))
             {
                 bot->GetPlayerbotAI()->SetMaster(NULL);
-                sRandomPlayerbotMgr.ScheduleTeleport(bot->GetGUID());
+                sRandomPlayerbotMgr.ScheduleTeleport(bot->GetObjectGuid());
                 sRandomPlayerbotMgr.SetLootAmount(bot, 0);
             }
 
@@ -69,7 +69,7 @@ namespace ai
 
             p >> guid;
 
-            if (bot->GetGUID() == guid)
+            if (bot->GetObjectGuid() == guid)
                 return LeaveGroupAction::Execute(event);
 
             return false;

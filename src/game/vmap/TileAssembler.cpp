@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <set>
 #include <iomanip>
 #include <sstream>
-#include <iomanip>
 
 #include "TileAssembler.h"
 #include "MapTree.h"
@@ -314,7 +313,7 @@ namespace VMAP
 
         // write WorldModel
         WorldModel model;
-        model.setRootWmoID(raw_model.RootWMOID);
+        model.SetRootWmoID(raw_model.RootWMOID);
         if (raw_model.groupsArray.size())
         {
             std::vector<GroupModel> groupsArray;
@@ -324,16 +323,15 @@ namespace VMAP
             {
                 GroupModel_Raw& raw_group = raw_model.groupsArray[g];
                 groupsArray.push_back(GroupModel(raw_group.mogpflags, raw_group.GroupWMOID, raw_group.bounds));
-                groupsArray.back().setMeshData(raw_group.vertexArray, raw_group.triangles);
-                groupsArray.back().setLiquidData(raw_group.liquid);
+                groupsArray.back().SetMeshData(raw_group.vertexArray, raw_group.triangles);
+                groupsArray.back().SetLiquidData(raw_group.liquid);
             }
 
-            model.setGroupModels(groupsArray);
+            model.SetGroupModels(groupsArray);
         }
 
-        success = model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
+        success = model.WriteFile(iDestDir + "/" + pModelFilename + ".vmo");
 
-        //std::cout << "readRawFile2: '" << pModelFilename << "' tris: " << nElements << " nodes: " << nNodes << std::endl;
         return success;
     }
 

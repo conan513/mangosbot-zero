@@ -67,7 +67,7 @@ bool SendMailAction::Execute(Event event)
             ItemPrototype const *proto = item->GetProto();
             bot->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
             item->DeleteFromInventoryDB();
-            item->SetOwnerGuid(master->GetGUID());
+            item->SetOwnerGuid(master->GetObjectGuid());
             item->SaveToDB();
             draft.AddItem(item);
         }

@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,12 +28,10 @@
 #include "ProgressBar.h"
 #include "DBCStores.h"
 #include "SQLStorages.h"
-#include "World.h"
 #include "Chat.h"
 #include "Spell.h"
-#include "BattleGround/BattleGroundMgr.h"
-#include "MapManager.h"
 #include "Unit.h"
+#include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -906,6 +904,16 @@ bool IsPositiveSpell(SpellEntry const* spellproto)
 
 bool IsSingleTargetSpell(SpellEntry const* spellInfo)
 {
+    switch (spellInfo->Id)
+    {
+        case 339:                                           // Druid Roots Rank 1
+        case 1062:                                          // Druid Roots Rank 2
+        case 5195:                                          // Druid Roots Rank 3
+        case 5196:                                          // Druid Roots Rank 4
+        case 9852:                                          // Druid Roots Rank 5
+        case 9853:                                          // Druid Roots Rank 6
+            return true;
+    }
     // hunter's mark and similar
     if (spellInfo->SpellVisual == 3239)
         { return true; }

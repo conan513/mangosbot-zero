@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,26 +68,23 @@ namespace VMAP
         return hit;
     }
 
-    void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo& info) const
+    void ModelInstance::GetAreaInfo(const G3D::Vector3& p, AreaInfo& info) const
     {
         if (!iModel)
-        {
-#ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
-#endif
             return;
-        }
 
         // M2 files don't contain area info, only WMO files
         if (flags & MOD_M2)
             { return; }
+
         if (!iBound.contains(p))
             { return; }
+
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
         float zDist;
-        if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
+        if (iModel->GetAreaInfo(pModel, zDirModel, zDist, info))
         {
             Vector3 modelGround = pModel + zDist * zDirModel;
             // Transform back to world space. Note that:
@@ -105,18 +102,15 @@ namespace VMAP
     bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const
     {
         if (!iModel)
-        {
-#ifdef VMAP_DEBUG
-            DEBUG_LOG("<object not loaded>");
-#endif
             return false;
-        }
 
         // M2 files don't contain area info, only WMO files
         if (flags & MOD_M2)
             { return false; }
+
         if (!iBound.contains(p))
             { return false; }
+
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);

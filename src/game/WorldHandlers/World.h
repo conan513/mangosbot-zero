@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
 
-#include <map>
 #include <set>
 #include <list>
 
@@ -74,13 +73,13 @@ enum ShutdownExitCode
 /// Timers for different object refresh rates
 enum WorldTimers
 {
-    WUPDATE_AUCTIONS    = 0,
-    WUPDATE_UPTIME      = 1,
-    WUPDATE_CORPSES     = 2,
-    WUPDATE_EVENTS      = 3,
-    WUPDATE_DELETECHARS = 4,
-    WUPDATE_AHBOT       = 5,
-    WUPDATE_COUNT       = 6
+    WUPDATE_AUCTIONS = 0,
+    WUPDATE_UPTIME,
+    WUPDATE_CORPSES,
+    WUPDATE_EVENTS,
+    WUPDATE_DELETECHARS,
+    WUPDATE_AHBOT,
+    WUPDATE_COUNT
 };
 
 /// Configuration elements
@@ -198,6 +197,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_WARDEN_NUM_MEM_CHECKS,
     CONFIG_UINT32_WARDEN_NUM_OTHER_CHECKS,
     CONFIG_UINT32_WARDEN_DB_LOGLEVEL,
+    CONFIG_UINT32_AUTOBROADCAST_INTERVAL,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -424,7 +424,7 @@ typedef UNORDERED_MAP<uint32, WorldSession*> SessionMap;
 class World
 {
     public:
-        static volatile uint32 m_worldLoopCounter;
+        static ACE_Atomic_Op<ACE_Thread_Mutex, uint32> m_worldLoopCounter;
 
         World();
         ~World();
@@ -467,6 +467,7 @@ class World
         void SetMotd(const std::string& motd) { m_motd = motd; }
         /// Get the current Message of the Day
         const char* GetMotd() const { return m_motd.c_str(); }
+        void showFooter();
 
         LocaleConstant GetDefaultDbcLocale() const { return m_defaultDbcLocale; }
 
@@ -583,6 +584,7 @@ class World
         void LoadDBVersion();
         char const* GetDBVersion() { return m_DBVersion.c_str(); }
 
+        void LoadBroadcastStrings();
 
         /**
         * \brief: force all client to request player data
@@ -616,6 +618,18 @@ class World
         bool configNoReload(bool reload, eConfigInt32Values index, char const* fieldname, int32 defvalue);
         bool configNoReload(bool reload, eConfigFloatValues index, char const* fieldname, float defvalue);
         bool configNoReload(bool reload, eConfigBoolValues index, char const* fieldname, bool defvalue);
+
+        // AutoBroadcast system
+        void AutoBroadcast();
+        struct BroadcastString
+        {
+            uint32 freq;
+            std::string text;
+        };
+        std::vector<BroadcastString> m_broadcastList;
+        uint32 m_broadcastWeight;
+        bool m_broadcastEnable;
+        IntervalTimer m_broadcastTimer;
 
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;

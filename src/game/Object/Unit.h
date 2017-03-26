@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,10 +43,10 @@
 #include "Utilities/EventProcessor.h"
 #include "MotionMaster.h"
 #include "DBCStructure.h"
-#include "Path.h"
 #include "WorldPacket.h"
 #include "Timer.h"
 #include "Log.h"
+
 #include <list>
 
 enum SpellInterruptFlags
@@ -451,7 +451,7 @@ enum UnitState
     UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
 
     // AI disabled by some reason
-    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_FLEEING | UNIT_STAT_CONTROLLED,
+    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_CONTROLLED,
 
     // above 2 state cases
     UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL  = UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_LOST_CONTROL,
@@ -1141,6 +1141,11 @@ class Unit : public WorldObject
          * \todo Add more information here
          */
         void CleanupsBeforeDelete() override;
+
+        bool IsControlledByPlayer() const override
+        {
+            return IsCharmerOrOwnerPlayerOrPlayerItself();
+        }
 
         float GetObjectBoundingRadius() const override      // overwrite WorldObject version
         {
@@ -3592,7 +3597,7 @@ class Unit : public WorldObject
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
         void ApplySpellDispelImmunity(const SpellEntry* spellProto, DispelType type, bool apply);
         virtual bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf);
-        bool IsImmunedToDamage(SpellSchoolMask meleeSchoolMask);
+        virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask);
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
 
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage);
@@ -3622,8 +3627,23 @@ class Unit : public WorldObject
         void StopMoving(bool forceSendStop = false);
         void InterruptMoving(bool forceSendStop = false);
 
+        ///----------Various crowd control methods-----------------
+        bool IsImmobilized() const { return hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED); }
+        void SetImmobilizedState(bool apply, bool stun = false);
+        
+        // These getters operate on unit flags set by IncapacitatedState and are meant for formal usage in conjunction with spell effects only
+        // For actual internal movement states use UnitState flags
+        // TODO: The UnitState thing needs to be rewriten at some point, this kind of duality is bad
+        bool IsFleeing() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING); }
+        bool IsConfused() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED); }
+        bool IsStunned() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED); }
+        bool IsIncapacitated() const { return (IsFleeing() || IsConfused() || IsStunned()); }
+        
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
         void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);
+        void SetStunned(bool apply);
+        void SetIncapacitatedState(bool apply, uint32 state = 0, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
+        ///----------End of crowd control methods----------
         void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid());
 
         void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }

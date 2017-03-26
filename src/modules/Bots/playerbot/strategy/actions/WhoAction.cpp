@@ -85,7 +85,7 @@ string WhoAction::QuerySkill(string text)
             uint32 spellId = AI_VALUE2(uint32, "spell id", skillName);
             uint16 value = bot->GetSkillValue(skill);
             uint16 maxSkill = bot->GetMaxSkillValue(skill);
-            ObjectGuid guid = bot->GetGUID();
+            ObjectGuid guid = bot->GetObjectGuid();
             string data = "0";
             out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":"
                     << std::hex << std::uppercase << guid.GetRawValue()

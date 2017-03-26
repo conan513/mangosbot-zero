@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "Log.h"
-#include "Corpse.h"
-#include "GameObject.h"
 #include "Player.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
@@ -35,8 +33,7 @@
 #include "Object.h"
 #include "Group.h"
 #include "World.h"
-#include "Util.h"
-#include "DBCStores.h"
+
 #ifdef ENABLE_ELUNA
 #include "LuaEngine.h"
 #endif /* ENABLE_ELUNA */
@@ -273,35 +270,41 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
     if (pLoot)
     {
         pLoot->NotifyMoneyRemoved();
-
-        if (!guid.IsItem() && player->GetGroup())           // item can be looted only single player
+        // Items/objects can ONLY be looted by a single player
+        if (!guid.IsItem() && player->GetGroup())
         {
-            Group* group = player->GetGroup();
-
-            std::vector<Player*> playersNear;
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            // Pickpocket case
+            if (player->getClass() == CLASS_ROGUE && GetPlayer()->GetMap()->GetCreature(guid)->lootForPickPocketed)
+                player->ModifyMoney(pLoot->gold);
+            else
             {
-                Player* playerGroup = itr->getSource();
-                if (!playerGroup)
-                    { continue; }
-                if (player->IsWithinDistInMap(playerGroup, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
-                    { playersNear.push_back(playerGroup); }
-            }
+                Group* group = player->GetGroup();
 
-            uint32 money_per_player = uint32((pLoot->gold) / (playersNear.size()));
+                std::vector<Player*> playersNear;
+                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    Player* playerGroup = itr->getSource();
+                    if (!playerGroup)
+                        continue;
+                    if (player->IsWithinDistInMap(playerGroup, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                        playersNear.push_back(playerGroup);
+                }
 
-            for (std::vector<Player*>::const_iterator i = playersNear.begin(); i != playersNear.end(); ++i)
-            {
-                (*i)->ModifyMoney(money_per_player);
+                uint32 money_per_player = uint32((pLoot->gold) / (playersNear.size()));
 
-                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
-                data << uint32(money_per_player);
+                for (std::vector<Player*>::const_iterator i = playersNear.begin(); i != playersNear.end(); ++i)
+                {
+                    (*i)->ModifyMoney(money_per_player);
 
-                (*i)->GetSession()->SendPacket(&data);
+                    WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
+                    data << uint32(money_per_player);
+
+                    (*i)->GetSession()->SendPacket(&data);
+                }
             }
         }
         else
-            { player->ModifyMoney(pLoot->gold); }
+            player->ModifyMoney(pLoot->gold);
 
         // Used by Eluna
 #ifdef ENABLE_ELUNA
@@ -311,7 +314,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
         pLoot->gold = 0;
 
         if (pItem)
-            { pItem->SetLootState(ITEM_LOOT_CHANGED); }
+            pItem->SetLootState(ITEM_LOOT_CHANGED);
     }
 }
 

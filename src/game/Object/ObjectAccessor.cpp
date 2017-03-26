@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,19 +26,14 @@
 #include "ObjectMgr.h"
 #include "Policies/Singleton.h"
 #include "Player.h"
-#include "WorldPacket.h"
 #include "Item.h"
 #include "Corpse.h"
-#include "GridNotifiers.h"
 #include "MapManager.h"
 #include "Map.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectGuid.h"
 #include "World.h"
-
-#include <cmath>
-
 #define CLASS_LOCK MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex>
 INSTANTIATE_SINGLETON_2(ObjectAccessor, CLASS_LOCK);
 INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);

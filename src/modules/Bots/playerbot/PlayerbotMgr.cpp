@@ -48,7 +48,7 @@ void PlayerbotHolder::LogoutAllBots()
         PlayerBotMap::const_iterator itr = GetPlayerBotsBegin();
         if (itr == GetPlayerBotsEnd()) break;
         Player* bot= itr->second;
-        LogoutPlayerBot(bot->GetGUID());
+        LogoutPlayerBot(bot->GetObjectGuid().GetRawValue());
     }
 }
 
@@ -81,12 +81,12 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 	bot->SetPlayerbotAI(ai);
 	OnBotLoginInternal(bot);
 
-    playerBots[bot->GetGUID()] = bot;
+    playerBots[bot->GetObjectGuid().GetRawValue()] = bot;
 
     Player* master = ai->GetMaster();
     if (master)
     {
-        ObjectGuid masterGuid = master->GetGUID();
+        ObjectGuid masterGuid = master->GetObjectGuid();
         if (master->GetGroup() &&
             ! master->GetGroup()->IsLeader(masterGuid))
             master->GetGroup()->ChangeLeader(masterGuid);
@@ -120,7 +120,7 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
     ai->ResetStrategies();
     ai->TellMaster("Hello!");
 
-    uint32 account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetGUID());
+    uint32 account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
     if (sPlayerbotAIConfig.IsInRandomAccountList(account))
     {
         sLog.outString("%d/%d Bot %s logged in", playerBots.size(), sRandomPlayerbotMgr.GetMaxAllowedBotCount(), bot->GetName());
@@ -305,7 +305,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
         {
 			ObjectGuid member = i->guid;
 
-			if (member.GetRawValue() == master->GetGUID())
+			if (member.GetRawValue() == master->GetObjectGuid().GetRawValue())
 				continue;
 
 			string bot;
@@ -363,7 +363,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
         {
             out << "character not found";
         }
-        else if (master && member.GetRawValue() != master->GetGUID())
+        else if (master && member.GetRawValue() != master->GetObjectGuid().GetRawValue())
         {
             out << ProcessBotCommand(cmdStr, member,
                     master->GetSession()->GetSecurity() >= SEC_GAMEMASTER,

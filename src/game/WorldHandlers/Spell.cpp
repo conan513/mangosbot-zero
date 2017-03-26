@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
 #include "GridNotifiersImpl.h"
 #include "Opcodes.h"
 #include "Log.h"
-#include "UpdateMask.h"
 #include "World.h"
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
@@ -40,7 +39,6 @@
 #include "DynamicObject.h"
 #include "Group.h"
 #include "UpdateData.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "CellImpl.h"
 #include "Policies/Singleton.h"
@@ -1133,7 +1131,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool isReflected)
     // Recheck immune (only for delayed spells)
     float speed = m_spellInfo->speed == 0.0f && m_triggeredBySpellInfo ? m_triggeredBySpellInfo->speed : m_spellInfo->speed;
     if (speed && (
-            unit->IsImmunedToDamage(GetSpellSchoolMask(m_spellInfo)) ||
+            unit->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo)) ||
             unit->IsImmuneToSpell(m_spellInfo, unit == realCaster)))
     {
         if (realCaster)
@@ -1167,7 +1165,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool isReflected)
             }
 
             // not break stealth by cast targeting
-            if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH))
+            if(!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH) && m_spellInfo->Id != 51690 && m_spellInfo->Id != 53055)
                 { unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH); }
 
             // can cause back attack (if detected), stealth removed at Spell::cast if spell break it
@@ -2738,12 +2736,12 @@ void Spell::cast(bool skipCheck)
                 { AddPrecastSpell(25771); }                     // Forbearance
             break;
         }
-		case SPELLFAMILY_ROGUE:
-	            {
-	            // exit stealth on sap when improved sap is not skilled 
-	            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) && m_caster->GetTypeId() == TYPEID_PLAYER && (!m_caster->GetAura(14076, SpellEffectIndex(0)) && !m_caster->GetAura(14094, SpellEffectIndex(0)) && !m_caster->GetAura(14095, SpellEffectIndex(0))))
-	            m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-	            }
+        case SPELLFAMILY_ROGUE:
+                {
+                // exit stealth on sap when improved sap is not skilled 
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) && m_caster->GetTypeId() == TYPEID_PLAYER && (!m_caster->GetAura(14076, SpellEffectIndex(0)) && !m_caster->GetAura(14094, SpellEffectIndex(0)) && !m_caster->GetAura(14095, SpellEffectIndex(0))))
+                m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                }
         case SPELLFAMILY_WARRIOR:
             break;
         case SPELLFAMILY_PRIEST:
@@ -4086,6 +4084,11 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (bg->GetStatus() == STATUS_WAIT_LEAVE)
                 { return SPELL_FAILED_DONT_REPORT; }
 
+    if (!m_IsTriggeredSpell && m_spellInfo->Id == 2479) //honorless target as non-triggered spell
+    {
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
     if (!m_IsTriggeredSpell && IsNonCombatSpell(m_spellInfo) &&
         m_caster->IsInCombat())
         { return SPELL_FAILED_AFFECTING_COMBAT; }
@@ -4095,11 +4098,11 @@ SpellCastResult Spell::CheckCast(bool strict)
         VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled())
     {
         if (m_spellInfo->HasAttribute(SPELL_ATTR_OUTDOORS_ONLY) &&
-            !m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
+            !m_caster->GetMap()->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
             { return SPELL_FAILED_ONLY_OUTDOORS; }
 
         if (m_spellInfo->HasAttribute(SPELL_ATTR_INDOORS_ONLY) &&
-            m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
+            m_caster->GetMap()->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
             { return SPELL_FAILED_ONLY_INDOORS; }
     }
     // only check at first call, Stealth auras are already removed at second call
@@ -4455,12 +4458,8 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Must be behind the target.
         if (m_spellInfo->AttributesEx2 == SPELL_ATTR_EX2_UNK20 && m_spellInfo->HasAttribute(SPELL_ATTR_EX_UNK9) && target->HasInArc(M_PI_F, m_caster))
         {
-            // Exclusion for Pounce: Facing Limitation was removed in 2.0.1, but it still uses the same, old Ex-Flags
-            if (!m_spellInfo->IsFitToFamily(SPELLFAMILY_DRUID, UI64LIT(0x0000000000020000)))
-            {
-                SendInterrupted(2);
-                return SPELL_FAILED_NOT_BEHIND;
-            }
+            SendInterrupted(2);
+            return SPELL_FAILED_NOT_BEHIND;
         }
 
         // Target must be facing you.
@@ -5572,19 +5571,19 @@ SpellCastResult Spell::CheckRange(bool strict)
             }
             break;                                          // let continue in generic way for no target
         }
-	case SPELL_RANGE_IDX_SHORT:
-	{
-		if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) || m_spellInfo->SpellFamilyFlags & 0x800000)))
-		{
-			Pet* pet = m_caster->GetPet();
-			if (pet)
-			{
-				float max_range = GetSpellMaxRange(sSpellRangeStore.LookupEntry(SPELL_RANGE_IDX_SHORT));
-				return m_caster->IsWithinDistInMap(pet, max_range) ? SPELL_CAST_OK : SPELL_FAILED_OUT_OF_RANGE;
-			}
-		}
-		break;
-	}        
+    case SPELL_RANGE_IDX_SHORT:
+    {
+        if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000080) || m_spellInfo->SpellFamilyFlags & 0x800000)))
+        {
+            Pet* pet = m_caster->GetPet();
+            if (pet)
+            {
+                float max_range = GetSpellMaxRange(sSpellRangeStore.LookupEntry(SPELL_RANGE_IDX_SHORT));
+                return m_caster->IsWithinDistInMap(pet, max_range) ? SPELL_CAST_OK : SPELL_FAILED_OUT_OF_RANGE;
+            }
+        }
+        break;
+    }        
     }
 
     // add radius of caster and ~5 yds "give" for non stricred (landing) check

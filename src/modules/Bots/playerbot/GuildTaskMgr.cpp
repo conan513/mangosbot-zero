@@ -53,7 +53,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
     }
 
-    uint32 owner = (uint32)player->GetGUID();
+    uint32 owner = (uint32)player->GetGUIDLow();
 
     uint32 activeTask = GetTaskValue(owner, guildId, "activeTask");
     if (!activeTask)
@@ -651,7 +651,7 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
     if (!guildId)
         return;
 
-    uint32 owner = (uint32)ownerPlayer->GetGUID();
+    uint32 owner = (uint32)ownerPlayer->GetGUIDLow();
 	Guild *guild = sGuildMgr.GetGuildById(bot->GetGuildId());
 	if (!guild)
 		return;
@@ -789,7 +789,7 @@ void GuildTaskMgr::CheckKillTask(Player* player, Unit* victim)
 
 void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
 {
-    uint32 owner = player->GetGUID();
+    uint32 owner = player->GetGUIDLow();
     Creature* creature = victim->ToCreature();
     if (!creature)
         return;

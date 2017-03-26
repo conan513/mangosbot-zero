@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,11 @@
 #define MANGOS_H_OBJECTMGR
 
 #include "Common.h"
-#include "Log.h"
 #include "Object.h"
 #include "Bag.h"
 #include "Creature.h"
 #include "Player.h"
 #include "GameObject.h"
-#include "Corpse.h"
 #include "QuestDef.h"
 #include "ItemPrototype.h"
 #include "NPCHandler.h"
@@ -43,7 +41,6 @@
 #include "ObjectGuid.h"
 #include "Policies/Singleton.h"
 
-#include <string>
 #include <map>
 #include <limits>
 
@@ -116,6 +113,9 @@ struct MangosStringLocale
 
 typedef UNORDERED_MAP<uint32 /*guid*/, CreatureData> CreatureDataMap;
 typedef CreatureDataMap::value_type CreatureDataPair;
+
+typedef std::multimap<uint32 /*mapId*/, uint32 /*guid*/> ActiveCreatureGuidsOnMap;
+typedef std::multimap<uint32 /*mapId*/, uint32 /*guid*/> LocalTransportGuidsOnMap;
 
 class FindCreatureData
 {
@@ -718,9 +718,6 @@ class ObjectMgr
         {
             LoadTrainers("npc_trainer", false);
         }
-        
-        /// @param _map Map* of the map for which to load active entities. If NULL active entities on continents are loaded
-        void LoadActiveEntities(Map* _map);
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level) const;
@@ -826,6 +823,8 @@ class ObjectMgr
                 { return "There is no info for this item"; }
         }
 
+        CreatureDataMap const* GetCreatureDataMap() const { return &mCreatureDataMap; }
+
         CreatureDataPair const* GetCreatureDataPair(uint32 guid) const
         {
             CreatureDataMap::const_iterator itr = mCreatureDataMap.find(guid);
@@ -852,6 +851,8 @@ class ObjectMgr
                 if (worker(*itr))
                     { break; }
         }
+
+        ActiveCreatureGuidsOnMap const* GetActiveCreatureGuids() const { return &m_activeCreatures; }
 
         CreatureLocale const* GetCreatureLocale(uint32 entry) const
         {
@@ -919,6 +920,7 @@ class ObjectMgr
             return &itr->second;
         }
 
+        LocalTransportGuidsOnMap const* GetLocalTransportGuids() const { return &m_localTransports; }
         GameObjectDataPair const* GetGODataPair(uint32 guid) const
         {
             GameObjectDataMap::const_iterator itr = mGameObjectDataMap.find(guid);
@@ -1234,13 +1236,13 @@ class ObjectMgr
         HalfNameMap PetHalfName0;
         HalfNameMap PetHalfName1;
 
-        typedef std::multimap<uint32 /*mapId*/, uint32 /*guid*/> ActiveCreatureGuidsOnMap;
 
         // Array to store creature stats, Max creature level + 1 (for data alignement with in game level)
         CreatureClassLvlStats m_creatureClassLvlStats[DEFAULT_MAX_CREATURE_LEVEL + 1][MAX_CREATURE_CLASS];
 
         MapObjectGuids mMapObjectGuids;
         ActiveCreatureGuidsOnMap m_activeCreatures;
+        LocalTransportGuidsOnMap m_localTransports;
         CreatureDataMap mCreatureDataMap;
         CreatureLocaleMap mCreatureLocaleMap;
         GameObjectDataMap mGameObjectDataMap;

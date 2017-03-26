@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,69 +26,25 @@
 /// @{
 /// \file
 
-#ifndef MANGOS_H_MASTER
-#define MANGOS_H_MASTER
+#ifndef MANGOS_H_WORLDTHREAD
+#define MANGOS_H_WORLDTHREAD
+
+#include <ace/INET_Addr.h>
+#include <ace/Task.h>
 
 #include "Common.h"
-#include "Policies/Singleton.h"
-
 /**
- * @brief Start the server
+ * @brief Heartbeat thread for the World
  *
  */
-class Master
+class WorldThread : public ACE_Task_Base
 {
     public:
-        /**
-         * @brief
-         *
-         */
-        Master();
-        /**
-         * @brief
-         *
-         */
-        ~Master();
-        /**
-         * @brief
-         *
-         * @return int
-         */
-        int Run();
-        static volatile uint32 m_masterLoopCounter; /**< TODO */
-
+        explicit WorldThread(uint16 port, const char* host);
+        virtual int open(void*) override;
+        virtual int svc();
     private:
-        /**
-         * @brief
-         *
-         * @return bool
-         */
-        bool _StartDB();
-
-        /**
-         * @brief
-         *
-         */
-        void _HookSignals();
-        /**
-         * @brief
-         *
-         */
-        void _UnhookSignals();
-        /**
-         * @brief
-         *
-         * @param s
-         */
-        static void _OnSignal(int s);
-
-        /**
-         * @brief
-         *
-         */
-        void clearOnlineAccounts();
+        ACE_INET_Addr listen_addr;
 };
-
-#define sMaster MaNGOS::Singleton<Master>::Instance()
 #endif
 /// @}

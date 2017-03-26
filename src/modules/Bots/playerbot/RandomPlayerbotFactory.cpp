@@ -94,7 +94,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     Player *player = new Player(session);
 	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender, skin, face, hairStyle, hairColor, facialHair, outfitId))
     {
-        player->DeleteFromDB(player->GetGUID(), accountId, true, true);
+        player->DeleteFromDB(player->GetObjectGuid(), accountId, true, true);
         delete session;
         delete player;
         sLog.outError("Unable to create random bot for account %d - name: \"%s\"; race: %u; class: %u",
