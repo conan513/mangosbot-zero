@@ -10,5 +10,10 @@ using namespace ai;
 void GenericRogueNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
-        
+     
+	
+		
+			triggers.push_back(new TriggerNode(
+				"no attackers",
+				NextAction::array(0, new NextAction("stealth", 20.0f), NULL)));
 }
