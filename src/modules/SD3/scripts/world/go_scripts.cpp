@@ -36,6 +36,7 @@
 /**
  * ContentData
  * go_barov_journal
+ * go_cat_figurine
 #if defined (TBC) || defined (WOTLK) || defined (CATA)    
  * go_ethereum_prison
  * go_ethereum_stasis
@@ -54,6 +55,26 @@
  */
 
 #include "precompiled.h"
+
+ /*######
+ ## go_cat_figurine
+ ######*/
+
+enum eCatFigurine
+{
+    SPELL_SUMMON_GHOST_SABER = 5968,
+};
+
+struct GOHello_go_cat_figurine : public GameObjectScript
+{
+    GOHello_go_cat_figurine() : GameObjectScript("go_cat_figureine") {}
+
+    bool OnUse(Player* pPlayer, GameObject* /*pGO*/)
+    {
+        pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
+        return false;
+    }
+};
 
 /*######
 ## go_barov_journal
