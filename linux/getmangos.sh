@@ -29,6 +29,7 @@ SRCPATH="$HOME/mangos/src"
 INSTPATH="$HOME/mangos"
 DB_PREFIX="zero"
 USER="mangos"
+P_SOAP="0"
 P_DEBUG="0"
 P_STD_MALLOC="1"
 P_ACE_EXTERNAL="1"
@@ -120,54 +121,207 @@ function Log()
 # Function to install prerequisite libraries
 function GetPrerequisites()
 {
-  local OS_VER=0
+  # First, we need to check the installer.
+  installer=0
+  
+  which apt-get
+  
+  if [ $? -ne 0 ]; then
+    Log "apt-get isn't the installer by default" 1
+  else
+    installer=1
+	apt-get -y install git lsb-release curl
+  fi
+  
+  which yum
+  
+  if [ $? -ne 0 ]; then
+    Log "yum isn't the installer by default" 1
+  else
+	installer=1
+	yum -y install git redhat-lsb curl
+  fi
+  
+  which aptitude
+  if [ $? -ne 0 ]; then
+    Log "aptitude isn't the installer by default" 1
+  else
+    installer=1
+	aptitude -y install git lsb-release curl
+  fi
+
+  # Then, let's check that we have the necessary tools to define the OS version.
+  which lsb_release
+  
+  if [ $? -ne 0 ]; then
+    Log "Cannot define your OS distribution and version." 1
+    return 0
+  fi  
+  
+  local OS=$(lsb_release -si)
+  local VER=$(lsb_release -sc)
+  local OS_VER=1
 
   # Ask the user to continue
   $DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Install Required Dependencies" \
     --yesno "Would you like to install the required build and development packages?" 8 60
 
-  # Check the suer's response
+  # Check the user's response
   if [ $? -ne 0 ]; then
     Log "User declined to install required tools and development libraries." 1
     return 0
-  fi
+  fi 
 
-  # Handle Debian OS
-  if [ -f "/etc/debian_version" ]; then
-    # Inform the user of the need for root access
-    $DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Install Required Dependencies" \
-      --yesno "Installing packages requires root access, which you will be prompted for.\nDo you want to proceed?" 8 60
+  # Inform the user of the need for root access
+  $DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Install Required Dependencies" \
+    --yesno "Installing packages requires root access, which you will be prompted for.\nDo you want to proceed?" 8 60
 
-    # Check the user's response
-    if [ $? -ne 0 ]; then
-      Log "User declined to proved root access for package installation." 1
-      return 0
-    fi
+  # Check the user's response
+  if [ $? -ne 0 ]; then
+    Log "User declined to proved root access for package installation." 1
+    return 0
+  fi	  
 
-    # Grab the version of Debian installed on this system
-    OS_VER=`cat /etc/debian_version`
-
-    # Check for a valid version
-    if [ $(echo "$OS_VER < 6.0" | bc) -eq 1 ] || [ $(echo "$OS_VER >= 8.0" | bc) -eq 1 ]; then
-      Log "Error: Only Debian Squeeze and Wheezy are supported." 1
-      return 1
-    fi
-
-    # Handle Debian Wheezy
-    if [ $(echo "$OS_VER >= 7.0" | bc) -eq 1 ] && [ $(echo "$OS_VER < 8.0" | bc) -eq 1 ]; then
-      # Install the prerequisite packages
-      su -c "aptitude -y install build-essential linux-headers-$(uname -r) autoconf automake cmake libbz2-dev libace-dev libace-6.0.3 libssl-dev libmysqlclient-dev zlib1g-dev" root
-    fi
-
-    # Handle Debian Squeeze
-    if [ $(echo "$OS_VER >= 6.0" | bc) -eq 1 ] && [ $(echo "$OS_VER < 7.0" | bc) -eq 1 ]; then
-      # Install the prerequisite packages
-      su -c "aptitude -y install build-essential linux-headers-$(uname -r) autoconf automake cmake libbz2-dev libace-dev libace-5.7.7 libssl-dev libmysqlclient-dev zlib1g-dev" root
-    fi
-  fi
+  # Handle OS
+  case ${OS} in
+    "LinuxMint")
+      case ${VER} in
+        "sarah")
+          # Linux Mint 18 - Ubuntu Xenial based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "rosa")
+          # Linux Mint 17.3 - Ubuntu Trusty based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "rafaela")
+          # Linux Mint 17.2 - Ubuntu Trusty based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "rebecca")
+          # Linux Mint 17.1 - Ubuntu Trusty based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "qiana")
+          # Linux Mint 17 - Ubuntu Trusty based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "maya")
+          # Linux Mint 13 - Ubuntu Precise based
+          su -c "aptitude -y install build-essential cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev" root
+          ;;
+        "betsy")
+          # LMDE 2 - Debian Jessie based
+          su -c "aptitude -y install build-essential linux-headers-$(uname -r) autoconf automake cmake libbz2-dev libace-dev libace-6.2.8 libssl-dev libmysqlclient-dev libtool zliblg-dev" root
+          ;;
+        *)
+          OS_VER=0
+          ;;
+      esac
+      ;;
+    "Ubuntu")
+      case ${VER} in
+        "precise")
+          # Ubuntu 12.04 LTS
+          su -c "apt-get -y install curl autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        "trusty")
+          # Ubuntu 14.04 LTS
+          su -c "apt-get -y install curl autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        "xenial")
+          # Ubuntu 16.04 LTS
+          su -c "apt-get -y install curl autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        "yakkety")
+          # Ubuntu 16.10
+          su -c "apt-get -y install curl autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        *)
+          OS_VER=0
+          ;;
+      esac      
+      ;;
+    "Debian")
+      case ${VER} in
+        "jessie")
+          # Debian 8.0 "current"
+          su -c "aptitude -y install curl build-essential autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        "stretch")
+          # Debian Next
+          su -c "aptitude -y install curl build-essential autoconf automake cmake libbz2-dev libace-dev libssl-dev libmysqlclient-dev libtool" root
+          ;;
+        *)
+          OS_VER=0
+          ;;
+      esac      
+      ;;    
+    "RedHatEntrepriseServer")
+      case ${VER} in        
+        "santiago")
+          # Red Hat 6.x
+          su -c "yum -y install curl build-essential linux-headers-$(uname -r) autoconf automake cmake libbz2-dev libace-dev ace-6.3.3 libssl-dev libmysqlclient-dev libtool zliblg-dev" root
+          ;;
+        "maipo")
+          # Red Hat 7.x
+          su -c "yum -y install curl build-essential linux-headers-$(uname -r) autoconf automake cmake libbz2-dev libace-dev ace-6.3.3 libssl-dev libmysqlclient-dev libtool zliblg-dev" root
+          ;;
+        *)
+          OS_VER=0
+          ;;
+      esac
+      ;;
+	"CentOS")
+      case ${VER} in        
+        "Core")
+          # Default CentOS - Adding necessary RPM third-party.
+		  rpm -Uv ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/devel:/libraries:/ACE:/micro/CentOS_7/x86_64/ace-6.3.3-55.1.x86_64.rpm
+		  rpm -Uv ftp://rpmfind.net/linux/centos/7.3.1611/os/x86_64/Packages/perl-Net-Telnet-3.03-19.el7.noarch.rpm
+		  rpm -Uv ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/devel:/libraries:/ACE:/micro:/versioned/CentOS_7/x86_64/mpc-6.3.3-42.1.x86_64.rpm		  		  
+		  rpm -Uv ftp://rpmfind.net/linux/centos/7.3.1611/os/x86_64/Packages/libtool-2.4.2-21.el7_2.x86_64.rpm
+		  rpm -Uv ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/devel:/libraries:/ACE:/micro/CentOS_7/x86_64/ace-devel-6.3.3-55.1.x86_64.rpm
+          su -c "yum -y install curl autoconf automake cmake ace-devel ace-6.3.3 openssl-devel mysql-devel libtool gcc-c++" root
+          ;;        
+        *)
+          OS_VER=0
+          ;;
+      esac
+      ;;
+    "Fedora")
+      case ${VER} in        
+        "TwentyFive")
+          # Fedora 25 - Adding necessary RPM third-party.
+		  su -c "yum -y install autoconf automake libtool gcc-c++" root
+		  # Getting and building ACE. Not provided in RPM for Fedora...
+		  rm -rf ACE-6.3.3.tar.bz2
+		  rm -rf ACE_wrappers
+		  wget ftp://download.dre.vanderbilt.edu/previous_versions/ACE-6.3.3.tar.bz2		  
+		  tar xjvf ACE-6.3.3.tar.bz2
+		  export ACE_ROOT=/root/ACE_wrappers
+		  echo '#include "ace/config-linux.h"' >> $ACE_ROOT/ace/config.h
+		  echo 'include $(ACE_ROOT)/include/makeinclude/platform_linux.GNU' >> $ACE_ROOT/include/makeinclude/platform_macros.GNU
+		  echo 'INSTALL_PREFIX=/usr/local' >> $ACE_ROOT/include/makeinclude/platform_macros.GNU
+		  export LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH		  
+		  CD $ACE_ROOT
+		  make
+		  make install
+		  cd ~
+		  # Installing remaining dependencies..
+          su -c "yum -y install cmake openssl-devel mariadb-devel" root		  
+          ;;        
+        *)
+          OS_VER=0
+          ;;
+      esac
+      ;;
+	*)
+      OS_VER=0
+      ;;	
+  esac    
 
   # See if a supported OS was detected
-  if [ OS_VER -ne 0 ]; then
+  if [ ${OS_VER} -ne 0 ]; then
     # Log success
     Log "The development tools and libraries have been installed!" 1
   else
@@ -587,6 +741,7 @@ function GetBuildOptions()
     5 "Build Client Tools" Off \
     6 "Use SD3" On \
     7 "Use Eluna" On \
+	8 "Use SOAP" Off \
     3>&2 2>&1 1>&3)
 
   if [ $? -ne 0 ]; then
@@ -642,6 +797,13 @@ function GetBuildOptions()
   else
     P_ELUNA="0"
   fi
+  
+  # See if SOAP will be used
+  if [[ $OPTIONS == *8* ]]; then
+    P_SOAP="1"
+  else
+	P_SOAP="0"
+  fi
 
   # Verify that at least one scripting library is enabled
   if [ $P_SD3 -eq 0 ] && [ $P_ELUNA -eq 0 ]; then
@@ -689,7 +851,7 @@ function BuildMaNGOS()
   # Attempt to configure and build MaNGOS
   Log "Building MaNGOS..." 0
   cd "$SRCPATH/server/linux"
-  cmake .. -DDEBUG=$P_DEBUG -DUSE_STD_MALLOC=$P_STD_MALLOC -DACE_USE_EXTERNAL=$P_ACE_EXTERNAL -DPOSTGRESQL=$P_PGRESQL -DBUILD_TOOLS=$P_TOOLS -DSCRIPT_LIB_ELUNA=$P_ELUNA -DSCRIPT_LIB_SD3=$P_SD3 -DCMAKE_INSTALL_PREFIX="$INSTPATH"
+  cmake .. -DDEBUG=$P_DEBUG -DUSE_STD_MALLOC=$P_STD_MALLOC -DACE_USE_EXTERNAL=$P_ACE_EXTERNAL -DPOSTGRESQL=$P_PGRESQL -DBUILD_TOOLS=$P_TOOLS -DSCRIPT_LIB_ELUNA=$P_ELUNA -DSCRIPT_LIB_SD3=$P_SD3 -DSOAP=$P_SOAP -DCMAKE_INSTALL_PREFIX="$INSTPATH"
   make
 
   # Check for an error
@@ -735,57 +897,65 @@ function InstallMaNGOS()
 function UpdateDatabases()
 {  
   local DB_HOST="$1"
-  local DB_USER="$2"
-  local DB_UPW="$3"
-  local DB_REALM="$4"
-  local DB_WORLD="$5"
-  local DB_TOONS="$6"
+  local DB_TYPE="$2"
+  local DB_COMMAND="$3"
+  local DB_USER="$4"
+  local DB_UPW="$5"
+  local DB_REALM="$6"
+  local DB_WORLD="$7"
+  local DB_TOONS="$8"
 
   # Loop through the character files
-  for pFile in $(ls $SRCPATH/database/Character/Updates/*.sql); do    
+  for pFile in $(ls $SRCPATH/database/Character/Updates/$(ls -a $SRCPATH/database/Character/Updates/ | tail -1)/*.sql 2>>/dev/null); do    
     if [ ! -f "$pFile" ]; then
       continue
     fi
     # Attempt to apply the update
-    mysql --login-path=local -q -s $DB_TOONS < "$pFile" > /dev/null 2>&1
+    $DB_COMMAND $DB_TOONS < "$pFile" > /dev/null 2>&1
 
     # Notify the user of which updates were and were not applied
     if [ $? -ne 0 ]; then
        Log "Database update \"$pFile\" was not applied!" 0
+	   Log "Database update \"$pFile\" was not applied!" 1
     else
        Log "Database update \"$pFile\" was successfully applied!" 0
+	   Log "Database update \"$pFile\" was successfully applied!" 1
     fi          
   done
 
   # Loop through the realm files  
-  for pFile in $(ls $SRCPATH/database/Realm/Updates/*.sql); do 
+  for pFile in $(ls $SRCPATH/database/Realm/Updates/$(ls -a $SRCPATH/database/Realm/Updates/ | tail -1)/*.sql 2>>/dev/null); do 
     if [ ! -f "$pFile" ]; then
       continue
     fi
     # Attempt to apply the update
-    mysql --login-path=local -q -s $DB_REALM < "$pFile" > /dev/null 2>&1
+    $DB_COMMAND $DB_REALM < "$pFile" > /dev/null 2>&1
 
     # Notify the user of which updates were and were not applied
     if [ $? -ne 0 ]; then
       Log "Database update \"$pFile\" was not applied!" 0
+	  Log "Database update \"$pFile\" was not applied!" 1
     else
       Log "Database update \"$pFile\" was successfully applied!" 0
+	  Log "Database update \"$pFile\" was successfully applied!" 1
     fi          
   done
 
   # Loop through the world files
-  for pFile in $(ls $SRCPATH/database/World/Updates/*.sql); do    
+  for pFile in $(ls $SRCPATH/database/World/Updates/$(ls -a $SRCPATH/database/World/Updates/ | tail -1)/*.sql 2>>/dev/null); do    
     if [ ! -f "$pFile" ]; then
       continue
     fi
     # Attempt to apply the update
-    mysql --login-path=local -q -s $DB_WORLD < "$pFile" > /dev/null 2>&1
+    $DB_COMMAND $DB_WORLD < "$pFile" > /dev/null 2>&1
 
     # Notify the user of which updates were and were not applied
     if [ $? -ne 0 ]; then
       Log "Database update \"$pFile\" was not applied!" 0
+	  Log "Database update \"$pFile\" was not applied!" 1
     else
       Log "Database update \"$pFile\" was successfully applied!" 0
+	  Log "Database update \"$pFile\" was successfully applied!" 1
     fi        
   done
 }
@@ -794,59 +964,71 @@ function UpdateDatabases()
 function InstallDatabases()
 {
   local DB_HOST="$1"
-  local DB_USER="$2"
-  local DB_UPW="$3"
-  local DB_REALM="$4"
-  local DB_WORLD="$5"
-  local DB_TOONS="$6"
+  local DB_TYPE="$2"
+  local DB_COMMAND="$3"
+  local DB_USER="$4"
+  local DB_UPW="$5"
+  local DB_REALM="$6"
+  local DB_WORLD="$7"
+  local DB_TOONS="$8"
 
   # First create the realm database structure
-  mysql --login-path=local -q -s $DB_REALM < $SRCPATH/database/Realm/Setup/realmdLoadDB.sql  
+  $DB_COMMAND $DB_REALM < $SRCPATH/database/Realm/Setup/realmdLoadDB.sql  
 
   # Check for success
   if [ $? -ne 0 ]; then
     Log "There was an error creating the realm database!" 1
     return 1
+  else
+    Log "The realm database has been created!" 1
   fi
 
   # Now create the characters database structure
-  mysql --login-path=local -q -s $DB_TOONS < $SRCPATH/database/Character/Setup/characterLoadDB.sql
+  $DB_COMMAND $DB_TOONS < $SRCPATH/database/Character/Setup/characterLoadDB.sql
 
   # Check for success
   if [ $? -ne 0 ]; then
     Log "There was an error creating the characters database!" 1
     return 1
+  else
+    Log "The characters database has been created!" 1
   fi
 
   # Next create the world database structure
-  mysql --login-path=local -q -s $DB_WORLD < $SRCPATH/database/World/Setup/mangosdLoadDB.sql
+  $DB_COMMAND $DB_WORLD < $SRCPATH/database/World/Setup/mangosdLoadDB.sql
 
   # Check for success
   if [ $? -ne 0 ]; then
     Log "There was an error creating the world database!" 1
     return 1
+  else
+    Log "The world database has been created!" 1
   fi
 
   # Finally, loop through and build the world database database
   for fFile in $SRCPATH/database/World/Setup/FullDB/*.sql; do
     # Attempt to execute the SQL file
-    mysql --login-path=local -q -s $DB_WORLD < $fFile
+    $DB_COMMAND $DB_WORLD < $fFile
 
     # Check for success
     if [ $? -ne 0 ]; then
       Log "There was an error processing \"$fFile\" during database creation!" 1
       return 1
+	else
+	  Log "The file \"$fFile\" was processed properly" 1
     fi
   done  
 
   # Now apply any updates
-  UpdateDatabases $DB_HOST $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS  
+  UpdateDatabases $DB_HOST $DB_TYPE "$DB_COMMAND" $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS
 }
 
 # Function to install or update the MySQL/MariaDB databases
 function HandleDatabases()
 {
   local DBMODE="0"
+  local DB_TYPE="0"
+  local DB_COMMAND=""
   local DB_TMP="0"
   local DB_USER="mangos"
   local DB_UPW="mangos"
@@ -877,6 +1059,20 @@ function HandleDatabases()
     return 0
   fi
 
+  # Ask the user the DB type
+  DB_TYPE=$($DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Database Type" \
+    --menu "Which database are you using?" 0 0 3 \
+    0 "MariaDB" \
+    1 "MySQL" \
+    2 "PostgreSQL" \
+    3>&2 2>&1 1>&3)
+  
+  # Exit if cancelled
+  if [ $? -ne 0 ]; then
+	Log "Database type selection cancelled. No modifications have been made to your databases." 1	
+	return 0
+  fi      
+  
   # Get the database hostname or IP address
   DB_TMP=$($DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Database Hostname Or IP Address" \
     --inputbox "Default: localhost" 0 0 3>&2 2>&1 1>&3)
@@ -936,9 +1132,21 @@ function HandleDatabases()
   if [ ! -z "$DB_TMP" ]; then
     DB_UPW="$DB_TMP"
   fi
-
-  printf "Confirm your MySQL password\t, "    
-  mysql_config_editor set --login-path=local --host=$DB_HOST --port=$DB_PORT --user=$DB_USER --password --skip-warn
+   
+  case "${DB_TYPE}" in
+	"0")
+		DB_COMMAND="mysql -u ${DB_USER} -p${DB_UPW} "
+		;;
+	"1")
+		printf "Confirm your MySQL password\t, "    
+		mysql_config_editor set --login-path=local --host=$DB_HOST --port=$DB_PORT --user=$DB_USER --password --skip-warn
+		DB_COMMAND="mysql --login-path=local -q -s "		
+		;;
+	"2")
+		Log "Currently not supported." 1
+		return 0
+		;;
+  esac  
 
   # Setup database names based on release
   DB_REALM="$DB_PREFIX$DB_REALM"
@@ -964,20 +1172,20 @@ function HandleDatabases()
 
     # Remove and create the realm DB if selected
     if [[ $DBSEL == *0* ]]; then
-      mysql --login-path=local -q -s -e "DROP DATABASE IF EXISTS $DB_REALM;"
-      mysql --login-path=local -q -s -e "CREATE DATABASE $DB_REALM;"      
+      $DB_COMMAND -e "DROP DATABASE IF EXISTS $DB_REALM;"
+      $DB_COMMAND -e "CREATE DATABASE $DB_REALM;"      
     fi
 
     # Remove and create the world DB if selected
     if [[ $DBSEL == *1* ]]; then
-      mysql --login-path=local -q -s -e "DROP DATABASE IF EXISTS $DB_WORLD;"
-      mysql --login-path=local -q -s -e "CREATE DATABASE $DB_WORLD;"
+      $DB_COMMAND -e "DROP DATABASE IF EXISTS $DB_WORLD;"
+      $DB_COMMAND -e "CREATE DATABASE $DB_WORLD;"
     fi
     
     # Remove and create the character DB if selected
     if [[ $DBSEL == *2* ]]; then      
-      mysql --login-path=local -q -s -e "DROP DATABASE IF EXISTS $DB_TOONS;"
-      mysql --login-path=local -q -s -e "CREATE DATABASE $DB_TOONS;"      
+      $DB_COMMAND -e "DROP DATABASE IF EXISTS $DB_TOONS;"
+      $DB_COMMAND -e "CREATE DATABASE $DB_TOONS;"      
     fi    
 
     # Validate success
@@ -987,24 +1195,24 @@ function HandleDatabases()
     fi
 
     # Finally, populate the databases
-    InstallDatabases $DB_HOST $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS
+    InstallDatabases $DB_HOST $DB_TYPE "$DB_COMMAND" $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS
     
     # Updating the realmlist
     if [[ $DBSEL == *3* ]]; then
-      mysql --login-path=local -q -s $DB_REALM < $SRCPATH/database/Tools/updateRealm.sql
+      $DB_COMMAND $DB_REALM < $SRCPATH/database/Tools/updateRealm.sql
     fi
   fi
 
   # Update the databases if requested
   if [ "$DBMODE" = "1" ]; then    
-    UpdateDatabases $DB_HOST $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS
+    UpdateDatabases $DB_HOST $DB_TYPE "$DB_COMMAND" $DB_USER $DB_UPW $DB_REALM $DB_WORLD $DB_TOONS
   fi
 }
 
 # Function helper to extract resources (mmaps, vmaps, dbc, ...) from the game
 function ExtractResources
 {
-  INSTGAMEPATH=$(dirname $(find /home -name "WoW.exe" 2>>/dev/null))
+  INSTGAMEPATH=$(dirname $(find /home -name "WoW.exe"| head -1 2>>/dev/null))
 
   GAMEPATH=$($DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "WoW Game Path" \
     --inputbox "Please, provide the path to your game directory. Default: $INSTGAMEPATH" 8 60 3>&2 2>&1 1>&3)
@@ -1029,7 +1237,8 @@ function ExtractResources
     Log "The mangos server is not build, cannot extract data" 1
     exit 1
   fi
-  
+ 
+#TODO What if DBC are not yet generated ?? 
   if [[ $ACTIONS == *1* ]]; then
     if [ -d "$GAMEPATH/dbc" ]; then
       $DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "DBC and Maps were already generated" \
@@ -1069,9 +1278,30 @@ function ExtractResources
         cp -R "$GAMEPATH/dbc" "$INSTPATH/bin"
         cp -R "$GAMEPATH/maps" "$INSTPATH/bin"                
       fi
+    else
+	rm -rf $GAMEPATH/map-extractor
+	cp "$INSTPATH/bin/tools/map-extractor" "$GAMEPATH"
+	
+	Log "Extracting DBC and Maps" 0
+	cd $GAMEPATH
+	./map-extractor
+	
+	if [ $? -eq 0 ]; then
+	  Log "DBC and Maps are extracted" 0
+	  Log "Copying DBC and Maps files to installation directory" 0
+	  cp -R "$GAMEPATH/dbc" "$INSTPATH/bin"
+          cp -R "$GAMEPATH/maps" "$INSTPATH/bin"
+          rm -rf "$GAMEPATH/map-extractor"
+          Log "Changing ownership of the extracted directories"
+          chown -R $USER:$USER "$INSTPATH"
+        else
+          Log "There was an issue while extracting DBC and Maps!" 1
+          rm -rf "$GAMEPATH/map-extractor"
+          rm -rf "$GAMEPATH/dbc"
+          rm -rf "$GAMEPATH/maps"
+          exit 1
+        fi
     fi
-    
-    
   fi
   
   if [[ $ACTIONS == *2* ]]; then
@@ -1110,6 +1340,30 @@ function ExtractResources
         Log "Copying VMaps files to installation directory" 0           
         cp -R "$GAMEPATH/vmaps" "$INSTPATH/bin"                
       fi
+    else
+     Log "Copying VMaps extractor" 0
+     rm -f "$GAMEPATH/vmap-extractor"
+     cp "$INSTPATH/bin/tools/vmap-extractor" "$GAMEPATH"
+
+     Log "Extracting VMaps" 0
+     cd $GAMEPATH
+     # Make sure there is no previous vmaps generation that cause issue.
+     rm -rf Buildings
+     ./vmap-extractor
+
+     if [ $? -eq 0 ]; then
+       Log "VMaps are extracted" 0
+       Log "Copying VMaps files to installation directory" 0
+       cp -R "$GAMEPATH/vmaps" "$INSTPATH/bin"
+       rm -rf "$GAMEPATH/vmap-extractor"
+       Log "Changing ownership of the extracted directories"
+       chown -R $USER:$USER "$INSTPATH"
+     else
+       Log "There was an issue while extracting VMaps!" 1
+       rm -rf "$GAMEPATH/vmap-extractor"
+       rm -rf "$GAMEPATH/vmaps"
+       exit 1
+     fi 
     fi    
   fi
   
@@ -1183,6 +1437,57 @@ function ExtractResources
         Log "Copying MMaps files to installation directory" 0           
         cp -R "$GAMEPATH/mmaps" "$INSTPATH/bin"          
       fi  
+    else
+	Log "Copying MMaps extractor" 0
+        rm -f "$GAMEPATH/MoveMapGen.sh"
+        cp "$INSTPATH/bin/tools/MoveMapGen.sh" "$GAMEPATH"
+        cp "$INSTPATH/bin/tools/offmesh.txt" "$GAMEPATH"
+        cp "$INSTPATH/bin/tools/mmap_excluded.txt" "$GAMEPATH"
+        cp "$INSTPATH/bin/tools/movemap-generator" "$GAMEPATH" 
+	CPU=$($DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Please provide the number of CPU to be used to generate MMaps (1-4)" \
+         --inputbox "Default: 1" 8 80 3>&2 2>&1 1>&3)
+
+        # User cancelled his choice, set default to 1.
+        if [ $? -ne 0 ]; then
+          Log "User selection was cancelled. Max CPU set to 1." 1
+          CPU=1
+        fi
+
+        if [ -z "$CPU" ]; then
+          Log "User didn't gave any value. Max CPU set to 1." 1
+          CPU=1
+        fi
+
+        if [ "$CPU" -lt 1 ] || [ "$CPU" -gt 4 ]; then
+          Log "User entered invalid value. Max CPU set to 1." 1
+          CPU=1
+        fi
+
+        Log "Extracting MMaps" 0
+        cd $GAMEPATH
+        # Making sure we can execute the script
+        chmod 700 MoveMapGen.sh
+        ./MoveMapGen.sh $CPU
+
+        if [ $? -eq 0 ]; then
+          Log "MMaps are extracted" 0
+          Log "Copying MMaps files to installation directory" 0
+          cp -R "$GAMEPATH/mmaps" "$INSTPATH/bin"
+          rm -rf "$GAMEPATH/MoveMapGen.sh"
+          rm -rf "$GAMEPATH/offmesh.txt"
+          rm -rf "$GAMEPATH/mmap_excluded.txt"
+          rm -rf "$GAMEPATH/movemap-generator"
+          Log "Changing ownership of the extracted directories"
+          chown -R $USER:$USER "$INSTPATH"
+        else
+	  Log "There was an issue while extracting MMaps!" 1
+          rm -rf "$GAMEPATH/MoveMapGen.sh"
+          rm -rf "$GAMEPATH/mmaps"
+          rm -rf "$GAMEPATH/offmesh.txt"
+          rm -rf "$GAMEPATH/mmap_excluded.txt"
+          rm -rf "$GAMEPATH/movemap-generator"
+          exit 1
+        fi
     fi    
   fi
 }
@@ -1218,13 +1523,13 @@ UseDialog
 # Select which activities to do
 TASKS=$($DLGAPP --backtitle "MaNGOS Linux Build Configuration" --title "Select Tasks" \
   --checklist "Please select the tasks to perform" 0 70 8 \
-  1 "Install Prerequisites" Off \
+  1 "Install Prerequisites" On \
   2 "Set Download And Install Paths" On \
   3 "Clone Source Repositories" On \
   4 "Build MaNGOS" On \
   5 "Install MaNGOS" On \
-  6 "Install Databases" Off \
-  7 "Extract Resources" Off \
+  6 "Install Databases" On \
+  7 "Extract Resources" On \
   8 "Create Code::Blocks Project File" Off \
   3>&2 2>&1 1>&3)
 
@@ -1282,7 +1587,7 @@ fi
 
 # If one of these actions has been performed, then we know the user.
 if [[ $TASKS == *2* ]] || [[ $TASKS == *3* ]] || [[ $TASKS == *4* ]] || [[ $TASKS == *5* ]] || [[ $TASKS == *7* ]]; then
-  Log "Changing ownership of the extracted directories"
+  Log "Changing ownership of the extracted directories" 1
   chown -R $USER:$USER "$INSTPATH"
 fi
 

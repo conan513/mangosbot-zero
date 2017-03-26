@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,9 @@
 
 #include "Common.h"
 #include "Unit.h"
-#include "UpdateMask.h"
-#include "ItemPrototype.h"
 #include "SharedDefines.h"
 #include "LootMgr.h"
 #include "DBCEnums.h"
-#include "Database/DatabaseEnv.h"
 #include "Cell.h"
 
 #include <list>
@@ -77,6 +74,7 @@ enum CreatureFlagsExtra
 
 #define MAX_KILL_CREDIT 2
 #define MAX_CREATURE_MODEL 4                                // only single send to client in static data
+#define USE_DEFAULT_DATABASE_LEVEL  0                       // just used to show we don't want to force the new creature level and use the level stored in db
 
 // from `creature_template` table
 struct CreatureInfo
@@ -131,6 +129,7 @@ struct CreatureInfo
     uint32  SkinningLootId;
     uint32  KillCredit[MAX_KILL_CREDIT];
     uint32  MechanicImmuneMask;
+    uint32  SchoolImmuneMask;
     int32   ResistanceHoly;
     int32   ResistanceFire;
     int32   ResistanceNature;
@@ -510,7 +509,7 @@ class Creature : public Unit
 
         bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team = TEAM_NONE, const CreatureData* data = NULL, GameEventCreatureData const* eventData = NULL);
         bool LoadCreatureAddon(bool reload);
-        void SelectLevel(const CreatureInfo* cinfo, float percentHealth = 100.0f);
+        void SelectLevel(uint32 forcedLevel = USE_DEFAULT_DATABASE_LEVEL);
         void LoadEquipment(uint32 equip_entry, bool force = false);
 
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
@@ -548,6 +547,7 @@ class Creature : public Unit
         void FillGuidsListFromThreatList(GuidVector& guids, uint32 maxamount = 0);
 
         bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) override;
+        bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask) override;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
 
         bool IsElite() const

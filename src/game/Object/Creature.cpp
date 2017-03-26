@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
 #include "ObjectGuid.h"
 #include "SQLStorages.h"
 #include "SpellMgr.h"
-#include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
 #include "GameEventMgr.h"
@@ -42,8 +41,6 @@
 #include "MapManager.h"
 #include "CreatureAI.h"
 #include "CreatureAISelector.h"
-#include "Formulas.h"
-#include "WaypointMovementGenerator.h"
 #include "InstanceData.h"
 #include "MapPersistentStateMgr.h"
 #include "BattleGround/BattleGroundMgr.h"
@@ -397,32 +394,39 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
 bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData* data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/, bool preserveHPAndPower /*=true*/)
 {
     if (!InitEntry(Entry, team, data, eventData))
-        { return false; }
+        return false;
 
     // creatures always have melee weapon ready if any
     SetSheath(SHEATH_STATE_MELEE);
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_AURAS);
 
-    SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f);
+    if (preserveHPAndPower)
+    {
+        uint32 healthPercent = GetHealthPercent();
+        SelectLevel();
+        SetHealthPercent(healthPercent);
+    }
+    else
+        SelectLevel();
 
     if (team == HORDE)
-        { setFaction(GetCreatureInfo()->FactionHorde);  }
+        setFaction(GetCreatureInfo()->FactionHorde);
     else
-        { setFaction(GetCreatureInfo()->FactionAlliance); }
+        setFaction(GetCreatureInfo()->FactionAlliance);
 
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->NpcFlags);
 
     uint32 attackTimer = GetCreatureInfo()->MeleeBaseAttackTime;
 
-    SetAttackTime(BASE_ATTACK,  attackTimer);
-    SetAttackTime(OFF_ATTACK,   attackTimer - attackTimer / 4);
+    SetAttackTime(BASE_ATTACK, attackTimer);
+    SetAttackTime(OFF_ATTACK, attackTimer - attackTimer / 4);
     SetAttackTime(RANGED_ATTACK, GetCreatureInfo()->RangedBaseAttackTime);
 
     uint32 unitFlags = GetCreatureInfo()->UnitFlags;
 
     // we may need to append or remove additional flags
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT))
-        { unitFlags |= UNIT_FLAG_IN_COMBAT; }
+        unitFlags |= UNIT_FLAG_IN_COMBAT;
 
     if (m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && (GetCreatureInfo()->ExtraFlags & CREATURE_EXTRA_FLAG_HAVE_NO_SWIM_ANIMATION) == 0)
         unitFlags |= UNIT_FLAG_UNK_15;
@@ -435,11 +439,11 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData* data /*=
     uint32 dynFlags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynFlags ? dynFlags : GetCreatureInfo()->DynamicFlags);
 
-    SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, float(GetCreatureInfo()->Armor));
-    SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(GetCreatureInfo()->ResistanceHoly));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(GetCreatureInfo()->ResistanceFire));
+    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(GetCreatureInfo()->Armor));
+    SetModifierValue(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(GetCreatureInfo()->ResistanceHoly));
+    SetModifierValue(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(GetCreatureInfo()->ResistanceFire));
     SetModifierValue(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(GetCreatureInfo()->ResistanceNature));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(GetCreatureInfo()->ResistanceFrost));
+    SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, float(GetCreatureInfo()->ResistanceFrost));
     SetModifierValue(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(GetCreatureInfo()->ResistanceShadow));
     SetModifierValue(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(GetCreatureInfo()->ResistanceArcane));
 
@@ -450,22 +454,22 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData* data /*=
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(GetCreatureInfo()->FactionAlliance))
     {
         if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP)
-            { SetPvP(true); }
+            SetPvP(true);
         else
-            { SetPvP(false); }
+            SetPvP(false);
     }
 
     // Try difficulty dependend version before falling back to base entry
     CreatureTemplateSpells const* templateSpells = sCreatureTemplateSpellsStorage.LookupEntry<CreatureTemplateSpells>(GetCreatureInfo()->Entry);
     if (!templateSpells)
-        { templateSpells = sCreatureTemplateSpellsStorage.LookupEntry<CreatureTemplateSpells>(GetEntry()); }
+        templateSpells = sCreatureTemplateSpellsStorage.LookupEntry<CreatureTemplateSpells>(GetEntry());
     if (templateSpells)
         for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
-            { m_spells[i] = templateSpells->spells[i]; }
+            m_spells[i] = templateSpells->spells[i];
 
     // if eventData set then event active and need apply spell_start
     if (eventData)
-        { ApplyGameEventSpells(eventData, true); }
+        ApplyGameEventSpells(eventData, true);
 
     return true;
 }
@@ -540,7 +544,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 CreatureInfo const* cinfo = GetCreatureInfo();
 
-                SelectLevel(cinfo);
+                SelectLevel();
                 UpdateAllStats();  // to be sure stats is correct regarding level of the creature
                 SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
                 if (m_IsDeadByDefault)
@@ -589,6 +593,16 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         }
         case ALIVE:
         {
+            Unit* charmer = GetCharmer();
+            if (GetCharmerGuid() && (!charmer || (!IsWithinDistInMap(charmer, GetMap()->GetVisibilityDistance()) &&
+                (charmer->GetCharmGuid() == GetObjectGuid()))))
+            {
+                if (charmer)
+                  { charmer->Uncharm(); }
+                ForcedDespawn();
+                return;
+            }
+
             if (m_aggroDelay <= update_diff)
                 m_aggroDelay = 0;
             else
@@ -664,7 +678,7 @@ void Creature::RegenerateAll(uint32 update_diff)
         { return; }
 
     if (!IsInCombat() || IsPolymorphed())
-        { RegenerateHealth(); }
+      { RegenerateHealth(); }
 
     RegeneratePower();
 
@@ -744,21 +758,21 @@ void Creature::RegenerateHealth()
     if (curValue >= maxValue)
         { return; }
 
-    uint32 addvalue;
+    uint32 addvalue = 0;
 
     // Not only pet, but any controlled creature
     if (GetCharmerOrOwnerGuid())
     {
         float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
-        float Spirit = GetStat(STAT_SPIRIT);
-
+        float Spirit = GetStat(STAT_SPIRIT); //for charmed creatures, spirit = 0!
         if (GetPower(POWER_MANA) > 0)
             { addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate); }
         else
             { addvalue = uint32(Spirit * 0.80 * HealthIncreaseRate); }
     }
-    else
-        { addvalue = maxValue / 3; }
+
+    if (addvalue == 0)
+      { addvalue = maxValue / 3; }
 
     ModifyHealth(addvalue);
 }
@@ -1200,14 +1214,22 @@ void Creature::SaveToDB(uint32 mapid)
     WorldDatabase.CommitTransaction();
 }
 
-void Creature::SelectLevel(const CreatureInfo* cinfo, float percentHealth /*= 100.0f*/)
+void Creature::SelectLevel(uint32 forcedLevel /*= USE_DEFAULT_DATABASE_LEVEL*/)
 {
-    uint32 rank = IsPet() ? 0 : cinfo->Rank;    // TODO :: IsPet probably not needed here
+    CreatureInfo const* cinfo = GetCreatureInfo();
+    if (!cinfo)
+        return;
 
-    // level
+    uint32 rank = IsPet() ? 0 : cinfo->Rank;                // TODO :: IsPet probably not needed here
+
+                                                            // level
+    uint32 level = forcedLevel;
     uint32 const minlevel = cinfo->MinLevel;
     uint32 const maxlevel = cinfo->MaxLevel;
-    uint32 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+
+    if (level == USE_DEFAULT_DATABASE_LEVEL)
+        level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+
     SetLevel(level);
 
     //////////////////////////////////////////////////////////////////////////
@@ -1219,7 +1241,7 @@ void Creature::SelectLevel(const CreatureInfo* cinfo, float percentHealth /*= 10
 
     // TODO: Remove cinfo->ArmorMultiplier test workaround to disable classlevelstats when DB is ready
     CreatureClassLvlStats const* cCLS = sObjectMgr.GetCreatureClassLvlStats(level, cinfo->UnitClass);
-    if (cinfo->ArmorMultiplier > 0 && cCLS) 
+    if (cinfo->ArmorMultiplier > 0 && cCLS)
     {
         // Use Creature Stats to calculate stat values
 
@@ -1231,18 +1253,28 @@ void Creature::SelectLevel(const CreatureInfo* cinfo, float percentHealth /*= 10
     }
     else
     {
-        // Use old style to calculate stat values
-        float rellevel = maxlevel == minlevel ? 0 : (float(level - minlevel)) / (maxlevel - minlevel);
+        if (forcedLevel == USE_DEFAULT_DATABASE_LEVEL || (forcedLevel >= minlevel && forcedLevel <= maxlevel))
+        {
+            // Use old style to calculate stat values
+            float rellevel = maxlevel == minlevel ? 0 : (float(level - minlevel)) / (maxlevel - minlevel);
 
-        // health
-        uint32 minhealth = std::min(cinfo->MaxLevelHealth, cinfo->MinLevelHealth);
-        uint32 maxhealth = std::max(cinfo->MaxLevelHealth, cinfo->MinLevelHealth);
-        health = uint32(minhealth + uint32(rellevel * (maxhealth - minhealth)));
+            // health
+            uint32 minhealth = std::min(cinfo->MaxLevelHealth, cinfo->MinLevelHealth);
+            uint32 maxhealth = std::max(cinfo->MaxLevelHealth, cinfo->MinLevelHealth);
+            health = uint32(minhealth + uint32(rellevel * (maxhealth - minhealth)));
 
-        // mana
-        uint32 minmana = std::min(cinfo->MaxLevelMana, cinfo->MinLevelMana);
-        uint32 maxmana = std::max(cinfo->MaxLevelMana, cinfo->MinLevelMana);
-        mana = minmana + uint32(rellevel * (maxmana - minmana));
+            // mana
+            uint32 minmana = std::min(cinfo->MaxLevelMana, cinfo->MinLevelMana);
+            uint32 maxmana = std::max(cinfo->MaxLevelMana, cinfo->MinLevelMana);
+            mana = minmana + uint32(rellevel * (maxmana - minmana));
+        }
+        else
+        {
+            sLog.outError("Creature::SelectLevel> Error trying to set level(%u) for creature %s without enough data to do it!", level, GetGuidStr().c_str());
+            // probably wrong
+            health = (cinfo->MaxLevelHealth / cinfo->MaxLevel) * level;
+            mana = (cinfo->MaxLevelMana / cinfo->MaxLevel) * level;
+        }
     }
 
     health *= _GetHealthMod(rank); // Apply custom config setting
@@ -1256,28 +1288,22 @@ void Creature::SelectLevel(const CreatureInfo* cinfo, float percentHealth /*= 10
     // health
     SetCreateHealth(health);
     SetMaxHealth(health);
-
-    if (percentHealth == 100.0f)
-        { SetHealth(health); }
-    else
-        { SetHealthPercent(percentHealth); }
-
-    ResetPlayerDamageReq();
+    SetHealth(health);
 
     SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(health));
 
     // all power types
-    for (uint8 i = POWER_MANA; i <= POWER_HAPPINESS; ++i)
+    for (int i = POWER_MANA; i <= POWER_HAPPINESS; ++i)
     {
         uint32 maxValue;
 
         switch (i)
         {
-            case POWER_MANA:        maxValue = mana; break;
-            case POWER_RAGE:        maxValue = 0; break;
-            case POWER_FOCUS:       maxValue = POWER_FOCUS; break;
-            case POWER_ENERGY:      maxValue = POWER_ENERGY* cinfo->PowerMultiplier; break;
-            case POWER_HAPPINESS:   maxValue = POWER_HAPPINESS; break;
+        case POWER_MANA:        maxValue = mana; break;
+        case POWER_RAGE:        maxValue = 0; break;
+        case POWER_FOCUS:       maxValue = POWER_FOCUS_DEFAULT; break;
+        case POWER_ENERGY:      maxValue = POWER_ENERGY_DEFAULT * cinfo->PowerMultiplier; break;
+        case POWER_HAPPINESS:   maxValue = POWER_HAPPINESS_DEFAULT; break;
         }
 
         uint32 value = maxValue;
@@ -1428,7 +1454,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         m_deathState = DEAD;
         if (CanFly())
         {
-            float tz = GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
+            float tz = GetMap()->GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
             if (data->posZ - tz > 0.1)
                 { Relocate(data->posX, data->posY, tz); }
         }
@@ -1458,7 +1484,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
             // Just set to dead, so need to relocate like above
             if (CanFly())
             {
-                float tz = GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
+                float tz = GetMap()->GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
                 if (data->posZ - tz > 0.1)
                     { Relocate(data->posX, data->posY, tz); }
             }
@@ -1653,6 +1679,11 @@ void Creature::SetDeathState(DeathState s)
         if (CanFly())
             { i_motionMaster.MoveFall(); }
 
+        if (Pet* pet = GetPet())
+        {
+            pet->Unsummon(PET_SAVE_AS_DELETED, this);
+        }
+
         Unit::SetDeathState(CORPSE);
     }
 
@@ -1724,10 +1755,24 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf)
     if (!spellInfo)
         { return false; }
 
-    if (!castOnSelf && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->Mechanic - 1)))
-        { return true; }
+    if (!castOnSelf)
+    {
+        if (GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->Mechanic - 1)))
+            { return true; }
+        
+        if (GetCreatureInfo()->SchoolImmuneMask & (1 << spellInfo->School))
+            { return true; }
+    }
 
     return Unit::IsImmuneToSpell(spellInfo, castOnSelf);
+}
+
+bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask)
+{
+    if (GetCreatureInfo()->SchoolImmuneMask & meleeSchoolMask)
+        { return true; }
+
+    return Unit::IsImmuneToDamage(meleeSchoolMask);
 }
 
 bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
@@ -1791,7 +1836,7 @@ SpellEntry const* Creature::ReachWithSpellAttack(Unit* pVictim)
 
         float dist = GetCombatDistance(pVictim, spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT);
 
-        // if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
+        // if(!IsInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if (dist > range || dist < minrange)
             { continue; }
@@ -1831,7 +1876,7 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
 
         float dist = GetCombatDistance(pVictim, spellInfo->rangeIndex == SPELL_RANGE_IDX_COMBAT);
 
-        // if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
+        // if(!IsInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if (dist > range || dist < minrange)
             { continue; }

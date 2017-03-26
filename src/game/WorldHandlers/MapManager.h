@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,6 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
         Map* CreateMap(uint32, const WorldObject* obj);
         Map* CreateBgMap(uint32 mapid, BattleGround* bg);
         Map* FindMap(uint32 mapid, uint32 instanceId = 0) const;
-
         void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, const uint32& x, const uint32& y, const uint32& t_diff);
 
         // only const version for outer users
@@ -133,6 +132,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
 
         void RemoveAllObjectsInRemoveList();
 
+        void LoadContinents();
         void LoadTransports();
 
         typedef std::set<Transport*> TransportSet;
@@ -172,6 +172,7 @@ class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockab
 
         void InitStateMachine();
         void DeleteStateMachine();
+        void LoadActiveEntities(Map* m);
 
         Map* CreateInstance(uint32 id, Player* player);
         DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = NULL);

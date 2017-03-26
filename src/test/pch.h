@@ -8,7 +8,6 @@
 #include "../shared/Config/Config.h"
 #include "../shared/Utilities/Util.h"
 #include "../game/WorldHandlers/AccountMgr.h"
-#include "../mangosd/Comm/CliRunnable.h"
 #include "../game/WorldHandlers/MapManager.h"
 #include "../game/Object/Player.h"
 #include "../game/WorldHandlers/Chat.h"

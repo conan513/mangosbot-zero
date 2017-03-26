@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -768,19 +768,19 @@ namespace MaNGOS
                 switch (i_push_type)
                 {
                     case PUSH_IN_FRONT:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
+                        if (i_castingObject->IsInFront((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
                             { i_data->push_back(itr->getSource()); }
                         break;
                     case PUSH_IN_FRONT_90:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 2))
+                        if (i_castingObject->IsInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 2))
                             { i_data->push_back(itr->getSource()); }
                         break;
                     case PUSH_IN_FRONT_15:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 12))
+                        if (i_castingObject->IsInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 12))
                             { i_data->push_back(itr->getSource()); }
                         break;
                     case PUSH_IN_BACK:
-                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
+                        if (i_castingObject->IsInBack((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
                             { i_data->push_back(itr->getSource()); }
                         break;
                     case PUSH_SELF_CENTER:

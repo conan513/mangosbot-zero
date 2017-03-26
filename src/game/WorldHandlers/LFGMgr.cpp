@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -348,7 +348,7 @@ void LFGQueue::Update(uint32 diff)
                     }
 
                     WorldPacket data;
-                    BuildMemberAddedPacket(data, member->GetGUID());
+                    BuildMemberAddedPacket(data, member->GetObjectGuid());
 
                     leader->GetSession()->SendPacket(&data);
 
@@ -432,7 +432,7 @@ bool LFGQueue::FindRoleToGroup(Player* plr, Group* grp, ClassRoles role)
             }
 
             WorldPacket data;
-            BuildMemberAddedPacket(data, plr->GetGUID());
+            BuildMemberAddedPacket(data, plr->GetObjectGuid());
             grp->BroadcastPacket(&data, true);
 
             // Add member to the group.
@@ -506,7 +506,7 @@ bool LFGQueue::FindRoleToGroup(Player* plr, Group* grp, ClassRoles role)
                 }
 
                 WorldPacket data;
-                BuildMemberAddedPacket(data, plr->GetGUID());
+                BuildMemberAddedPacket(data, plr->GetObjectGuid());
                 grp->BroadcastPacket(&data, true);
 
                 // Add member to the group.

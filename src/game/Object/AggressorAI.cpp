@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,16 +25,12 @@
 #include "AggressorAI.h"
 #include "Errors.h"
 #include "Creature.h"
-#include "SharedDefines.h"
-#include "VMapFactory.h"
 #include "World.h"
 #include "DBCStores.h"
 #include "Map.h"
+#include "Log.h"
 
-#include <list>
-
-int
-AggressorAI::Permissible(const Creature* creature)
+int AggressorAI::Permissible(const Creature* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!(creature->GetCreatureInfo()->ExtraFlags & CREATURE_EXTRA_FLAG_NO_AGGRO) && !creature->IsNeutralToAll())
@@ -47,8 +43,7 @@ AggressorAI::AggressorAI(Creature* c) : CreatureAI(c), i_state(STATE_NORMAL), i_
 {
 }
 
-void
-AggressorAI::MoveInLineOfSight(Unit* u)
+void AggressorAI::MoveInLineOfSight(Unit* u)
 {
     // Ignore Z for flying creatures
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE)
@@ -63,7 +58,6 @@ AggressorAI::MoveInLineOfSight(Unit* u)
             if (!m_creature->getVictim())
             {
                 AttackStart(u);
-                u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
             }
             else if (sMapStore.LookupEntry(m_creature->GetMapId())->IsDungeon())
             {

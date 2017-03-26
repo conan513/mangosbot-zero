@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "ObjectMgr.h"
 #include "MapPersistentStateMgr.h"
 #include "Creature.h"
-#include "GameObject.h"
 #include "DynamicObject.h"
 #include "Corpse.h"
 #include "World.h"
@@ -134,7 +133,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair& cell, GridRefManager<T>& 
         addUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
-        if (obj->isActiveObject())
+        if (obj->IsActiveObject())
             { map->AddToActive(obj); }
 
         obj->GetViewPoint().Event_AddedToWorld(&grid);
@@ -167,7 +166,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair& cell, CorpseMapType
         addUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
-        if (obj->isActiveObject())
+        if (obj->IsActiveObject())
             { map->AddToActive(obj); }
 
         ++count;

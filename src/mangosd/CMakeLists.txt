@@ -1,7 +1,7 @@
 # MaNGOS is a full featured server for World of Warcraft, supporting
 # the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
 #
-# Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+# Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,17 +23,7 @@ set(EXECUTABLE_NAME mangosd)
 file(GLOB SRC_GRP_MAIN *.cpp *.h)
 source_group("Main" FILES ${SRC_GRP_MAIN})
 
-#Command Line Files
-file(GLOB SRC_GRP_COMM Comm/*.cpp Comm/*.h)
-source_group("Command Line" FILES ${SRC_GRP_COMM})
-
-#Remote Access Files
-file(GLOB SRC_GRP_RA RA/*.cpp RA/*.h)
-source_group("Remote Access" FILES ${SRC_GRP_RA})
-
 set(EXECUTABLE_SRCS
-    ${SRC_GRP_COMM}
-    ${SRC_GRP_RA}
     ${SRC_GRP_MAIN}
 )
 
@@ -50,6 +40,7 @@ endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/shared
+    ${CMAKE_SOURCE_DIR}/src/shared/Config
     ${CMAKE_SOURCE_DIR}/src/shared/Common
     ${CMAKE_SOURCE_DIR}/src/shared/Threading
     ${CMAKE_SOURCE_DIR}/src/shared/Utilities

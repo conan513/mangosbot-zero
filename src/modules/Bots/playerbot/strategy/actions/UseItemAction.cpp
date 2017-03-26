@@ -76,7 +76,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
     uint8 cast_count = 1;
-    uint64 item_guid = item->GetGUID();
+    uint64 item_guid = item->GetObjectGuid().GetRawValue();
     uint32 glyphIndex = 0;
     uint8 unk_flags = 0;
 
@@ -111,7 +111,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
     {
         uint16 targetFlag = TARGET_FLAG_ITEM;
         *packet << targetFlag;
-        packet->appendPackGUID(itemTarget->GetGUID());
+        packet->appendPackGUID(itemTarget->GetObjectGuid());
         out << " on " << chat->formatItem(itemTarget->GetProto());
         targetSelected = true;
     }
@@ -188,7 +188,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
             else
             {
                 *packet << (uint16)TARGET_FLAG_ITEM;
-                packet->appendPackGUID(itemForSpell->GetGUID());
+                packet->appendPackGUID(itemForSpell->GetObjectGuid());
                 targetSelected = true;
                 out << " on "<< chat->formatItem(itemForSpell->GetProto());
             }

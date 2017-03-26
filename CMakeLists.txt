@@ -1,7 +1,7 @@
 # MaNGOS is a full featured server for World of Warcraft, supporting
 # the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
 #
-# Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+# Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ message(
   To set an option simply type -D<OPTION>=<VALUE> after 'cmake <srcs>'.
   Also, you can specify the generator with -G. see 'cmake --help' for more details
   For example: cmake .. -DDEBUG=1 -DCMAKE_INSTALL_PREFIX=/opt/mangos
-  
+
   Note: On UNIX systems, CONF_DIR is relative to the bin folder."
 )
 message("")
@@ -129,30 +129,8 @@ endif()
 #Include platform/compiler-specific definitions
 include(${CMAKE_SOURCE_DIR}/cmake/SetDefinitions.cmake)
 
-# Generate revision-extractor
-set(GENREV_SRC src/tools/genrevision/genrevision.cpp)
-add_executable(genrev ${GENREV_SRC})
-
-# Find core revision
-if(GIT_EXECUTABLE)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        OUTPUT_VARIABLE GIT_REVISION
-        RESULT_VARIABLE GIT_RESULT
-        ERROR_QUIET
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(GIT_RESULT)
-        set(GIT_REVISION "Git repository not found")
-    endif()
-else()
-    set(GIT_REVISION "Git not found")
-endif()
-
 set(DEFINITIONS ${DEFINITIONS} CLASSIC)
 
-message(STATUS "MaNGOS-Core revision  : ${GIT_REVISION}")
 message(STATUS "Install server to     : ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Install configs to    : ${CONF_INSTALL_DIR}")
 if("${CONF_DIR}" STREQUAL "")

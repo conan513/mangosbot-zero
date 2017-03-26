@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2016  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
 #include "Item.h"
 
 #include "Database/DatabaseEnv.h"
-#include "NPCHandler.h"
 #include "QuestDef.h"
 #include "Group.h"
 #include "Bag.h"
@@ -46,7 +45,6 @@
 #include "Chat.h"
 #include "GMTicketMgr.h"
 
-#include<string>
 #include<vector>
 
 struct Mail;
@@ -2178,6 +2176,10 @@ class Player : public Unit
         /*********************************************************/
         float m_modManaRegen;
         float m_modManaRegenInterrupt;
+
+        float m_rageDecayRate;
+        float m_rageDecayMultiplier;
+
         float m_SpellCritPercentage[MAX_SPELL_SCHOOL];
         bool HasMovementFlag(MovementFlags f) const;        // for script access to m_movementInfo.HasMovementFlag
         void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
@@ -2198,6 +2200,7 @@ class Player : public Unit
         bool IsFlying() const { return false; }
         bool IsFreeFlying() const { return false; }
 
+        bool IsClientControl(Unit* target) const;
         void SetClientControl(Unit* target, uint8 allowMove);
         void SetMover(Unit* target) { m_mover = target ? target : this; }
         Unit* GetMover() const { return m_mover; }
@@ -2241,9 +2244,7 @@ class Player : public Unit
         bool IsVisibleGloballyFor(Player* pl) const;
 
         void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target);
-
-        template<class T>
-        void UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+        void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
         // Stealth detection system
         void HandleStealthedUnitsDetection();
