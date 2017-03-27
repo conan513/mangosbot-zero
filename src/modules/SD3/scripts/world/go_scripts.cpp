@@ -69,10 +69,15 @@ struct GOHello_go_cat_figurine : public GameObjectScript
 {
     GOHello_go_cat_figurine() : GameObjectScript("go_cat_figureine") {}
 
+    uint32 random;
+
     bool OnUse(Player* pPlayer, GameObject* /*pGO*/)
     {
-        pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
-        return false;
+        random = (urand(0, 99));
+        if (random <= 30)
+            pPlayer->CastSpell(pPlayer, SPELL_SUMMON_GHOST_SABER, true);
+        else
+            return false;
     }
 };
 
@@ -457,6 +462,8 @@ void AddSC_go_scripts()
     s = new go_barov_journal();
     s->RegisterSelf();
     s = new go_andorhal_tower();
+    s->RegisterSelf();
+    s = new GOHello_go_cat_figurine();
     s->RegisterSelf();
 
 #if defined (CLASSIC) || defined (TBC)
