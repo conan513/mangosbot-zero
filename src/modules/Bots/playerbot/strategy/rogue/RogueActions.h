@@ -28,6 +28,7 @@ namespace ai
 	{
 	public:
 		CastStealthAction(PlayerbotAI* ai) : CastSpellAction(ai, "stealth") {}
+		virtual string GetTargetName() { return "self target"; }
 	};
 
 	class CastFeintAction : public CastBuffSpellAction
