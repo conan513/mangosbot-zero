@@ -35,10 +35,5 @@ GenericRogueNonCombatStrategy::GenericRogueNonCombatStrategy(PlayerbotAI* ai) : 
 void GenericRogueNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
-     
-	
-		
-			triggers.push_back(new TriggerNode(
-				"enemy out of melee",
-				NextAction::array(0, new NextAction("stealth", 20.0f), NULL)));
+        
 }
