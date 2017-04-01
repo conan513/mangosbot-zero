@@ -677,6 +677,8 @@ bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
     //fast returns in some special cases
     switch (spellproto->Id)
     {
+        case 27861:  // The Baron's Ultimatum
+            return false;
         case 13003:
         case 13010:
         case 23182:  // Mark of Frost
