@@ -37,6 +37,7 @@
  * ContentData
  * go_barov_journal
  * go_cat_figurine
+ * go_lord_shrine
 #if defined (TBC) || defined (WOTLK) || defined (CATA)    
  * go_ethereum_prison
  * go_ethereum_stasis
@@ -55,6 +56,26 @@
  */
 
 #include "precompiled.h"
+
+ /*######
+ ## go_lordaeron_shrine
+ ######*/
+
+enum eLordShrine
+{
+    SPELL_LORD_SHRINE = 30238,
+};
+
+struct GoHello_go_lordaeron_shrine : public GameObjectScript
+{
+    GoHello_go_lordaeron_shrine() : GameObjectScript("go_lord_shrine") {}
+
+    bool OnUse(Player* pPlayer, GameObject* /*pGo*/)
+    {
+        pPlayer->CastSpell(pPlayer, SPELL_LORD_SHRINE, true);
+    }
+};
+
 
  /*######
  ## go_cat_figurine
@@ -464,6 +485,8 @@ void AddSC_go_scripts()
     s = new go_andorhal_tower();
     s->RegisterSelf();
     s = new GOHello_go_cat_figurine();
+    s->RegisterSelf();
+    s = new GoHello_go_lordaeron_shrine();
     s->RegisterSelf();
 
 #if defined (CLASSIC) || defined (TBC)
