@@ -1939,6 +1939,13 @@ void SpellMgr::ModDBCSpellAttributes()
 
         switch(spell_id)
         {
+
+            // infected bite
+            case 7367:
+            case 16128:
+            case 24339:
+                spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_CANT_MISS;
+                break;
             // Mark of Nature 
             case 25040:
                 spellInfo->Attributes |= SPELL_ATTR_UNK23, SPELL_ATTR_UNK26, SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
