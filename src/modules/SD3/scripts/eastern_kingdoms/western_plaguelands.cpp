@@ -554,35 +554,35 @@ struct npc_taelan_fordring : public CreatureScript
             {
             case NPC_SCARLET_CAVALIER:
             {
-                                         // kneel and make everyone worried
-                                         m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                // kneel and make everyone worried
+                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
-                                         std::list<Creature*> lCavaliersInRange;
-                                         GetCreatureListWithEntryInGrid(lCavaliersInRange, m_creature, NPC_SCARLET_CAVALIER, 10.0f);
+                std::list<Creature*> lCavaliersInRange;
+                GetCreatureListWithEntryInGrid(lCavaliersInRange, m_creature, NPC_SCARLET_CAVALIER, 10.0f);
 
-                                         uint8 uiIndex = 0;
-                                         for (std::list<Creature*>::const_iterator itr = lCavaliersInRange.begin(); itr != lCavaliersInRange.end(); ++itr)
-                                         {
-                                             m_lCavalierGuids.push_back((*itr)->GetObjectGuid());
-                                             (*itr)->SetFacingToObject(m_creature);
-                                             DoScriptText(aCavalierYells[uiIndex], (*itr));
-                                             ++uiIndex;
-                                         }
-                                         break;
+                uint8 uiIndex = 0;
+                for (std::list<Creature*>::const_iterator itr = lCavaliersInRange.begin(); itr != lCavaliersInRange.end(); ++itr)
+                {
+                    m_lCavalierGuids.push_back((*itr)->GetObjectGuid());
+                    (*itr)->SetFacingToObject(m_creature);
+                    DoScriptText(aCavalierYells[uiIndex], (*itr));
+                    ++uiIndex;
+                }
+                break;
             }
             case QUEST_ID_SCARLET_SUBTERFUGE:
             {
-                                                float fX, fY, fZ;
-                                                for (GuidList::const_iterator itr = m_lCavalierGuids.begin(); itr != m_lCavalierGuids.end(); ++itr)
-                                                {
-                                                    if (Creature* pCavalier = m_creature->GetMap()->GetCreature(*itr))
-                                                    {
-                                                        m_creature->GetContactPoint(pCavalier, fX, fY, fZ);
-                                                        pCavalier->GetMotionMaster()->MovePoint(0, fX, fY, fZ);
-                                                    }
-                                                }
-                                                break;
+                float fX, fY, fZ;
+                for (GuidList::const_iterator itr = m_lCavalierGuids.begin(); itr != m_lCavalierGuids.end(); ++itr)
+                {
+                    if (Creature* pCavalier = m_creature->GetMap()->GetCreature(*itr))
+                    {
+                        m_creature->GetContactPoint(pCavalier, fX, fY, fZ);
+                        pCavalier->GetMotionMaster()->MovePoint(0, fX, fY, fZ);
+                    }
+                }
+                break;
             }
             case SAY_SCARLET_COMPLETE_1:
                 // stand up and knock down effect
@@ -617,30 +617,30 @@ struct npc_taelan_fordring : public CreatureScript
                 break;
             case SPELL_CRUSADER_STRIKE:
             {
-                                          // spawn additioinal elites
-                                          m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2711.32f, -1882.67f, 67.89f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
-                                          m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2710.93f, -1878.90f, 67.97f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
-                                          m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2710.53f, -1875.28f, 67.90f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
+                // spawn additioinal elites
+                m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2711.32f, -1882.67f, 67.89f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
+                m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2710.93f, -1878.90f, 67.97f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
+                m_creature->SummonCreature(NPC_CRIMSON_ELITE, 2710.53f, -1875.28f, 67.90f, 3.2f, TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN, 15 * MINUTE*IN_MILLISECONDS);
 
-                                          std::list<Creature*> lElitesInRange;
-                                          Player* pPlayer = GetPlayerForEscort();
-                                          if (!pPlayer)
-                                              return;
+                std::list<Creature*> lElitesInRange;
+                Player* pPlayer = GetPlayerForEscort();
+                if (!pPlayer)
+                    return;
 
-                                          GetCreatureListWithEntryInGrid(lElitesInRange, m_creature, NPC_CRIMSON_ELITE, 70.0f);
+                GetCreatureListWithEntryInGrid(lElitesInRange, m_creature, NPC_CRIMSON_ELITE, 70.0f);
 
-                                          for (std::list<Creature*>::const_iterator itr = lElitesInRange.begin(); itr != lElitesInRange.end(); ++itr)
-                                              (*itr)->AI()->AttackStart(pPlayer);
+                for (std::list<Creature*>::const_iterator itr = lElitesInRange.begin(); itr != lElitesInRange.end(); ++itr)
+                    (*itr)->AI()->AttackStart(pPlayer);
 
-                                          // Isillien only attacks Taelan
-                                          if (Creature* pIsillien = m_creature->GetMap()->GetCreature(m_isillenGuid))
-                                          {
-                                              pIsillien->AI()->AttackStart(m_creature);
-                                              AttackStart(pIsillien);
-                                          }
+                // Isillien only attacks Taelan
+                if (Creature* pIsillien = m_creature->GetMap()->GetCreature(m_isillenGuid))
+                {
+                    pIsillien->AI()->AttackStart(m_creature);
+                    AttackStart(pIsillien);
+                }
 
-                                          m_bFightStarted = true;
-                                          break;
+                m_bFightStarted = true;
+                break;
             }
             case SAY_KILL_TAELAN_1:
                 // kill taelan and attack players
