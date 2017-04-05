@@ -73,7 +73,7 @@ struct GoHello_go_lordaeron_shrine : public GameObjectScript
     bool OnUse(Player* pPlayer, GameObject* /*pGo*/)
     {
         pPlayer->CastSpell(pPlayer, SPELL_LORD_SHRINE, true);
-        return false;
+        return true;
     }
 };
 
