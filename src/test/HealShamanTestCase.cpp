@@ -78,7 +78,7 @@ protected:
         tick();
         tick();
 
-        assertActions(">S:water shield>S:earthliving weapon>S:flametongue weapon>S:frostbrand weapon>S:rockbiter weapon>S:mana spring totem>S:strength of earth totem>S:flametongue totem>S:windfury totem");
+        assertActions(">S:water shield>S:earthliving weapon>S:flametongue weapon>S:frostbrand weapon>S:rockbiter weapon>S:mana spring totem>S:strength of earth totem>S:flametongue totem>S:grace of air totem");
     }
 
     void interruptSpell()
