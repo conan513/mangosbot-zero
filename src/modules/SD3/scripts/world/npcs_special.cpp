@@ -53,7 +53,7 @@
  * npc_doctor                 100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
  * npc_innkeeper               25%    ScriptName not assigned. Innkeepers in general.
 #if defined (WOTLK) || defined (CATA)
- * npc_spring_rabbit            1%    Used for pet "Spring Rabbit" of Noblegarden
+ * npc_spring_rabbit            1%    Used for pet "Spring Rabbit" of Noblegarden.
 #endif
  * npc_redemption_target      100%    Used for the paladin quests: 1779,1781,9600,9685
  * EndContentData
