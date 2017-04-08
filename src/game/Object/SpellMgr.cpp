@@ -677,6 +677,8 @@ bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
     //fast returns in some special cases
     switch (spellproto->Id)
     {
+        case 27861:  // The Baron's Ultimatum
+            return false;
         case 13003:
         case 13010:
         case 23182:  // Mark of Frost
@@ -717,6 +719,8 @@ bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
                     // dummy aura can be positive or negative dependent from casted spell
                     switch (spellproto->Id)
                     {
+                        case 25040:                         //Mark of Nature
+                            return false;
                         case 13139:                         // net-o-matic special effect
                         case 18172:                         // Quest Kodo Roundup player debuff
                         case 23445:                         // evil twin
@@ -917,6 +921,18 @@ bool IsSingleTargetSpell(SpellEntry const* spellInfo)
     // hunter's mark and similar
     if (spellInfo->SpellVisual == 3239)
         { return true; }
+
+    // DRUID SPELLS
+    switch (spellInfo->Id)
+    {
+        case 339:                                           // Druid Roots Rank 1
+        case 1062:                                          // Druid Roots Rank 2
+        case 5195:                                          // Druid Roots Rank 3
+        case 5196:                                          // Druid Roots Rank 4
+        case 9852:                                          // Druid Roots Rank 5
+        case 9853:                                          // Druid Roots Rank 6
+            return true;
+    }
 
     // exceptions (have spellInfo->AttributesEx & (1<<18) but not single targeted)
     switch (spellInfo->Id)
@@ -1933,6 +1949,20 @@ void SpellMgr::ModDBCSpellAttributes()
 
         switch(spell_id)
         {
+
+            // infected bite
+            case 7367:
+            case 16128:
+            case 24339:
+                spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_CANT_MISS;
+                break;
+            // Mark of Nature 
+            case 25040:
+                spellInfo->Attributes |= SPELL_ATTR_UNK23, SPELL_ATTR_UNK26, SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
+                spellInfo->AttributesEx2 |= SPELL_ATTR_EX2_UNK0, SPELL_ATTR_EX2_CANT_REFLECTED;
+                spellInfo->AttributesEx3 |= SPELL_ATTR_EX3_DEATH_PERSISTENT;
+                break;
+
             // Execute spell id 20647 is used to actually notify the client of the damage done.
             // If MeleeSpellHitResult method is executed for this spell id, it means that the spellId sent by the client for execute did already passed.
             case 20647:

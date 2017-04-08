@@ -104,6 +104,16 @@ bool PetAI::_needToStop() const
     if (m_creature->IsCharmed() && m_creature->getVictim() == m_creature->GetCharmer())
         { return true; }
 
+    //returns the pet before it disapears out of range.
+    if (Unit* owner = m_creature->GetCharmerOrOwner())
+        if (m_creature->GetDistance(owner) >= 85)
+            return true;
+
+    //returns the pet if the target gets sheeped/blind
+    if (m_creature->getVictim()->HasAuraType(SPELL_AURA_MOD_CONFUSE))
+        return true;
+
+
     return !m_creature->getVictim()->IsTargetableForAttack();
 }
 
