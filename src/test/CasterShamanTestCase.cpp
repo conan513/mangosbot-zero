@@ -67,12 +67,8 @@ protected:
 
         tickWithAoeCount(3);
         tickWithAoeCount(3);
-        tickWithAoeCount(3);
-        tickWithAoeCount(3);
-        tickWithAoeCount(3);
-        tickWithAoeCount(3);
 
-        assertActions(">S:flametongue totem>T:reach melee>S:magma totem>T:thunderstorm>T:fire nova>T:chain lightning");
+        assertActions(">S:flametongue totem>T:chain lightning");
     }
 
     void snare()
