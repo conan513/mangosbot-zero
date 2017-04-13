@@ -787,6 +787,10 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell)
     if (!target)
         target = bot;
 
+    Pet* pet = bot->GetPet();
+    if (pet && pet->HasSpell(spellid))
+        return true;
+
     if (checkHasSpell && !bot->HasSpell(spellid))
         return false;
 
@@ -862,8 +866,21 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
 	SpellEntry const *pSpellInfo = sSpellStore.LookupEntry(spellId);
 	if (pet && pet->HasSpell(spellId))
     {
-		pet->ToggleAutocast(spellId, true);
-        TellMaster("My pet will auto-cast this spell");
+	    bool autocast = false;
+	    for(AutoSpellList::iterator i = pet->m_autospells.begin(); i != pet->m_autospells.end(); ++i)
+	    {
+	        if (*i == spellId)
+	        {
+	            autocast = true;
+	            break;
+	        }
+	    }
+
+		pet->ToggleAutocast(spellId, !autocast);
+		ostringstream out;
+		out << (autocast ? "|cffff0000|Disabling" : "|cFF00ff00|Enabling") << " pet auto-cast for ";
+		out << chatHelper.formatSpell(pSpellInfo);
+        TellMaster(out);
         return true;
     }
 
