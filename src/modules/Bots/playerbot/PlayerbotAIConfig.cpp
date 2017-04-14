@@ -47,6 +47,7 @@ bool PlayerbotAIConfig::Initialize()
     globalCoolDown = (uint32) config.GetIntDefault("AiPlayerbot.GlobalCooldown", 500);
     maxWaitForMove = config.GetIntDefault("AiPlayerbot.MaxWaitForMove", 3000);
     expireActionTime = config.GetIntDefault("AiPlayerbot.ExpireActionTime", 0);
+    dispelAuraDuration = config.GetIntDefault("AiPlayerbot.DispelAuraDuration", 0);
     reactDelay = (uint32) config.GetIntDefault("AiPlayerbot.ReactDelay", 100);
 
     sightDistance = config.GetFloatDefault("AiPlayerbot.SightDistance", 50.0f);
