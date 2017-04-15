@@ -36,9 +36,8 @@ protected:
     void runaway()
     {
         engine->addStrategy("runaway");
-		tickWithAttackerCount(0);
 		tickInMeleeRange();
-        assertActions(">S:runaway>S:runaway");
+        assertActions(">S:flee");
     }
 
     void stay()

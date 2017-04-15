@@ -22,6 +22,9 @@ float ConserveManaMultiplier::GetValue(Action* action)
     if (health < sPlayerbotAIConfig.lowHealth)
         return 1.0f;
 
+    if (mediumMana && dynamic_cast<BuffOnPartyAction*>(action))
+        return 0.0f;
+
     if (action->GetTarget() != AI_VALUE(Unit*, "current target"))
         return 1.0f;
 
