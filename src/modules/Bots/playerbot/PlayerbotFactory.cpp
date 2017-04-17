@@ -1165,6 +1165,7 @@ void AddPrevQuests(uint32 questId, list<uint32>& questIds)
     {
         uint32 prevId = abs(*iter);
         AddPrevQuests(prevId, questIds);
+        questIds.remove(prevId);
         questIds.push_back(prevId);
     }
 }
@@ -1184,6 +1185,7 @@ void PlayerbotFactory::InitQuests()
             continue;
 
         AddPrevQuests(questId, questIds);
+        questIds.remove(questId);
         questIds.push_back(questId);
     }
 
