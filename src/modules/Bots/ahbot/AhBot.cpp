@@ -656,7 +656,6 @@ void AhBot::HandleCommand(string command)
                     << "\n";
             }
             sLog.outString(out.str().c_str());
-            break;
         }
     }
 }
@@ -1026,6 +1025,21 @@ double AhBot::GetRarityPriceMultiplier(const ItemPrototype* proto)
 
     return 1.0;
 
+}
+
+bool AhBot::IsUsedBySkill(const ItemPrototype* proto, uint32 skillId)
+{
+    if (!sAhBotConfig.enabled)
+        return false;
+
+    for (int i=0; i<CategoryList::instance.size(); i++)
+    {
+        Category* category = CategoryList::instance[i];
+        if (category->GetSkillId() == skillId && category->Contains(proto))
+            return true;
+    }
+
+    return false;
 }
 
 INSTANTIATE_SINGLETON_1( ahbot::AhBot );

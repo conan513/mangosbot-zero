@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "ItemUsageValue.h"
 
+#include "../../../ahbot/AhBot.h"
 #include "../../GuildTaskMgr.h"
 using namespace ai;
 
@@ -78,7 +79,36 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemPrototype const * proto)
     switch (proto->Class)
     {
     case ITEM_CLASS_TRADE_GOODS:
-		return true;
+    case ITEM_CLASS_MISC:
+    case ITEM_CLASS_REAGENT:
+        {
+            if (bot->HasSkill(SKILL_TAILORING) && auctionbot.IsUsedBySkill(proto, SKILL_TAILORING))
+                return true;
+            if (bot->HasSkill(SKILL_LEATHERWORKING) && auctionbot.IsUsedBySkill(proto, SKILL_LEATHERWORKING))
+                return true;
+            if (bot->HasSkill(SKILL_ENGINEERING) && auctionbot.IsUsedBySkill(proto, SKILL_ENGINEERING))
+                return true;
+            if (bot->HasSkill(SKILL_BLACKSMITHING) && auctionbot.IsUsedBySkill(proto, SKILL_BLACKSMITHING))
+                return true;
+            if (bot->HasSkill(SKILL_ALCHEMY) && auctionbot.IsUsedBySkill(proto, SKILL_ALCHEMY))
+                return true;
+            if (bot->HasSkill(SKILL_ENCHANTING) && auctionbot.IsUsedBySkill(proto, SKILL_ENCHANTING))
+                return true;
+            if (bot->HasSkill(SKILL_FISHING) && auctionbot.IsUsedBySkill(proto, SKILL_FISHING))
+                return true;
+            if (bot->HasSkill(SKILL_FIRST_AID) && auctionbot.IsUsedBySkill(proto, SKILL_FIRST_AID))
+                return true;
+            if (bot->HasSkill(SKILL_COOKING) && auctionbot.IsUsedBySkill(proto, SKILL_COOKING))
+                return true;
+            if (bot->HasSkill(SKILL_MINING) && auctionbot.IsUsedBySkill(proto, SKILL_MINING))
+                return true;
+            if (bot->HasSkill(SKILL_SKINNING) && auctionbot.IsUsedBySkill(proto, SKILL_SKINNING))
+                return true;
+            if (bot->HasSkill(SKILL_HERBALISM) && auctionbot.IsUsedBySkill(proto, SKILL_HERBALISM))
+                return true;
+
+            return false;
+        }
     case ITEM_CLASS_RECIPE:
         {
             if (bot->HasSpell(proto->Spells[2].SpellId))

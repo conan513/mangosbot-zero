@@ -23,6 +23,7 @@ namespace ahbot
         virtual uint32 GetMaxAllowedAuctionCount();
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto);
         virtual uint32 GetStackCount(ItemPrototype const* proto);
+        virtual uint32 GetSkillId() { return 0; }
 
         virtual PricingStrategy* GetPricingStrategy();
 
@@ -105,7 +106,9 @@ namespace ahbot
     public:
         virtual bool Contains(ItemPrototype const* proto)
         {
-            return proto->Class == ITEM_CLASS_TRADE_GOODS;
+            return proto->Class == ITEM_CLASS_TRADE_GOODS ||
+                    proto->Class == ITEM_CLASS_MISC ||
+                    proto->Class == ITEM_CLASS_REAGENT;
         }
         virtual string GetName() { return "trade"; }
 
@@ -130,6 +133,21 @@ namespace ahbot
 
             return 1;
         }
+    };
+
+    class TradeSkill : public Trade
+    {
+    public:
+        TradeSkill(uint32 skill) : Trade(), skill(skill) {}
+
+    public:
+        virtual bool Contains(ItemPrototype const* proto);
+        virtual string GetName();
+        virtual uint32 GetSkillId() { return skill; }
+
+    private:
+        bool IsCraftedBy(ItemPrototype const* proto, uint32 craftId);
+        uint32 skill;
     };
 
     class Reagent : public Category
@@ -299,6 +317,7 @@ namespace ahbot
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto);
         virtual uint32 GetStackCount(ItemPrototype const* proto) { return category->GetStackCount(proto); }
         virtual PricingStrategy* GetPricingStrategy() { return category->GetPricingStrategy(); }
+        virtual uint32 GetSkillId() { return category->GetSkillId(); }
 
     private:
         uint32 quality;

@@ -74,3 +74,124 @@ uint32 QualityCategoryWrapper::GetMaxAllowedItemAuctionCount(ItemPrototype const
 {
     return category->GetMaxAllowedItemAuctionCount(proto);
 }
+
+bool TradeSkill::Contains(ItemPrototype const* proto)
+{
+    if (!Trade::Contains(proto))
+        return false;
+
+    for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+    {
+        CreatureInfo const* co = sCreatureStorage.LookupEntry<CreatureInfo>(id);
+        if (!co || co->TrainerType != TRAINER_TYPE_TRADESKILLS)
+            continue;
+
+        uint32 trainerId = co->TrainerTemplateId;
+        if (!trainerId)
+            trainerId = co->Entry;
+
+        TrainerSpellData const* trainer_spells = sObjectMgr.GetNpcTrainerTemplateSpells(trainerId);
+        if (!trainer_spells)
+            trainer_spells = sObjectMgr.GetNpcTrainerSpells(trainerId);
+
+        if (!trainer_spells)
+            continue;
+
+        for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
+        {
+            TrainerSpell const* tSpell = &itr->second;
+
+            if (!tSpell || tSpell->reqSkill != skill)
+                continue;
+
+            if (IsCraftedBy(proto, tSpell->spell))
+                return true;
+        }
+    }
+
+    for (uint32 itemId = 0; itemId < sItemStorage.GetMaxEntry(); ++itemId)
+    {
+        ItemPrototype const* recipe = sItemStorage.LookupEntry<ItemPrototype>(itemId);
+        if (!recipe)
+            continue;
+
+        if (recipe->Class == ITEM_CLASS_RECIPE && (
+            (recipe->SubClass == ITEM_SUBCLASS_LEATHERWORKING_PATTERN && skill == SKILL_LEATHERWORKING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_TAILORING_PATTERN && skill == SKILL_TAILORING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_ENGINEERING_SCHEMATIC && skill == SKILL_ENGINEERING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_BLACKSMITHING && skill == SKILL_BLACKSMITHING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_COOKING_RECIPE && skill == SKILL_COOKING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_ALCHEMY_RECIPE && skill == SKILL_ALCHEMY) ||
+            (recipe->SubClass == ITEM_SUBCLASS_FIRST_AID_MANUAL && skill == SKILL_FIRST_AID) ||
+            (recipe->SubClass == ITEM_SUBCLASS_ENCHANTING_FORMULA && skill == SKILL_ENCHANTING) ||
+            (recipe->SubClass == ITEM_SUBCLASS_FISHING_MANUAL && skill == SKILL_FISHING)
+            ))
+        {
+            for (uint32 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            {
+                if (IsCraftedBy(proto, recipe->Spells[i].SpellId))
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool TradeSkill::IsCraftedBy(ItemPrototype const* proto, uint32 spellId)
+{
+    SpellEntry const *entry = sSpellStore.LookupEntry(spellId);
+    if (!entry)
+        return false;
+
+    for (uint32 effect = EFFECT_INDEX_0; effect < MAX_EFFECT_INDEX; ++effect)
+    {
+        uint32 craftId = entry->EffectTriggerSpell[effect];
+        SpellEntry const *craft = sSpellStore.LookupEntry(craftId);
+        if (!craft)
+            continue;
+
+        for (uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
+        {
+            uint32 itemId = craft->Reagent[i];
+            if (itemId == proto->ItemId)
+            {
+                sLog.outDetail("%s is crafted by %s", proto->Name1, craft->SpellName[0]);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+string TradeSkill::GetName()
+{
+    switch (skill)
+    {
+    case SKILL_TAILORING:
+        return "tailoring reagent";
+    case SKILL_LEATHERWORKING:
+        return "leatherworking reagent";
+    case SKILL_ENGINEERING:
+        return "engineering reagent";
+    case SKILL_BLACKSMITHING:
+        return "blacksmithing reagent";
+    case SKILL_ALCHEMY:
+        return "alchemy reagent";
+    case SKILL_COOKING:
+        return "cooking reagent";
+    case SKILL_FISHING:
+        return "fishing reagent";
+    case SKILL_ENCHANTING:
+        return "enchanting reagent";
+    case SKILL_MINING:
+        return "mining reagent";
+    case SKILL_SKINNING:
+        return "skinning reagent";
+    case SKILL_HERBALISM:
+        return "herbalism reagent";
+    case SKILL_FIRST_AID:
+        return "first aid reagent";
+    }
+}
