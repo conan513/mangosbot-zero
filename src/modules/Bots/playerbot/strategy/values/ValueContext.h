@@ -62,6 +62,7 @@
 #include "NewPlayerNearbyValue.h"
 #include "OutfitListValue.h"
 #include "RandomBotUpdateValue.h"
+#include "SkipSpellsListValue.h"
 
 namespace ai
 {
@@ -70,6 +71,7 @@ namespace ai
     public:
         ValueContext()
         {
+            creators["skip spells list"] = &ValueContext::skip_spells_list_value;
             creators["nearest game objects"] = &ValueContext::nearest_game_objects;
             creators["nearest npcs"] = &ValueContext::nearest_npcs;
             creators["nearest friendly players"] = &ValueContext::nearest_friendly_players;
@@ -254,5 +256,6 @@ namespace ai
         static UntypedValue* outfit_list_value(PlayerbotAI* ai) { return new OutfitListValue(ai); }
         static UntypedValue* random_bot_update_value(PlayerbotAI* ai) { return new RandomBotUpdateValue(ai); }
         static UntypedValue* nearest_non_bot_players(PlayerbotAI* ai) { return new NearestNonBotPlayersValue(ai); }
+        static UntypedValue* skip_spells_list_value(PlayerbotAI* ai) { return new SkipSpellsListValue(ai); }
     };
 };

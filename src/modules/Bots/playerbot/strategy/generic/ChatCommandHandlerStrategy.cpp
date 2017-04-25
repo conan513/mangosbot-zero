@@ -147,6 +147,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("los");
     supported.push_back("drop");
     supported.push_back("ll");
+    supported.push_back("ss");
     supported.push_back("release");
     supported.push_back("teleport");
     supported.push_back("taxi");

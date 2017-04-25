@@ -20,6 +20,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( drop );
       CPPUNIT_TEST( query );
       CPPUNIT_TEST( ll );
+      CPPUNIT_TEST( ss );
       CPPUNIT_TEST( loot_all );
       CPPUNIT_TEST( release );
       CPPUNIT_TEST( teleport );
@@ -461,6 +462,14 @@ protected:
     void outfit()
     {
         assertParametrizedCommand("outfit", "outfit");
+    }
+
+    void ss()
+    {
+        assertCommand("ss");
+        assertParametrizedCommand("ss", "[spell]");
+        assertParametrizedCommand("ss", "-[spell]");
+        assertParametrizedCommand("ss", "all");
     }
 };
 

@@ -48,5 +48,9 @@ bool SpellCastUsefulValue::Calculate()
             return false;
     }
 
+    set<uint32>& skipSpells = AI_VALUE(set<uint32>&, "skip spells list");
+    if (skipSpells.find(spellid) != skipSpells.end())
+        return false;
+
 	return true;
 }

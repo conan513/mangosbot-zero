@@ -19,6 +19,7 @@ namespace ai
             creators["drop"] = &ChatTriggerContext::drop;
             creators["q"] = &ChatTriggerContext::q;
             creators["ll"] = &ChatTriggerContext::ll;
+            creators["ss"] = &ChatTriggerContext::ss;
             creators["loot all"] = &ChatTriggerContext::loot_all;
             creators["add all loot"] = &ChatTriggerContext::loot_all;
             creators["release"] = &ChatTriggerContext::release;
@@ -129,6 +130,7 @@ namespace ai
         static Trigger* teleport(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "teleport"); }
         static Trigger* q(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "q"); }
         static Trigger* ll(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "ll"); }
+        static Trigger* ss(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "ss"); }
         static Trigger* drop(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "drop"); }
         static Trigger* quests(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "quests"); }
         static Trigger* stats(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "stats"); }

@@ -50,6 +50,7 @@
 #include "SaveManaAction.h"
 #include "../values/Formations.h"
 #include "SendMailAction.h"
+#include "SkipSpellsListAction.h"
 
 namespace ai
 {
@@ -68,6 +69,7 @@ namespace ai
             creators["query quest"] = &ChatActionContext::query_quest;
             creators["query item usage"] = &ChatActionContext::query_item_usage;
             creators["ll"] = &ChatActionContext::ll;
+            creators["ss"] = &ChatActionContext::ss;
             creators["add all loot"] = &ChatActionContext::add_all_loot;
             creators["release"] = &ChatActionContext::release;
             creators["teleport"] = &ChatActionContext::teleport;
@@ -178,6 +180,7 @@ namespace ai
         static Action* log(PlayerbotAI* ai) { return new LogLevelAction(ai); }
         static Action* los(PlayerbotAI* ai) { return new TellLosAction(ai); }
         static Action* ll(PlayerbotAI* ai) { return new LootStrategyAction(ai); }
+        static Action* ss(PlayerbotAI* ai) { return new SkipSpellsListAction(ai); }
         static Action* add_all_loot(PlayerbotAI* ai) { return new AddAllLootAction(ai); }
         static Action* reset_ai(PlayerbotAI* ai) { return new ResetAiAction(ai); }
         static Action* gossip_hello(PlayerbotAI* ai) { return new GossipHelloAction(ai); }
