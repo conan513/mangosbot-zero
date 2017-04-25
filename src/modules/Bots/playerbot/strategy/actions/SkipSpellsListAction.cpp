@@ -13,17 +13,42 @@ bool SkipSpellsListAction::Execute(Event event)
 
     set<uint32>& skipSpells = AI_VALUE(set<uint32>&, "skip spells list");
 
-    if (cmd == "?")
+    SpellIds spellIds = parseIds(cmd);
+    if (!spellIds.empty()) {
+        skipSpells.clear();
+        for (SpellIds::iterator i = spellIds.begin(); i != spellIds.end(); ++i)
+        {
+            skipSpells.insert(*i);
+        }
+        cmd = "?";
+    }
+
+    if (cmd == "reset")
+    {
+        skipSpells.clear();
+        ai->TellMaster("Ignored spell list is empty");
+        return true;
+    }
+
+    if (cmd.empty() || cmd == "?")
     {
         ostringstream out;
-        out << "I won't cast: ";
+        if (skipSpells.empty())
+        {
+            ai->TellMaster("Ignored spell list is empty");
+            return true;
+        }
 
+        out << "Ignored spell list: ";
+
+        bool first = true;
         for (set<uint32>::iterator i = skipSpells.begin(); i != skipSpells.end(); i++)
         {
             SpellEntry const* spell = sSpellStore.LookupEntry(*i);
             if (!spell)
                 continue;
 
+            if (first) first = false; else out << ", ";
             out << chat->formatSpell(spell);
         }
         ai->TellMaster(out);
@@ -52,7 +77,7 @@ bool SkipSpellsListAction::Execute(Event event)
             {
                 skipSpells.erase(j);
                 ostringstream out;
-                out << chat->formatSpell(spell) << "removed from ignored spells";
+                out << chat->formatSpell(spell) << " removed from ignored spells";
                 ai->TellMaster(out);
                 return true;
             }
@@ -64,7 +89,7 @@ bool SkipSpellsListAction::Execute(Event event)
             {
                 skipSpells.insert(spellId);
                 ostringstream out;
-                out << chat->formatSpell(spell) << "added to ignored spells";
+                out << chat->formatSpell(spell) << " added to ignored spells";
                 ai->TellMaster(out);
                 return true;
             }
@@ -74,3 +99,24 @@ bool SkipSpellsListAction::Execute(Event event)
     return false;
 }
 
+
+SpellIds SkipSpellsListAction::parseIds(string text)
+{
+    SpellIds spellIds;
+
+    uint8 pos = 0;
+    while (pos < text.size())
+    {
+        int endPos = text.find(',', pos);
+        if (endPos == -1)
+            endPos = text.size();
+
+        string idC = text.substr(pos, endPos - pos);
+        uint32 id = atol(idC.c_str());
+        pos = endPos + 1;
+        if (id)
+            spellIds.insert(id);
+    }
+
+    return spellIds;
+}

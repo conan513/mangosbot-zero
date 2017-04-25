@@ -69,6 +69,17 @@ void PlayerbotDbStore::Save(PlayerbotAI *ai)
         ostringstream outOutfit; outOutfit << "outfit " << *i;
         SaveValue(guid, "outfit", outOutfit.str());
     }
+
+    set<uint32>& ss = ai->GetAiObjectContext()->GetValue<set<uint32>&>("skip spells list")->Get();
+    ostringstream outSs;
+    outSs << "ss ";
+    bool first = true;
+    for (set<uint32>::iterator i = ss.begin(); i != ss.end(); ++i)
+    {
+        if (first) first = false; else outSs << ",";
+        outSs << *i;
+    }
+    SaveValue(guid, "ss", outSs.str());
 }
 
 string PlayerbotDbStore::FormatStrategies(string type, list<string> strategies)
