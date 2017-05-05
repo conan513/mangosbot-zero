@@ -14,8 +14,9 @@ namespace ahbot
         PricingStrategy(Category* category) : category(category) {}
 
     public:
-        virtual uint32 GetSellPrice(ItemPrototype const* proto, uint32 auctionHouse);
+        virtual uint32 GetSellPrice(ItemPrototype const* proto, uint32 auctionHouse, bool ignoreMarket = false);
         virtual uint32 GetBuyPrice(ItemPrototype const* proto, uint32 auctionHouse);
+        double GetMarketPrice(uint32 itemId, uint32 auctionHouse);
         string ExplainSellPrice(ItemPrototype const* proto, uint32 auctionHouse);
         string ExplainBuyPrice(ItemPrototype const* proto, uint32 auctionHouse);
         virtual double GetRarityPriceMultiplier(uint32 itemId);
@@ -24,11 +25,10 @@ namespace ahbot
     protected:
         virtual uint32 GetDefaultBuyPrice(ItemPrototype const* proto);
         virtual uint32 GetDefaultSellPrice(ItemPrototype const* proto);
-        virtual uint32 ApplyQualityMultiplier(ItemPrototype const* proto, uint32 price);
+        virtual double GetQualityMultiplier(ItemPrototype const* proto);
         virtual double GetCategoryPriceMultiplier(uint32 untilTime, uint32 auctionHouse);
         virtual double GetItemPriceMultiplier(ItemPrototype const* proto, uint32 untilTime, uint32 auctionHouse);
         double GetMultiplier(double count, double firstBuyTime, double lastBuyTime);
-        double GetMarketPrice(uint32 itemId, uint32 auctionHouse);
 
     protected:
         Category* category;
@@ -41,6 +41,7 @@ namespace ahbot
 
     public:
         virtual uint32 GetBuyPrice(ItemPrototype const* proto, uint32 auctionHouse);
+        virtual uint32 GetSellPrice(ItemPrototype const* proto, uint32 auctionHouse);
     };
 
     class PricingStrategyFactory

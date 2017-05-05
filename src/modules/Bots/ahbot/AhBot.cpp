@@ -531,7 +531,7 @@ int AhBot::AddAuction(int auction, Category* category, ItemPrototype const* prot
     sLog.outDetail( "AddAuction: market price adjust");
     updateMarketPrice(proto->ItemId, price, auctionIds[auction]);
 
-    price = category->GetPricingStrategy()->GetBuyPrice(proto, auctionIds[auction]);
+    price = category->GetPricingStrategy()->GetSellPrice(proto, auctionIds[auction]);
 
     uint32 stackCount = category->GetStackCount(proto);
     if (!price || !stackCount)
@@ -647,12 +647,15 @@ void AhBot::HandleCommand(string command)
                     << GetAvailableMoney(auctionIds[auction])
                     << ") ---\n";
 
-                out << "sell: " << category->GetPricingStrategy()->GetSellPrice(proto, auctionIds[auction])
+                out << "sell: " << ChatHelper::formatMoney(category->GetPricingStrategy()->GetSellPrice(proto, auctionIds[auction], true))
                     << " ("  << category->GetPricingStrategy()->ExplainSellPrice(proto, auctionIds[auction]) << ")"
                     << "\n";
 
-                out << "buy: " << category->GetPricingStrategy()->GetBuyPrice(proto, auctionIds[auction])
+                out << "buy: " << ChatHelper::formatMoney(category->GetPricingStrategy()->GetBuyPrice(proto, auctionIds[auction]))
                     << " ("  << category->GetPricingStrategy()->ExplainBuyPrice(proto, auctionIds[auction]) << ")"
+                    << "\n";
+
+                out << "market: " << ChatHelper::formatMoney(category->GetPricingStrategy()->GetMarketPrice(proto->ItemId, auctionIds[auction]))
                     << "\n";
             }
             sLog.outString(out.str().c_str());
