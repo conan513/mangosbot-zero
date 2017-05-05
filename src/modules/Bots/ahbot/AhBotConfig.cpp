@@ -51,6 +51,7 @@ bool AhBotConfig::Initialize()
     defaultMinPrice = config.GetIntDefault("AhBot.DefaultMinPrice", 20);
     maxItemLevel = config.GetIntDefault("AhBot.MaxItemLevel", 199);
     maxRequiredLevel = config.GetIntDefault("AhBot.MaxRequiredLevel", 80);
+    stackReducePrice = config.GetIntDefault("AhBot.StackReducePrice", 1000000);
     priceQualityMultiplier = config.GetFloatDefault("AhBot.PriceQualityMultiplier", 1.0f);
     underPriceProbability = config.GetFloatDefault("AhBot.UnderPriceProbability", 0.05f);
     LoadSet<set<uint32> >(config.GetStringDefault("AhBot.IgnoreItemIds", "49283,52200,8494,6345,6891,2460,37164,34835"), ignoreItemIds);

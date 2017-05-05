@@ -25,7 +25,7 @@ public:
     uint32 itemSellMinInterval, itemSellMaxInterval;
     uint32 alwaysAvailableMoney;
     float priceMultiplier, priceQualityMultiplier;
-    uint32 defaultMinPrice;
+    uint32 defaultMinPrice, stackReducePrice;
     uint32 maxItemLevel, maxRequiredLevel;
     float underPriceProbability;
     std::set<uint32> ignoreItemIds;
