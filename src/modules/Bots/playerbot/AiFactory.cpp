@@ -131,8 +131,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("arcane", "arcane aoe", "threat", NULL);
             else if (tab == 1)
                 engine->addStrategies("fire", "fire aoe", "threat", NULL);
+	    else if (tab == 2)
+		engine->addStrategies("frost", "frost aoe", "threat", NULL);
             else
-                engine->addStrategies("frost", "frost aoe", "threat", NULL);
+                engine->addStrategies("fire", "threat", NULL)
 
             engine->addStrategies("flee", "cure", NULL);
             break;
