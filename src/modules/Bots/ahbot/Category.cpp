@@ -195,3 +195,32 @@ string TradeSkill::GetName()
         return "first aid reagent";
     }
 }
+
+string TradeSkill::GetLabel()
+{
+    switch (skill)
+    {
+    case SKILL_TAILORING:
+        return "tailoring materials";
+    case SKILL_LEATHERWORKING:
+    case SKILL_SKINNING:
+        return "leather and hides";
+    case SKILL_ENGINEERING:
+        return "engineering materials";
+    case SKILL_BLACKSMITHING:
+        return "blacksmithing materials";
+    case SKILL_ALCHEMY:
+    case SKILL_HERBALISM:
+        return "herbs";
+    case SKILL_COOKING:
+        return "fish and meat";
+    case SKILL_FISHING:
+        return "fish";
+    case SKILL_ENCHANTING:
+        return "enchants";
+    case SKILL_MINING:
+        return "ore and stone";
+    case SKILL_FIRST_AID:
+        return "first aid reagents";
+    }
+}

@@ -19,6 +19,7 @@ namespace ahbot
         virtual bool Contains(ItemPrototype const* proto) { return false; }
         virtual string GetName() { return "default"; }
         virtual string GetDisplayName() { return GetName(); }
+        virtual string GetLabel() { return GetName(); }
 
         virtual uint32 GetMaxAllowedAuctionCount();
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto);
@@ -43,6 +44,7 @@ namespace ahbot
         }
 
         virtual string GetName() { return "consumable"; }
+        virtual string GetLabel() { return "Consumables"; }
 
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
@@ -143,6 +145,7 @@ namespace ahbot
     public:
         virtual bool Contains(ItemPrototype const* proto);
         virtual string GetName();
+        virtual string GetLabel();
         virtual uint32 GetSkillId() { return skill; }
 
     private:
@@ -161,6 +164,7 @@ namespace ahbot
             return proto->Class == ITEM_CLASS_REAGENT && proto->ItemLevel > 1;
         }
         virtual string GetName() { return "reagent"; }
+        virtual string GetLabel() { return "reagents"; }
     };
 
     class Recipe : public Category
@@ -174,6 +178,7 @@ namespace ahbot
             return proto->Class == ITEM_CLASS_RECIPE && proto->ItemLevel > 1;
         }
         virtual string GetName() { return "recipe"; }
+        virtual string GetLabel() { return "recipes and patterns"; }
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
             return 1;
@@ -197,6 +202,7 @@ namespace ahbot
                 proto->Class == ITEM_CLASS_ARMOR) && proto->ItemLevel > 1;
         }
         virtual string GetName() { return "equip"; }
+        virtual string GetLabel() { return "equipment"; }
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
             return 1;
@@ -244,6 +250,7 @@ namespace ahbot
         }
 
         virtual string GetName() { return "quiver"; }
+        virtual string GetLabel() { return "quivers and ammo poaches"; }
 
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
@@ -268,6 +275,7 @@ namespace ahbot
         }
 
         virtual string GetName() { return "projectile"; }
+        virtual string GetLabel() { return "projectiles"; }
 
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
@@ -292,6 +300,7 @@ namespace ahbot
         }
 
         virtual string GetName() { return "container"; }
+        virtual string GetLabel() { return "containers"; }
 
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
@@ -314,6 +323,7 @@ namespace ahbot
         virtual uint32 GetMaxAllowedAuctionCount();
         virtual string GetName() { return category->GetName(); }
         virtual string GetDisplayName() { return combinedName; }
+        virtual string GetLabel() { return category->GetLabel(); }
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto);
         virtual uint32 GetStackCount(ItemPrototype const* proto) { return category->GetStackCount(proto); }
         virtual PricingStrategy* GetPricingStrategy() { return category->GetPricingStrategy(); }
