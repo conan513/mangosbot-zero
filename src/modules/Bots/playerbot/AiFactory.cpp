@@ -122,7 +122,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     engine->addStrategy("dps debuff");
             }
             else
-                engine->addStrategy("heal");
+                engine->addStrategy("heal", "holy", NULL);
 
             engine->addStrategies("flee", "cure", NULL);
             break;
