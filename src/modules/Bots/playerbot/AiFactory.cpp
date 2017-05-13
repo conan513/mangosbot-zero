@@ -122,17 +122,19 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     engine->addStrategy("dps debuff");
             }
             else
-                engine->addStrategy("heal");
+                engine->addStrategy("heal", "holy", NULL);
 
-            engine->addStrategies("dps assist", "flee", "cure", NULL);
+            engine->addStrategies("flee", "cure", NULL);
             break;
         case CLASS_MAGE:
             if (tab == 0)
-                engine->addStrategies("arcane", "threat", NULL);
+                engine->addStrategies("arcane", "arcane aoe", "threat", NULL);
             else if (tab == 1)
                 engine->addStrategies("fire", "fire aoe", "threat", NULL);
+	    else if (tab == 2)
+		engine->addStrategies("frost", "frost aoe", "threat", NULL);
             else
-                engine->addStrategies("frost", "frost aoe", "threat", NULL);
+                engine->addStrategies("fire", "threat", NULL)
 
             engine->addStrategies("dps assist", "flee", "cure", NULL);
             break;

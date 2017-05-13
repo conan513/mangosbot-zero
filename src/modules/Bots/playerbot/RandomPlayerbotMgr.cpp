@@ -77,7 +77,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
     ostringstream out; out << "Random bots are now scheduled to be processed in the background. Next re-schedule in " << sPlayerbotAIConfig.randomBotUpdateInterval << " seconds";
     sLog.outString(out.str().c_str());
-    sWorld.SendWorldText(3, out.str().c_str());
+    //sWorld.SendWorldText(3, out.str().c_str());
 
     PrintStats();
 }

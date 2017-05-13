@@ -22,24 +22,17 @@ namespace ai
         CastFireBlastAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire blast") {}
     };
 
-    class CastArcaneBlastAction : public CastBuffSpellAction
-    {
-    public:
-        CastArcaneBlastAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "arcane blast") {}
-        virtual string GetTargetName() { return "current target"; }
-    };
-
-    class CastArcaneBarrageAction : public CastSpellAction
-    {
-    public:
-        CastArcaneBarrageAction(PlayerbotAI* ai) : CastSpellAction(ai, "arcane barrage") {}
-    };
-
     class CastArcaneMissilesAction : public CastSpellAction
     {
     public:
         CastArcaneMissilesAction(PlayerbotAI* ai) : CastSpellAction(ai, "arcane missiles") {}
     };
+
+	class CastArcaneExplosionAction : public CastSpellAction
+	{
+	public:
+		CastArcaneExplosionAction(PlayerbotAI* ai) : CastSpellAction(ai, "arcane explosion") {}
+	};
 
     class CastPyroblastAction : public CastSpellAction
     {
@@ -141,12 +134,6 @@ namespace ai
 		CastIceBlockAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "ice block") {}
 	};
 
-    class CastMoltenArmorAction : public CastBuffSpellAction
-    {
-    public:
-        CastMoltenArmorAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "molten armor") {}
-    };
-
     class CastMageArmorAction : public CastBuffSpellAction
     {
     public:
@@ -172,34 +159,10 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
     };
 
-	class CastSpellstealAction : public CastSpellAction
-	{
-	public:
-		CastSpellstealAction(PlayerbotAI* ai) : CastSpellAction(ai, "spellsteal") {}
-	};
-
-	class CastLivingBombAction : public CastDebuffSpellAction
-	{
-	public:
-	    CastLivingBombAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "living bomb") {}
-	};
-
-	class CastDragonsBreathAction : public CastSpellAction
-	{
-	public:
-	    CastDragonsBreathAction(PlayerbotAI* ai) : CastSpellAction(ai, "dragon's breath") {}
-	};
-
 	class CastBlastWaveAction : public CastSpellAction
 	{
 	public:
 	    CastBlastWaveAction(PlayerbotAI* ai) : CastSpellAction(ai, "blast wave") {}
-	};
-
-	class CastInvisibilityAction : public CastBuffSpellAction
-	{
-	public:
-	    CastInvisibilityAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "invisibility") {}
 	};
 
 	class CastEvocationAction : public CastSpellAction

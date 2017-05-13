@@ -3,22 +3,10 @@
 
 namespace ai
 {
-    class CastJudgementOfLightAction : public CastMeleeSpellAction
+    class CastJudgementAction : public CastMeleeSpellAction
     {
     public:
-        CastJudgementOfLightAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement of light") {}
-    };
-
-    class CastJudgementOfWisdomAction : public CastMeleeSpellAction
-    {
-    public:
-        CastJudgementOfWisdomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement of wisdom") {}
-    };
-
-    class CastJudgementOfJusticeAction : public CastMeleeSpellAction
-    {
-    public:
-        CastJudgementOfJusticeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement of justice") {}
+        CastJudgementAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement") {}
     };
 
 	class CastRighteousFuryAction : public CastBuffSpellAction
@@ -43,18 +31,6 @@ namespace ai
 	{
 	public:
 		CastConcentrationAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "concentration aura") {}
-	};
-
-	class CastDivineStormAction : public CastBuffSpellAction
-	{
-	public:
-		CastDivineStormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine storm") {}
-	};
-
-	class CastCrusaderStrikeAction : public CastMeleeSpellAction
-	{
-	public:
-		CastCrusaderStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "crusader strike") {}
 	};
 
 	class CastShadowResistanceAuraAction : public CastBuffSpellAction
@@ -112,10 +88,10 @@ namespace ai
 		CastSealOfCommandAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "seal of command") {}
 	};
 
-	class CastSealOfVengeanceAction : public CastBuffSpellAction
+	class CastSealOfTheCrusaderAction : public CastBuffSpellAction
 	{
 	public:
-	    CastSealOfVengeanceAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "seal of vengeance") {}
+		CastSealOfTheCrusaderAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "seal of the crusader") {}
 	};
 
 
@@ -257,12 +233,6 @@ namespace ai
 		CastHammerOfWrathAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "hammer of wrath") {}
 	};
 
-	class CastHammerOfTheRighteousAction : public CastMeleeSpellAction
-	{
-	public:
-		CastHammerOfTheRighteousAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "hammer of the righteous") {}
-	};
-
 	class CastPurifyPoisonAction : public CastCureSpellAction
 	{
 	public:
@@ -338,9 +308,6 @@ namespace ai
 
 		virtual string getName() { return "cleanse magic on party"; }
 	};
-
-    BEGIN_SPELL_ACTION(CastAvengersShieldAction, "avenger's shield")
-    END_SPELL_ACTION()
 
 	BEGIN_SPELL_ACTION(CastExorcismAction, "exorcism")
 	END_SPELL_ACTION()

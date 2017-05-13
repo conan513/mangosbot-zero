@@ -1,3 +1,8 @@
+# Come and join to the Single Player Project Discord Server!
+![logo](http://i.imgur.com/Rn2rKfy.png) 
+## --> https://discord.gg/TpxqWWT <--
+
+
 <table border=0 cellpadding=0 cellspacing=0 valign='top'><tr>
 <td><a href='https://www.getmangos.eu' target='getmangos.eu'><img src='https://www.getmangos.eu/!assets_mangos/logo.png' border=0></a></td>
 <td valign='top'>

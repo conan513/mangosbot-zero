@@ -38,24 +38,6 @@ namespace ai {
 		CastDemoralizingRoarAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "demoralizing roar") {}
 	};
 
-	class CastMangleBearAction : public CastMeleeSpellAction
-	{
-	public:
-		CastMangleBearAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "mangle (bear)") {}
-	};
-
-	class CastSwipeBearAction : public CastMeleeSpellAction
-	{
-	public:
-		CastSwipeBearAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "swipe (bear)") {}
-	};
-
-    class CastLacerateAction : public CastMeleeSpellAction
-    {
-    public:
-        CastLacerateAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "lacerate") {}
-    };
-
     class CastBashOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
     {
     public:

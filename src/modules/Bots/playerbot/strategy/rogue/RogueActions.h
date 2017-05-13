@@ -24,6 +24,12 @@ namespace ai
 	public:
 		CastKickAction(PlayerbotAI* ai) : CastSpellAction(ai, "kick") {}
 	};
+	class CastStealthAction : public CastSpellAction
+	{
+	public:
+		CastStealthAction(PlayerbotAI* ai) : CastSpellAction(ai, "stealth") {}
+		virtual string GetTargetName() { return "self target"; }
+	};
 
 	class CastFeintAction : public CastBuffSpellAction
 	{
@@ -66,12 +72,6 @@ namespace ai
 	{
 	public:
 		CastAdrenalineRushAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "adrenaline rush") {}
-	};
-
-	class CastKillingSpreeAction : public CastBuffSpellAction
-	{
-	public:
-		CastKillingSpreeAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "killing spree") {}
 	};
 
     class CastKickOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
