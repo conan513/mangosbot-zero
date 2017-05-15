@@ -28,6 +28,9 @@ AhBot.MaxRequiredLevel = 80
 # Ignore items by ID
 AhBot.IgnoreItemIds = 49283,52200,8494,6345,6891,2460
 
+# Notify about overpriced auctions
+AhBot.SendMail = 1
+
 AhBot.PriceMultiplier = 1.0
 AhBot.DefaultMinPrice = 20
 AhBot.PriceQualityMultiplier = 1.0

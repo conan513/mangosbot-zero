@@ -15,6 +15,7 @@
 #define AHBOT_WON_BID 3
 #define AHBOT_WON_DELAY 4
 #define AHBOT_SELL_DELAY 5
+#define AHBOT_SENDMAIL 6
 
 namespace ahbot
 {
@@ -74,6 +75,7 @@ namespace ahbot
         uint32 GetTime(string category, uint32 id, uint32 auctionHouse, uint32 type);
         void SetTime(string category, uint32 id, uint32 auctionHouse, uint32 type, uint32 value);
         uint32 GetSellTime(uint32 itemId, uint32 auctionHouse, Category*& category);
+        void CheckSendMail(uint32 bidder, uint32 price, AuctionEntry *entry);
 
     public:
         static uint32 auctionIds[MAX_AUCTIONS];
