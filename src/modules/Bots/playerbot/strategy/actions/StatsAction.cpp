@@ -71,11 +71,16 @@ void StatsAction::ListXP( ostringstream &out )
 {
     uint32 curXP = bot->GetUInt32Value(PLAYER_XP);
     uint32 nextLevelXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+    uint32 restXP = bot->GetUInt32Value(PLAYER_REST_STATE_EXPERIENCE);
     uint32 xpPercent = 0;
     if (nextLevelXP)
         xpPercent = 100 * curXP / nextLevelXP;
+    uint32 restPercent = 0;
+    if (restXP)
+        restPercent = 100 * restXP / nextLevelXP;
 
     out << "|r|cff00ff00" << xpPercent << "|r|cffffd333%" << "|h|cffffffff XP";
+    out << "(|r|cff00ff00" << restPercent << "|r|cffffd333%" << "|h|cffffffff rest)";
 }
 
 void StatsAction::ListRepairCost(ostringstream &out)
