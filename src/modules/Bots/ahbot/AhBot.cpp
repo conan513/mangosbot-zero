@@ -852,12 +852,24 @@ void AhBot::CheckCategoryMultipliers()
 
     CharacterDatabase.PExecute("DELETE FROM ahbot_category");
 
+    set<string> tmp;
     for (int i = 0; i < CategoryList::instance.size(); i++)
     {
         string name = CategoryList::instance[i]->GetName();
+        if (tmp.find(name) != tmp.end())
+            continue;
+
+        tmp.insert(name);
         if (categoryMultiplierExpireTimes[name] <= time(0) || categoryMultipliers[name] <= 0)
         {
-            categoryMultipliers[name] = (double)urand(20, 100) / 20.0;
+            uint32 k = urand(1, 100);
+            double m = 1.0;
+            double r = (double)urand(100, 200) / 100.0;
+            if (k < 50) m = r; // 1..2
+            else if (k < 80) m = 1 + r; // 2..3
+            else if (k < 90) m = 2 + r; // 3..4
+            else m = 3 + r; // 4..5
+            categoryMultipliers[name] = m;
             uint32 maxAllowedAuctionCount = CategoryList::instance[i]->GetMaxAllowedAuctionCount();
             categoryMaxAuctionCount[name] = urand(maxAllowedAuctionCount / 2, maxAllowedAuctionCount);
             categoryMultiplierExpireTimes[name] = time(0) + urand(4, 7) * 3600 * 24;
