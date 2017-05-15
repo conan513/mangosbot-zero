@@ -1075,13 +1075,31 @@ void AhBot::CheckSendMail(uint32 bidder, uint32 price, AuctionEntry *entry)
     if (entryTime > time(0))
         return;
 
+    const AuctionHouseEntry* ahEntry = sAuctionHouseStore.LookupEntry(entry->auctionHouseEntry->houseId);
+    if (!ahEntry)
+        return;
+
+    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(ahEntry);
+    const AuctionHouseObject::AuctionEntryMap& auctionEntryMap = auctionHouse->GetAuctions();
+    for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = auctionEntryMap.begin(); itr != auctionEntryMap.end(); ++itr)
+    {
+        AuctionEntry *otherEntry = itr->second;
+        if (otherEntry->owner == entry->owner && otherEntry->Id != entry->Id && otherEntry->itemTemplate == entry->itemTemplate)
+        {
+            time_t otherEntryTime = GetTime("entry", otherEntry->Id, entry->auctionHouseEntry->houseId, AHBOT_SENDMAIL);
+            if (otherEntryTime > time(0))
+                return;
+        }
+    }
+
     ostringstream body;
     body << "Hello,\n";
     body << "\n";
     Item *item = sAuctionMgr.GetAItem(entry->itemGuidLow);
     if (!item)
         return;
-    body << "I see you posted " << item->GetProto()->Name1 << " to the AH and I really need it at the moment. Could you lower your price at least to ";
+    body << "I see you posted " << ChatHelper::formatItem(item->GetProto(), item->GetCount());
+    body << " to the AH and I really need that at the moment. Could you lower your price at least to ";
     body << ChatHelper::formatMoney(PricingStrategy::RoundPrice(price)) << "? I'll buy it then.\n";
     body << "\n";
     body << "Regards,\n";
@@ -1092,7 +1110,8 @@ void AhBot::CheckSendMail(uint32 bidder, uint32 price, AuctionEntry *entry)
 
     body << name << "\n";
 
-    MailDraft draft("AH Proposition", body.str());
+    ostringstream title; title << "AH Proposition: " << item->GetProto()->Name1;
+    MailDraft draft(title.str(), body.str());
     ObjectGuid receiverGuid(HIGHGUID_PLAYER, entry->owner);
     draft.SendMailTo(MailReceiver(receiverGuid), MailSender(MAIL_NORMAL, bidder));
 
