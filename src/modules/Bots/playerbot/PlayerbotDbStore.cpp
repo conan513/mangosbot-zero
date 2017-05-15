@@ -80,6 +80,10 @@ void PlayerbotDbStore::Save(PlayerbotAI *ai)
         outSs << *i;
     }
     SaveValue(guid, "ss", outSs.str());
+
+    uint32 saveMana = (uint32)round(ai->GetAiObjectContext()->GetValue<double>("mana save level")->Get());
+    ostringstream outSaveMana; outSaveMana << "save mana " << saveMana;
+    SaveValue(guid, "save mana", outSaveMana.str());
 }
 
 string PlayerbotDbStore::FormatStrategies(string type, list<string> strategies)
