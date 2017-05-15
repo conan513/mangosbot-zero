@@ -73,35 +73,43 @@ void StatsAction::ListXP( ostringstream &out )
     uint32 nextLevelXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 restXP = bot->GetUInt32Value(PLAYER_REST_STATE_EXPERIENCE);
     uint32 xpPercent = 0;
+
     if (nextLevelXP)
         xpPercent = 100 * curXP / nextLevelXP;
     uint32 restPercent = 0;
     if (restXP)
         restPercent = 100 * restXP / nextLevelXP;
 
-    out << "|r|cff00ff00" << xpPercent << "|r|cffffd333%" << "|h|cffffffff XP";
-    out << "(|r|cff00ff00" << restPercent << "|r|cffffd333%" << "|h|cffffffff rest)";
+    out << "|r|cff00ff00" << xpPercent << "|r|cffffd333/|r|cff00ff00" << restPercent << "%|h|cffffffff XP";
 }
 
 void StatsAction::ListRepairCost(ostringstream &out)
 {
-    out << chat->formatMoney(EstRepairAll()) << " Repair";
-}
-
-uint32 StatsAction::EstRepairAll()
-{
-    uint32 TotalCost = 0;
-    // equipped, backpack, bags itself
+    uint32 totalCost = 0;
+    double percent = 0;
     for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
-        TotalCost += EstRepair(( (INVENTORY_SLOT_BAG_0 << 8) | i ));
+    {
+        uint16 pos = ( (INVENTORY_SLOT_BAG_0 << 8) | i );
+        totalCost += EstRepair(pos);
+        percent = (percent + RepairPercent(pos)) / 2;
+    }
 
-    // bank, buyback and keys not repaired
-
-    // items in inventory bags
     for(int j = INVENTORY_SLOT_BAG_START; j < INVENTORY_SLOT_BAG_END; ++j)
+    {
         for(int i = 0; i < MAX_BAG_SIZE; ++i)
-            TotalCost += EstRepair(( (j << 8) | i ));
-    return TotalCost;
+        {
+            uint16 pos = ( (j << 8) | i );
+            totalCost += EstRepair(pos);
+            percent = (percent + RepairPercent(pos)) / 2;
+        }
+    }
+
+    string color = "ff00ff00";
+    if (percent < 50)
+        color = "ffffff00";
+    if (percent < 25)
+        color = "ffff0000";
+    out << "|r|c" << color << (uint32)ceil(percent) << "% (" << chat->formatMoney(totalCost) << "|h|cffffffff) Repair";
 }
 
 uint32 StatsAction::EstRepair(uint16 pos)
@@ -147,4 +155,21 @@ uint32 StatsAction::EstRepair(uint16 pos)
         TotalCost = costs;
     }
     return TotalCost;
+}
+
+double StatsAction::RepairPercent(uint16 pos)
+{
+    Item* item = bot->GetItemByPos(pos);
+    if (!item)
+        return 100;
+
+    uint32 maxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
+    if(!maxDurability)
+        return 100;
+
+    uint32 curDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
+    if (!curDurability)
+        return 0;
+
+    return curDurability * 100.0 / maxDurability;
 }
