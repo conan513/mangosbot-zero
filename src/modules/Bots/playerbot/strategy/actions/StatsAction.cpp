@@ -80,36 +80,33 @@ void StatsAction::ListXP( ostringstream &out )
     if (restXP)
         restPercent = 100 * restXP / nextLevelXP;
 
-    out << "|r|cff00ff00" << xpPercent << "|r|cffffd333/|r|cff00ff00" << restPercent << "%|h|cffffffff XP";
+    out << "|cff00ff00" << xpPercent << "|cffffd333/|cff00ff00" << restPercent << "%|cffffffff XP";
 }
 
 void StatsAction::ListRepairCost(ostringstream &out)
 {
     uint32 totalCost = 0;
-    double percent = 0;
+    double repairPercent = 0;
+    double repairCount = 0;
     for(int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
         uint16 pos = ( (INVENTORY_SLOT_BAG_0 << 8) | i );
         totalCost += EstRepair(pos);
-        percent = (percent + RepairPercent(pos)) / 2;
-    }
-
-    for(int j = INVENTORY_SLOT_BAG_START; j < INVENTORY_SLOT_BAG_END; ++j)
-    {
-        for(int i = 0; i < MAX_BAG_SIZE; ++i)
+        double repair = RepairPercent(pos);
+        if (repair < 100)
         {
-            uint16 pos = ( (j << 8) | i );
-            totalCost += EstRepair(pos);
-            percent = (percent + RepairPercent(pos)) / 2;
+            repairPercent += repair;
+            repairCount++;
         }
     }
+    repairPercent /= repairCount;
 
     string color = "ff00ff00";
-    if (percent < 50)
+    if (repairPercent < 50)
         color = "ffffff00";
-    if (percent < 25)
+    if (repairPercent < 25)
         color = "ffff0000";
-    out << "|r|c" << color << (uint32)ceil(percent) << "% (" << chat->formatMoney(totalCost) << "|h|cffffffff) Repair";
+    out << "|c" << color << (uint32)ceil(repairPercent) << "% (" << chat->formatMoney(totalCost) << ")|cffffffff Dur";
 }
 
 uint32 StatsAction::EstRepair(uint16 pos)
