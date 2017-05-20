@@ -160,13 +160,26 @@ string ChatHelper::formatMoney(uint32 copper)
     copper -= (gold * 10000);
     uint32 silver = uint32(copper / 100);
     copper -= (silver * 100);
-    out << " ";
+
+    bool space = false;
     if (gold > 0)
-        out << gold <<  "g ";
+    {
+        out << gold <<  "g";
+        space = true;
+    }
+
     if (silver > 0 && gold < 50)
-        out << silver <<  "s ";
+    {
+        if (space) out << " ";
+        out << silver <<  "s";
+        space = true;
+    }
+
 	if (copper > 0 && gold < 10)
+	{
+        if (space) out << " ";
 		out << copper <<  "c";
+	}
 
     return out.str();
 }
