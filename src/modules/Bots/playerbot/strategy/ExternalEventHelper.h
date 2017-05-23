@@ -32,7 +32,6 @@ namespace ai
             if (!ChatHelper::parseable(command))
                 return false;
 
-            HandleCommand("q", command, owner);
             HandleCommand("c", command, owner);
             HandleCommand("t", command, owner);
             return true;

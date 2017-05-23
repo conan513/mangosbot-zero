@@ -41,98 +41,111 @@ bool QueryItemUsageAction::Execute(Event event)
         if (!item)
             return false;
 
-        ostringstream out; out << chat->formatItem(item, count);
-        if (created)
-            out << " created";
-        else if (received)
-            out << " received";
-        ai->TellMaster(out);
-
-        QueryItemUsage(item);
-        QueryQuestItem(itemId);
+        ai->TellMaster(QueryItem(item, count, GetCount(item)));
         return true;
     }
 
     string text = event.getParam();
-
     ItemIds items = chat->parseItems(text);
-    QueryItemsUsage(items);
+    for (ItemIds::iterator i = items.begin(); i != items.end(); i++)
+    {
+        ItemPrototype const *item = sItemStorage.LookupEntry<ItemPrototype>(*i);
+        if (!item) continue;
+
+        ai->TellMaster(QueryItem(item, 0, GetCount(item)));
+    }
     return true;
 }
 
-bool QueryItemUsageAction::QueryItemUsage(ItemPrototype const *item)
+uint32 QueryItemUsageAction::GetCount(ItemPrototype const *item)
+{
+    uint32 total = 0;
+    list<Item*> items = InventoryAction::parseItems(item->Name1);
+    if (!items.empty())
+    {
+        for (list<Item*>::iterator i = items.begin(); i != items.end(); ++i)
+        {
+            total += (*i)->GetCount();
+        }
+    }
+    return total;
+}
+
+string QueryItemUsageAction::QueryItem(ItemPrototype const *item, uint32 count, uint32 total)
+{
+    ostringstream out;
+    string usage = QueryItemUsage(item);
+    string quest = QueryQuestItem(item->ItemId);
+    string price = QueryItemPrice(item);
+    if (usage.empty())
+        usage = (quest.empty() ? "Useless" : "Quest");
+
+    out << chat->formatItem(item, count, total) << ": " << usage;
+    if (!quest.empty())
+        out << ", " << quest;
+    if (!price.empty())
+        out << ", " << price;
+    return out.str();
+}
+
+string QueryItemUsageAction::QueryItemUsage(ItemPrototype const *item)
 {
     ostringstream out; out << item->ItemId;
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
     switch (usage)
     {
     case ITEM_USAGE_EQUIP:
-        ai->TellMaster("Equip");
-        return true;
+        return "Equip";
     case ITEM_USAGE_REPLACE:
-        ai->TellMaster("Equip (replace)");
-        return true;
+        return "Equip (replace)";
     case ITEM_USAGE_SKILL:
-        ai->TellMaster("Tradeskill");
-        return true;
+        return "Tradeskill";
     case ITEM_USAGE_USE:
-        ai->TellMaster("Use");
-        return true;
+        return "Use";
 	case ITEM_USAGE_GUILD_TASK:
-		ai->TellMaster("Guild task");
-		return true;
+		return "Guild task";
 	}
 
-    return false;
+    return "";
 }
 
-void QueryItemUsageAction::QueryItemPrice(ItemPrototype const *item)
+string QueryItemUsageAction::QueryItemPrice(ItemPrototype const *item)
 {
     if (!sRandomPlayerbotMgr.IsRandomBot(bot))
-        return;
+        return "";
 
     if (item->Bonding == BIND_WHEN_PICKED_UP)
-        return;
+        return "";
 
+    ostringstream msg;
     list<Item*> items = InventoryAction::parseItems(item->Name1);
+    int32 sellPrice = 0;
     if (!items.empty())
     {
         for (list<Item*>::iterator i = items.begin(); i != items.end(); ++i)
         {
             Item* sell = *i;
-            int32 sellPrice = sell->GetCount() * auctionbot.GetSellPrice(sell->GetProto()) * sRandomPlayerbotMgr.GetSellMultiplier(bot);
-            ostringstream out;
-            out << "Selling " << chat->formatItem(sell->GetProto(), sell->GetCount()) << " for " << chat->formatMoney(sellPrice);
-            ai->TellMaster(out.str());
+            sellPrice = sell->GetCount() * auctionbot.GetSellPrice(sell->GetProto()) * sRandomPlayerbotMgr.GetSellMultiplier(bot);
+            msg << "Sell: " << chat->formatMoney(sellPrice);
         }
     }
 
     ostringstream out; out << item->ItemId;
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
     if (usage == ITEM_USAGE_NONE)
-        return;
+        return msg.str();
 
     int32 buyPrice = auctionbot.GetBuyPrice(item) * sRandomPlayerbotMgr.GetBuyMultiplier(bot);
     if (buyPrice)
     {
-        ostringstream out;
-        out << "Will buy for " << chat->formatMoney(buyPrice);
-        ai->TellMaster(out.str());
+        if (sellPrice) msg << " ";
+        msg << "Buy: " << chat->formatMoney(buyPrice);
     }
+
+    return msg.str();
 }
 
-void QueryItemUsageAction::QueryItemsUsage(ItemIds items)
-{
-    for (ItemIds::iterator i = items.begin(); i != items.end(); i++)
-    {
-        ItemPrototype const *item = sItemStorage.LookupEntry<ItemPrototype>(*i);
-        QueryItemUsage(item);
-        QueryQuestItem(*i);
-        QueryItemPrice(item);
-    }
-}
-
-void QueryItemUsageAction::QueryQuestItem(uint32 itemId)
+string QueryItemUsageAction::QueryQuestItem(uint32 itemId)
 {
     Player *bot = ai->GetBot();
     QuestStatusMap& questMap = bot->getQuestStatusMap();
@@ -147,13 +160,16 @@ void QueryItemUsageAction::QueryQuestItem(uint32 itemId)
         if (status == QUEST_STATUS_INCOMPLETE || (status == QUEST_STATE_COMPLETE && !bot->GetQuestRewardStatus(questId)))
         {
             QuestStatusData const& questStatus = i->second;
-            QueryQuestItem(itemId, questTemplate, &questStatus);
+            string usage = QueryQuestItem(itemId, questTemplate, &questStatus);
+            if (!usage.empty()) return usage;
         }
     }
+
+    return "";
 }
 
 
-void QueryItemUsageAction::QueryQuestItem(uint32 itemId, const Quest *questTemplate, const QuestStatusData *questStatus)
+string QueryItemUsageAction::QueryQuestItem(uint32 itemId, const Quest *questTemplate, const QuestStatusData *questStatus)
 {
     for (int i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {
@@ -166,7 +182,9 @@ void QueryItemUsageAction::QueryQuestItem(uint32 itemId, const Quest *questTempl
         if (!required)
             continue;
 
-        ai->TellMaster(chat->formatQuestObjective(chat->formatQuest(questTemplate), available, required));
+        return chat->formatQuestObjective(chat->formatQuest(questTemplate), available, required);
     }
+
+    return "";
 }
 

@@ -264,7 +264,7 @@ string ChatHelper::formatSpell(SpellEntry const *sInfo)
     return out.str();
 }
 
-string ChatHelper::formatItem(ItemPrototype const * proto, int count)
+string ChatHelper::formatItem(ItemPrototype const * proto, int count, int total)
 {
     char color[32];
     sprintf(color, "%x", ItemQualityColors[proto->Quality]);
@@ -276,6 +276,9 @@ string ChatHelper::formatItem(ItemPrototype const * proto, int count)
 
     if (count > 1)
         out << "x" << count;
+
+    if (total > 0)
+        out << " (" << total << ")";
 
     return out.str();
 }
