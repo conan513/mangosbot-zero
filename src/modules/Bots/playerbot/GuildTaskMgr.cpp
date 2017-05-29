@@ -226,10 +226,6 @@ bool GuildTaskMgr::SendAdvertisement(uint32 owner, uint32 guildId)
     if (!guild)
         return false;
 
-    Player* player = sObjectMgr.GetPlayer((uint64)owner);
-    if (!player)
-        return false;
-
     Player* leader = sObjectMgr.GetPlayer(guild->GetLeaderGuid());
     if (!leader)
         return false;
@@ -268,10 +264,20 @@ string formatTime(uint32 secs)
     return out.str();
 }
 
+string GetHelloText(uint32 owner)
+{
+    ostringstream body;
+    body << "Hello";
+    string playerName;
+    sObjectMgr.GetPlayerNameByGUID(ObjectGuid(HIGHGUID_PLAYER, owner), playerName);
+    if (!playerName.empty()) body << ", " << playerName;
+    body << ",\n\n";
+    return body.str();
+}
+
 bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 guildId, uint32 validIn)
 {
     Guild *guild = sGuildMgr.GetGuildById(guildId);
-    Player* player = sObjectMgr.GetPlayer((uint64)owner);
     Player* leader = sObjectMgr.GetPlayer(guild->GetLeaderGuid());
 
     ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
@@ -279,8 +285,7 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
         return false;
 
     ostringstream body;
-    body << "Hello, " << player->GetName() << ",\n";
-    body << "\n";
+    body << GetHelloText(owner);
     body << "We are in a great need of " << proto->Name1 << ". If you could sell us ";
     uint32 count = GetTaskValue(owner, guildId, "itemCount");
     if (count > 1)
@@ -296,7 +301,7 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
 
     ostringstream subject;
     subject << "Guild Task: " << proto->Name1;
-    MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(player), MailSender(leader));
+    MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
     return true;
 }
@@ -305,7 +310,6 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
 bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32 guildId, uint32 validIn)
 {
     Guild *guild = sGuildMgr.GetGuildById(guildId);
-    Player* player = sObjectMgr.GetPlayer((uint64)owner);
     Player* leader = sObjectMgr.GetPlayer(guild->GetLeaderGuid());
 
     CreatureInfo const* proto = sObjectMgr.GetCreatureTemplate(creatureId);
@@ -335,8 +339,7 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
     delete result;
 
     ostringstream body;
-    body << "Hello, " << player->GetName() << ",\n";
-    body << "\n";
+    body << GetHelloText(owner);
     body << "As you probably know " << proto->Name << " is wanted dead for the crimes it did against our guild. If you should kill it ";
     body << "we'd really appreciate that.\n";
     if (!location.empty())
@@ -351,7 +354,8 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
     subject << "Guild Task: " << proto->Name;
     if (!location.empty())
         subject << ", " << location;
-    MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(player), MailSender(leader));
+
+    MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
     return true;
 }
@@ -360,10 +364,6 @@ bool GuildTaskMgr::SendThanks(uint32 owner, uint32 guildId)
 {
     Guild *guild = sGuildMgr.GetGuildById(guildId);
     if (!guild)
-        return false;
-
-    Player* player = sObjectMgr.GetPlayer((uint64)owner);
-    if (!player)
         return false;
 
     Player* leader = sObjectMgr.GetPlayer(guild->GetLeaderGuid());
@@ -378,8 +378,7 @@ bool GuildTaskMgr::SendThanks(uint32 owner, uint32 guildId)
             return false;
 
         ostringstream body;
-        body << "Hello, " << player->GetName() << ",\n";
-        body << "\n";
+        body << GetHelloText(owner);
         body << "One of our guild members wishes to thank you for the " << proto->Name1 << "!";
         uint32 count = GetTaskValue(owner, guildId, "itemCount");
         if (count)
@@ -394,7 +393,7 @@ bool GuildTaskMgr::SendThanks(uint32 owner, uint32 guildId)
 
         MailDraft("Thank You", body.str()).
                 SetMoney(GetTaskValue(owner, guildId, "payment")).
-                SendMailTo(MailReceiver(player), MailSender(leader));
+                SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
         return true;
     }
@@ -747,10 +746,6 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
     if (!guild)
         return false;
 
-    Player* player = sObjectMgr.GetPlayer((uint64)owner);
-    if (!player)
-        return false;
-
     Player* leader = sObjectMgr.GetPlayer(guild->GetLeaderGuid());
     if (!leader)
         return false;
@@ -761,8 +756,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         return false;
 
     ostringstream body;
-    body << "Hello, " << player->GetName() << ",\n";
-    body << "\n";
+    body << GetHelloText(owner);
 
     RandomItemType rewardType;
     if (itemTask)
@@ -802,7 +796,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         draft.AddItem(item);
     }
 
-    draft.SetMoney(GetTaskValue(owner, guildId, "payment")).SendMailTo(MailReceiver(player), MailSender(leader));
+    draft.SetMoney(GetTaskValue(owner, guildId, "payment")).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
     SetTaskValue(owner, guildId, "activeTask", 0, 0);
     return true;
