@@ -312,11 +312,35 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
     if (!proto)
         return false;
 
+    QueryResult *result = WorldDatabase.PQuery("SELECT map, position_x, position_y, position_z FROM creature where id = '%u'", creatureId);
+    if (!result)
+        return false;
+
+    string location;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 mapid = fields[0].GetUInt32();
+        float x = fields[1].GetFloat();
+        float y = fields[2].GetFloat();
+        float z = fields[3].GetFloat();
+        Map* map = sMapMgr.FindMap(mapid, 0);
+        if (!map) continue;
+        uint32 area = map->GetTerrain()->GetAreaId(x, y, z);
+        const AreaTableEntry* entry = sAreaStore.LookupEntry(area);
+        if (!entry) continue;
+        location = entry->area_name[0];
+        break;
+    } while (result->NextRow());
+    delete result;
+
     ostringstream body;
     body << "Hello, " << player->GetName() << ",\n";
     body << "\n";
     body << "As you probably know " << proto->Name << " is wanted dead for the crimes it did against our guild. If you should kill it ";
     body << "we'd really appreciate that.\n";
+    if (!location.empty())
+        body << proto->Name << "'s the last known location was " << location << ".\n";
     body << "The task will expire in " << formatTime(validIn) << "\n";
     body << "\n";
     body << "Best Regards,\n";
@@ -325,6 +349,8 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
 
     ostringstream subject;
     subject << "Guild Task: " << proto->Name;
+    if (!location.empty())
+        subject << ", " << location;
     MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(player), MailSender(leader));
 
     return true;
@@ -608,9 +634,19 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
         return true;
     }
 
-    if (cmd.find("reward ") != string::npos)
+    if (cmd == "advert")
     {
-        string charName = cmd.substr(cmd.find("reward ") + 7);
+        sLog.outString("Usage: gtask advert <player name>");
+        return true;
+    }
+
+    bool reward = cmd.find("reward ") != string::npos;
+    bool advert = cmd.find("advert ") != string::npos;
+    if (reward || advert)
+    {
+        string charName;
+        if (reward) charName = cmd.substr(cmd.find("reward ") + 7);
+        if (advert) charName = cmd.substr(cmd.find("advert ") + 7);
         ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(charName);
         if (!guid)
         {
@@ -633,7 +669,8 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
                 if (!guild)
                     continue;
 
-                sGuildTaskMgr.Reward(owner, guildId);
+                if (reward) sGuildTaskMgr.Reward(owner, guildId);
+                if (advert) sGuildTaskMgr.SendAdvertisement(owner, guildId);
             } while (result->NextRow());
 
             Field* fields = result->Fetch();
