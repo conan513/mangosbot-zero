@@ -104,6 +104,8 @@ string QueryItemUsageAction::QueryItemUsage(ItemPrototype const *item)
         return "Use";
 	case ITEM_USAGE_GUILD_TASK:
 		return "Guild task";
+	case ITEM_USAGE_DISENCHANT:
+		return "Disenchant";
 	}
 
     return "";
