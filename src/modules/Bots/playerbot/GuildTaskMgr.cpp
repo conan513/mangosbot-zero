@@ -351,7 +351,10 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
     body << leader->GetName() << "\n";
 
     ostringstream subject;
-    subject << "Guild Task: " << proto->Name;
+    subject << "Guild Task: ";
+    if (proto->Rank == CREATURE_ELITE_ELITE || proto->Rank == CREATURE_ELITE_RAREELITE || proto->Rank == CREATURE_ELITE_WORLDBOSS)
+        subject << "(Elite) ";
+    subject << proto->Name;
     if (!location.empty())
         subject << ", " << location;
 
