@@ -34,7 +34,7 @@ ItemUsage ItemUsageValue::Calculate()
         return equip;
 
     if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP &&
-            bot->HasSkill(SKILL_ENCHANTING))
+            bot->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
         return ITEM_USAGE_DISENCHANT;
 
     return ITEM_USAGE_NONE;
