@@ -231,11 +231,13 @@ bool GuildTaskMgr::SendAdvertisement(uint32 owner, uint32 guildId)
         return false;
 
     uint32 validIn;
-    uint32 itemTask = GetTaskValue(owner, guildId, "itemTask", &validIn);
+    GetTaskValue(owner, guildId, "activeTask", &validIn);
+
+    uint32 itemTask = GetTaskValue(owner, guildId, "itemTask");
     if (itemTask)
         return SendItemAdvertisement(itemTask, owner, guildId, validIn);
 
-    uint32 killTask = GetTaskValue(owner, guildId, "killTask", &validIn);
+    uint32 killTask = GetTaskValue(owner, guildId, "killTask");
     if (killTask)
         return SendKillAdvertisement(killTask, owner, guildId, validIn);
 
@@ -262,6 +264,16 @@ string formatTime(uint32 secs)
     }
 
     return out.str();
+}
+
+string formatDateTime(uint32 secs)
+{
+    time_t rawtime = time(0) + secs;
+    tm* timeinfo = localtime (&rawtime);
+
+    char buffer[256];
+    strftime(buffer, sizeof(buffer), "%b %d, %H:%M", timeinfo);
+    return string(buffer);
 }
 
 string GetHelloText(uint32 owner)
@@ -292,8 +304,8 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
         body << "at least " << count << " of them ";
     else
         body << "some ";
-    body << "we'd really appreciate that and pay a high price.\n";
-    body << "The task will expire in " << formatTime(validIn) << "\n";
+    body << "we'd really appreciate that and pay a high price.\n\n";
+    body << "The task will expire at " << formatDateTime(validIn) << "\n";
     body << "\n";
     body << "Best Regards,\n";
     body << guild->GetName() << "\n";
@@ -341,10 +353,10 @@ bool GuildTaskMgr::SendKillAdvertisement(uint32 creatureId, uint32 owner, uint32
     ostringstream body;
     body << GetHelloText(owner);
     body << "As you probably know " << proto->Name << " is wanted dead for the crimes it did against our guild. If you should kill it ";
-    body << "we'd really appreciate that.\n";
+    body << "we'd really appreciate that.\n\n";
     if (!location.empty())
         body << proto->Name << "'s the last known location was " << location << ".\n";
-    body << "The task will expire in " << formatTime(validIn) << "\n";
+    body << "The task will expire at " << formatDateTime(validIn) << "\n";
     body << "\n";
     body << "Best Regards,\n";
     body << guild->GetName() << "\n";
