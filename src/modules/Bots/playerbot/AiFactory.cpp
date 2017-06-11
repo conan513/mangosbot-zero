@@ -127,8 +127,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategies("flee", "cure", NULL);
             break;
         case CLASS_MAGE:
-			if ((tab == 0) && (player->getLevel() > 9))
-				engine->addStrategies("arcane", "arcane aoe", "threat", NULL);
+			if (tab == 0) 
+			{
+				if (player->getLevel() > 9)
+                engine->addStrategies("arcane", "arcane aoe", "threat", NULL);
+
+				else engine->addStrategies("fire", "fire aoe", "threat", NULL);
+}
 			else if ((tab == 1) && (player->getLevel() > 9))
 				engine->addStrategies("fire", "fire aoe", "threat", NULL);
 			else if ((tab == 2) && (player->getLevel() > 9))
