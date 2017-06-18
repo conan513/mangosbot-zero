@@ -101,20 +101,56 @@ void SuggestWhatToDoAction::grindMaterials()
     if (bot->getLevel() <= 5)
         return;
 
-    switch (urand(0, 5))
+    QueryResult *result = CharacterDatabase.PQuery("SELECT distinct category, multiplier FROM ahbot_category where category not in ('other', 'quest', 'trade', 'reagent') and multiplier > 3 order by multiplier desc limit 10");
+    if (!result)
+        return;
+
+    map<string, double> categories;
+    do
     {
-    case 0:
-        spam("Need help for tradeskill?");
-        break;
-    case 1:
-        spam("Can we have some trade material grinding?");
-        break;
-    case 2:
-        spam("I have some trade materials for sell");
-        break;
-    default:
-        spam("I am going to grind some trade materials. Would you like to join me?");
+        Field* fields = result->Fetch();
+        categories[fields[0].GetCppString()] = fields[1].GetDouble();
+    } while (result->NextRow());
+
+    for (map<string, double>::iterator i = categories.begin(); i != categories.end(); ++i)
+    {
+        if (urand(0, 10) < 3) {
+            string name = i->first;
+            double multiplier = i->second;
+
+            for (int j = 0; j < ahbot::CategoryList::instance.size(); j++)
+            {
+                ahbot::Category* category = ahbot::CategoryList::instance[j];
+                if (name == category->GetName())
+                {
+                    string item = category->GetLabel();
+                    transform(item.begin(), item.end(), item.begin(), tolower);
+                    ostringstream itemout, msg;
+                    itemout << "|c0000FF00" << item << "|cffffffff";
+                    item = itemout.str();
+                    msg << "|cffffffff";
+                    switch (urand(0, 4))
+                    {
+                    case 0:
+                        msg << "Need help for tradeskill? I've heard that " << item << " are a good sell on the AH at the moment.";
+                        break;
+                    case 1:
+                        msg << "Can we have some trade material grinding? Especially for " << item << "?";
+                        break;
+                    case 2:
+                        msg << "I have some trade materials for sell. You know, " << item << " are very expensive now, I'd sell it cheaper";
+                        break;
+                    default:
+                        msg << "I am going to grind some trade materials, " << item << " to be exact. Would you like to join me?";
+                    }
+                    spam(msg.str());
+                    break;
+                }
+            }
+        }
     }
+
+    delete result;
 }
 
 void SuggestWhatToDoAction::grindReputation()

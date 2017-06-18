@@ -19,6 +19,7 @@ namespace ai
             creators["drop"] = &ChatTriggerContext::drop;
             creators["q"] = &ChatTriggerContext::q;
             creators["ll"] = &ChatTriggerContext::ll;
+            creators["ss"] = &ChatTriggerContext::ss;
             creators["loot all"] = &ChatTriggerContext::loot_all;
             creators["add all loot"] = &ChatTriggerContext::loot_all;
             creators["release"] = &ChatTriggerContext::release;
@@ -58,7 +59,7 @@ namespace ai
             creators["grind"] = &ChatTriggerContext::grind;
             creators["tank attack"] = &ChatTriggerContext::tank_attack;
             creators["talk"] = &ChatTriggerContext::talk;
-            creators["cast"] = &ChatTriggerContext::talk;
+            creators["cast"] = &ChatTriggerContext::cast;
             creators["invite"] = &ChatTriggerContext::invite;
             creators["spell"] = &ChatTriggerContext::spell;
             creators["rti"] = &ChatTriggerContext::rti;
@@ -74,9 +75,11 @@ namespace ai
             creators["formation"] = &ChatTriggerContext::formation;
             creators["sendmail"] = &ChatTriggerContext::sendmail;
             creators["outfit"] = &ChatTriggerContext::outfit;
+            creators["go"] = &ChatTriggerContext::go;
         }
 
     private:
+        static Trigger* go(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "go"); }
         static Trigger* outfit(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "outfit"); }
         static Trigger* sendmail(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "sendmail"); }
         static Trigger* formation(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "formation"); }
@@ -129,6 +132,7 @@ namespace ai
         static Trigger* teleport(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "teleport"); }
         static Trigger* q(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "q"); }
         static Trigger* ll(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "ll"); }
+        static Trigger* ss(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "ss"); }
         static Trigger* drop(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "drop"); }
         static Trigger* quests(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "quests"); }
         static Trigger* stats(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "stats"); }

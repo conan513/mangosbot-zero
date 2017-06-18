@@ -133,17 +133,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed)
     if (bot->IsBeingTeleported())
         return;
 
-    if (nextAICheckDelay > sPlayerbotAIConfig.globalCoolDown &&
-            bot->IsNonMeleeSpellCasted(true, true, false) &&
-            *GetAiObjectContext()->GetValue<bool>("invalid target", "current target"))
-    {
-        Spell* spell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-        if (spell && !IsPositiveSpell(spell->m_spellInfo))
-        {
-            InterruptSpell();
-        }
-    }
-
     Pet* pet = bot->GetPet();
     if (pet && pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
     {
@@ -674,7 +663,7 @@ bool PlayerbotAI::TellMaster(string text, PlayerbotSecurityLevel securityLevel)
     if (!TellMasterNoFacing(text, securityLevel))
         return false;
 
-    if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId())
+    if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId() && !bot->IsTaxiFlying())
     {
         if (!bot->IsInFront(master, sPlayerbotAIConfig.sightDistance, M_PI / 2))
             bot->SetFacingTo(bot->GetAngle(master));
@@ -960,7 +949,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     }
 
 
-    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2) && !bot->IsTaxiFlying())
     {
         bot->SetFacingTo(bot->GetAngle(faceTo));
         spell->cancel();
@@ -1002,11 +991,6 @@ void PlayerbotAI::WaitForSpellCast(Spell *spell)
 
 void PlayerbotAI::InterruptSpell()
 {
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-        return;
-
-    LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get();
-
     for (int type = CURRENT_MELEE_SPELL; type < CURRENT_CHANNELED_SPELL; type++)
     {
         Spell* spell = bot->GetCurrentSpell((CurrentSpellTypes)type);
@@ -1034,8 +1018,6 @@ void PlayerbotAI::InterruptSpell()
 
         SpellInterrupted(spell->m_spellInfo->Id);
     }
-
-    SpellInterrupted(lastSpell.id);
 }
 
 

@@ -29,14 +29,24 @@ CategoryList::CategoryList()
     Add(new Recipe());
     Add(new Container());
 
+    Add(new TradeSkill(SKILL_TAILORING));
+    Add(new TradeSkill(SKILL_LEATHERWORKING));
+    Add(new TradeSkill(SKILL_ENGINEERING));
+    Add(new TradeSkill(SKILL_BLACKSMITHING));
+    Add(new TradeSkill(SKILL_ALCHEMY));
+    Add(new TradeSkill(SKILL_ENCHANTING));
+    Add(new TradeSkill(SKILL_FISHING));
+    Add(new TradeSkill(SKILL_FIRST_AID));
+    Add(new TradeSkill(SKILL_COOKING));
+    Add(new TradeSkill(SKILL_MINING));
+    Add(new TradeSkill(SKILL_HERBALISM));
+    Add(new TradeSkill(SKILL_SKINNING));
     Add(new Reagent());
-    Add(new Trade());
     Add(new Alchemy());
     Add(new Scroll());
     Add(new Food());
     Add(new Bandage());
 
-    Add(new Trade());
     Add(new Engineering());
 
     Add(new OtherConsumable());

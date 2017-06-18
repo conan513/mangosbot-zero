@@ -81,16 +81,16 @@ void PlayerbotFactory::Prepare()
 
 void PlayerbotFactory::Randomize(bool incremental)
 {
-    sLog.outString("Preparing to randomize...");
+    sLog.outDetail("Preparing to randomize...");
     Prepare();
 
-    sLog.outString("Resetting player...");
+    sLog.outDetail("Resetting player...");
     bot->resetTalents(true);
     ClearSpells();
     ClearInventory();
     bot->SaveToDB();
 
-    sLog.outString("Initializing quests...");
+    sLog.outDetail("Initializing quests...");
     //InitQuests();
     // quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
@@ -99,55 +99,55 @@ void PlayerbotFactory::Randomize(bool incremental)
     CancelAuras();
     bot->SaveToDB();
 
-    sLog.outString("Initializing spells (step 1)...");
+    sLog.outDetail("Initializing spells (step 1)...");
     InitAvailableSpells();
 
-    sLog.outString("Initializing skills (step 1)...");
+    sLog.outDetail("Initializing skills (step 1)...");
     InitSkills();
     InitTradeSkills();
 
-    sLog.outString("Initializing talents...");
+    sLog.outDetail("Initializing talents...");
     InitTalents();
 
-    sLog.outString("Initializing spells (step 2)...");
+    sLog.outDetail("Initializing spells (step 2)...");
     InitAvailableSpells();
     InitSpecialSpells();
 
-    sLog.outString("Initializing mounts...");
+    sLog.outDetail("Initializing mounts...");
     InitMounts();
 
-    sLog.outString("Initializing skills (step 2)...");
+    sLog.outDetail("Initializing skills (step 2)...");
     UpdateTradeSkills();
     bot->SaveToDB();
 
-    sLog.outString("Initializing equipmemt...");
+    sLog.outDetail("Initializing equipmemt...");
     InitEquipment(incremental);
 
-    sLog.outString("Initializing bags...");
+    sLog.outDetail("Initializing bags...");
     InitBags();
 
-    sLog.outString("Initializing ammo...");
+    sLog.outDetail("Initializing ammo...");
     InitAmmo();
 
-    sLog.outString("Initializing food...");
+    sLog.outDetail("Initializing food...");
     InitFood();
 
-    sLog.outString("Initializing potions...");
+    sLog.outDetail("Initializing potions...");
     InitPotions();
 
-    sLog.outString("Initializing second equipment set...");
+    sLog.outDetail("Initializing second equipment set...");
     InitSecondEquipmentSet();
 
-    sLog.outString("Initializing inventory...");
+    sLog.outDetail("Initializing inventory...");
     InitInventory();
 
-    sLog.outString("Initializing guilds...");
+    sLog.outDetail("Initializing guilds...");
     InitGuild();
 
-    sLog.outString("Initializing pet...");
+    sLog.outDetail("Initializing pet...");
     InitPet();
 
-    sLog.outString("Saving to DB...");
+    sLog.outDetail("Saving to DB...");
     bot->SetMoney(urand(level * 1000, level * 5 * 1000));
     bot->SaveToDB();
 }
@@ -1165,6 +1165,7 @@ void AddPrevQuests(uint32 questId, list<uint32>& questIds)
     {
         uint32 prevId = abs(*iter);
         AddPrevQuests(prevId, questIds);
+        questIds.remove(prevId);
         questIds.push_back(prevId);
     }
 }
@@ -1184,6 +1185,7 @@ void PlayerbotFactory::InitQuests()
             continue;
 
         AddPrevQuests(questId, questIds);
+        questIds.remove(questId);
         questIds.push_back(questId);
     }
 

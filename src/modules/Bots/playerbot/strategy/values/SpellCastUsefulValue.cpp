@@ -48,5 +48,25 @@ bool SpellCastUsefulValue::Calculate()
             return false;
     }
 
+    set<uint32>& skipSpells = AI_VALUE(set<uint32>&, "skip spells list");
+    if (skipSpells.find(spellid) != skipSpells.end())
+        return false;
+
+    const string spellName = spellInfo->SpellName[0];
+    for (set<uint32>::iterator i = skipSpells.begin(); i != skipSpells.end(); ++i)
+    {
+        SpellEntry const *spell = sSpellStore.LookupEntry(*i);
+        if (!spell)
+            continue;
+
+        wstring wnamepart;
+        if (!Utf8toWStr(spell->SpellName[0], wnamepart))
+            continue;
+
+        wstrToLower(wnamepart);
+        if (!spellName.empty() && spellName.length() == wnamepart.length() && Utf8FitTo(spellName, wnamepart))
+            return false;
+    }
+
 	return true;
 }
