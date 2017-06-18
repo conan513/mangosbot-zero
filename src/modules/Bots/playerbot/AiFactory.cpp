@@ -122,17 +122,24 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     engine->addStrategy("dps debuff");
             }
             else
-                engine->addStrategy("heal");
+                engine->addStrategies("heal", "holy", NULL);
 
-            engine->addStrategies("dps assist", "flee", "cure", NULL);
+            engine->addStrategies("flee", "cure", NULL);
             break;
         case CLASS_MAGE:
-            if (tab == 0)
-                engine->addStrategies("arcane", "threat", NULL);
-            else if (tab == 1)
-                engine->addStrategies("fire", "fire aoe", "threat", NULL);
-            else
-                engine->addStrategies("frost", "frost aoe", "threat", NULL);
+			if (tab == 0) 
+			{
+				if (player->getLevel() > 9)
+                engine->addStrategies("arcane", "arcane aoe", "threat", NULL);
+
+				else engine->addStrategies("fire", "fire aoe", "threat", NULL);
+}
+			else if ((tab == 1) && (player->getLevel() > 9))
+				engine->addStrategies("fire", "fire aoe", "threat", NULL);
+			else if ((tab == 2) && (player->getLevel() > 9))
+				engine->addStrategies("frost", "frost aoe", "threat", NULL);
+			else
+				engine->addStrategies("fire", "threat", NULL);
 
             engine->addStrategies("dps assist", "flee", "cure", NULL);
             break;
@@ -143,12 +150,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("dps", "dps assist", "threat", NULL);
             break;
         case CLASS_SHAMAN:
-            if (tab == 0)
+            if ((tab == 0) && (player->getLevel() > 9))
                 engine->addStrategies("caster", "caster aoe", "bmana", "threat", "flee", NULL);
-            else if (tab == 2)
+            else if ((tab == 2) && (player->getLevel() > 9))
                 engine->addStrategies("heal", "bmana", "flee", NULL);
-            else
+            else if ((tab == 1) && (player->getLevel() > 9))
                 engine->addStrategies("dps", "melee aoe", "bdps", "threat", NULL);
+
+			else engine->addStrategies("caster", "bmana", "threat", "flee", NULL);
 
             engine->addStrategies("dps assist", "cure", NULL);
             break;
@@ -159,16 +168,19 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("dps", "bdps", "threat", "dps assist", "cure", NULL);
             break;
         case CLASS_DRUID:
-            if (tab == 0)
+            if ((tab == 0) && (player->getLevel() > 9))
             {
                 engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", NULL);
                 if (player->getLevel() > 19)
                     engine->addStrategy("caster debuff");
             }
-            else if (tab == 2)
+            else if ((tab == 2) && (player->getLevel() > 9))
                 engine->addStrategies("heal", "cure", "flee", "dps assist", NULL);
-            else
-                engine->addStrategies("bear", "tank aoe", "flee", NULL);
+
+			else if ((tab == 1) && (player->getLevel() > 9))
+                engine->addStrategies("bear", "tank aoe", NULL);
+
+			else engine->addStrategies("caster", "cure", "threat", "flee", "dps assist", NULL);
             break;
         case CLASS_HUNTER:
             engine->addStrategies("dps", "bdps", "threat", "dps assist", NULL);
@@ -179,15 +191,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategies("dps", "threat", "dps assist", NULL);
             break;
         case CLASS_WARLOCK:
-            if (tab == 1)
-                engine->addStrategies("tank", "threat", NULL);
-            else
-                engine->addStrategies("dps", "threat", NULL);
-
+            
+                engine->addStrategies("dps", "threat", "dps assist", "flee", NULL);
+            
             if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
 
-            engine->addStrategies("dps assist", "flee", NULL);
             break;
     }
 

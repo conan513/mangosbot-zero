@@ -27,6 +27,12 @@ namespace ai
 	class CastRegrowthAction : public CastHealingSpellAction {
 	public:
 		CastRegrowthAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "regrowth") {}
+	};
+
+	class CastProwlAction : public CastSpellAction {
+	public:
+		CastProwlAction(PlayerbotAI* ai) : CastSpellAction(ai, "prowl") {}
+	virtual string GetTargetName() { return "self target"; }
 
 	};
 
@@ -84,11 +90,6 @@ namespace ai
 		CastMarkOfTheWildOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "mark of the wild") {}
 	};
 
-	class CastSurvivalInstinctsAction : public CastBuffSpellAction {
-	public:
-		CastSurvivalInstinctsAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "survival instincts") {}
-	};
-
 	class CastThornsAction : public CastBuffSpellAction {
 	public:
 		CastThornsAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "thorns") {}
@@ -98,12 +99,6 @@ namespace ai
 	{
 	public:
 		CastWrathAction(PlayerbotAI* ai) : CastSpellAction(ai, "wrath") {}
-	};
-
-	class CastStarfallAction : public CastSpellAction
-	{
-	public:
-		CastStarfallAction(PlayerbotAI* ai) : CastSpellAction(ai, "starfall") {}
 	};
 
 	class CastHurricaneAction : public CastSpellAction
@@ -183,10 +178,16 @@ namespace ai
         virtual NextAction** getAlternatives();
     };
 
-    class CastBarskinAction : public CastBuffSpellAction
+	class CastFrenziedRegenerationAction : public CastBuffSpellAction
+	{
+	public:
+		CastFrenziedRegenerationAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "frenzied regeneration") {}
+	};
+
+    class CastBarkskinAction : public CastBuffSpellAction
     {
     public:
-        CastBarskinAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "barskin") {}
+        CastBarkskinAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "barkskin") {}
     };
 
     class CastInnervateAction : public CastSpellAction

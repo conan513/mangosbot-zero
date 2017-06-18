@@ -9,7 +9,6 @@ class FeralDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode
 public:
     FeralDruidStrategyActionNodeFactory()
     {
-        creators["survival instincts"] = &survival_instincts;
         creators["thorns"] = &thorns;
         creators["cure poison"] = &cure_poison;
         creators["cure poison on party"] = &cure_poison_on_party;
@@ -17,13 +16,6 @@ public:
         creators["abolish poison on party"] = &abolish_poison_on_party;
     }
 private:
-    static ActionNode* survival_instincts(PlayerbotAI* ai)
-    {
-        return new ActionNode ("survival instincts",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("barskin"), NULL),
-            /*C*/ NULL);
-    }
     static ActionNode* thorns(PlayerbotAI* ai)
     {
         return new ActionNode ("thorns",
@@ -85,6 +77,10 @@ void FeralDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "critical health",
-        NextAction::array(0, new NextAction("survival instincts", ACTION_EMERGENCY + 1), NULL)));
+        NextAction::array(0, new NextAction("dire bear form", ACTION_EMERGENCY + 2), new NextAction("frenzied regeneration", ACTION_EMERGENCY + 1), NULL)));
+	
+	triggers.push_back(new TriggerNode(
+		"cat form",
+		NextAction::array(0, new NextAction("prowl", 21.0f), NULL)));
 }
 

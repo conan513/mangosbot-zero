@@ -28,10 +28,6 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "tree form",
-        NextAction::array(0, new NextAction("tree form", ACTION_HIGH + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "medium health",
         NextAction::array(0, new NextAction("regrowth", ACTION_MEDIUM_HEAL + 2), NULL)));
 

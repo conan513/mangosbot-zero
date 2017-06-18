@@ -14,7 +14,6 @@ bool ShamanWeaponTrigger::IsActive()
         spells.push_back("frostbrand weapon");
         spells.push_back("rockbiter weapon");
         spells.push_back("flametongue weapon");
-        spells.push_back("earthliving weapon");
         spells.push_back("windfury weapon");
     }
 
