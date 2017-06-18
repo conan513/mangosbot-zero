@@ -399,10 +399,20 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
 
 void RandomPlayerbotMgr::Randomize(Player* bot)
 {
-    if (bot->getLevel() == 1)
-        RandomizeFirst(bot);
-    else
-        IncreaseLevel(bot);
+		if (bot->getLevel() == 1)
+		{
+			RandomizeFirst(bot);
+		}
+		else
+		{
+			// EJ bot wont increase level
+			if (bot->IsDead())
+				bot->ResurrectPlayer(1.0f);
+			bot->CombatStop(true);
+			IncreaseLevel(bot);
+			RandomTeleportForLevel(bot);
+		}
+	
 }
 
 void RandomPlayerbotMgr::IncreaseLevel(Player* bot)

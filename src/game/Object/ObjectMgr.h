@@ -472,15 +472,35 @@ class ObjectMgr
 {
         friend class PlayerDumpReader;
 
-    public:
+public:
         ObjectMgr();
         ~ObjectMgr();
+
+public:
+	typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
+
+	// EJ objects 	
+	QuestMap m_ClassSpellQuestTemplates;
+	std::unordered_map<uint32, uint32> mTamableBeastsEntryStore;
+	// inventory type, sub class, required level, seq index
+	std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, uint32>>>> mCategorizedEquipmentEntryStore;
+
+	QuestMap const& GetClassSpellQuestTemplates() const
+	{
+		return m_ClassSpellQuestTemplates;
+	}
+	std::unordered_map<uint32, uint32> GetTamableBeastsEntryStore() const
+	{
+		return mTamableBeastsEntryStore;
+	}
+	std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, uint32>>>> GetCategorizedEquipmentEntryStore()
+	{
+		return mCategorizedEquipmentEntryStore;
+	}
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
         typedef UNORDERED_MAP<uint32, Group*> GroupMap;
-
-        typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
 
         typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
 

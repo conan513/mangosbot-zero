@@ -146,8 +146,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategies("tank", "tank aoe", NULL);
-            else
-                engine->addStrategies("dps", "dps assist", "threat", NULL);
+			else if (tab == 0)
+				engine->addStrategies("arms dps", "dps assist", "threat", NULL);
+			else if (tab == 1)
+                engine->addStrategies("fury dps", "dps assist", "threat", NULL);
             break;
         case CLASS_SHAMAN:
             if ((tab == 0) && (player->getLevel() > 9))

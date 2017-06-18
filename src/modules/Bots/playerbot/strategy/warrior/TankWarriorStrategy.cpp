@@ -77,11 +77,10 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrate
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("revenge", ACTION_NORMAL + 6),
+    return NextAction::array(0, new NextAction("revenge", ACTION_HIGH + 2),
 		new NextAction("shield slam", ACTION_NORMAL + 5),
 		new NextAction("shield block", ACTION_NORMAL + 4),
 		new NextAction("sunder armor", ACTION_NORMAL + 3),
-		new NextAction("heroic strike", ACTION_NORMAL + 2),
 		new NextAction("melee", ACTION_NORMAL),
 		NULL);
 }
