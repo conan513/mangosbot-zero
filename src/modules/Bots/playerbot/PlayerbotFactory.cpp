@@ -10,6 +10,7 @@
 #include "ahbot/AhBot.h"
 #include "RandomPlayerbotFactory.h"
 
+
 using namespace ai;
 using namespace std;
 
@@ -91,7 +92,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SaveToDB();
 
     sLog.outDetail("Initializing quests...");
-    //InitQuests();
+    InitQuests();
     // quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
     ClearInventory();
@@ -112,7 +113,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     sLog.outDetail("Initializing spells (step 2)...");
     InitAvailableSpells();
     InitSpecialSpells();
-
+	
     sLog.outDetail("Initializing mounts...");
     InitMounts();
 
@@ -147,7 +148,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     sLog.outDetail("Initializing pet...");
     InitPet();
 
-    sLog.outDetail("Saving to DB...");
+    sLog.outString("Initializing spells (quest)...");
+    InitQuestSpells();
+
+    sLog.outString("Saving to DB...");
     bot->SetMoney(urand(level * 1000, level * 5 * 1000));
     bot->SaveToDB();
 }
@@ -1065,6 +1069,18 @@ void PlayerbotFactory::InitAvailableSpells()
     }
 }
 
+// EJ init quest spells
+void PlayerbotFactory::InitQuestSpells()
+{
+	std::unordered_map<uint32, Quest*> allClassSpellQuestTemplates = sObjectMgr.GetClassSpellQuestTemplates();
+	for (std::unordered_map<uint32, Quest*>::iterator i = allClassSpellQuestTemplates.begin(); i != allClassSpellQuestTemplates.end(); ++i)
+	{
+		if (i->second->GetRequiredClasses() & bot->getClassMask())
+		{
+			bot->learnQuestRewardedSpells(i->second);
+		}
+	}
+}
 
 void PlayerbotFactory::InitSpecialSpells()
 {
@@ -1095,6 +1111,8 @@ void PlayerbotFactory::InitTalents(uint32 specNo)
 
         spells[talentInfo->Row].push_back(talentInfo);
     }
+	// EJ init talent points first
+	bot->InitTalentForLevel();
 
     uint32 freePoints = bot->GetFreeTalentPoints();
     for (map<uint32, vector<TalentEntry const*> >::iterator i = spells.begin(); i != spells.end(); ++i)
