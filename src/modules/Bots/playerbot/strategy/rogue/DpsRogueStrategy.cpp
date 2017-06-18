@@ -11,7 +11,7 @@ public:
     DpsRogueStrategyActionNodeFactory()
     {
         creators["mutilate"] = &mutilate;
-        creators["sinister strike"] = &sinister_strike;
+        //creators["sinister strike"] = &sinister_strike;
         creators["kick"] = &kick;
         creators["kidney shot"] = &kidney_shot;
         creators["rupture"] = &rupture;
@@ -23,23 +23,23 @@ private:
     {
         return new ActionNode ("melee",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* mutilate(PlayerbotAI* ai)
     {
         return new ActionNode ("mutilate",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* sinister_strike(PlayerbotAI* ai)
-    {
-        return new ActionNode ("sinister strike",
-            /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
+   // static ActionNode* sinister_strike(PlayerbotAI* ai)
+    //{
+    //    return new ActionNode ("sinister strike",
+    //        /*P*/ NULL,
+    //        /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
+    //        /*C*/ NULL);
+    //}
     static ActionNode* kick(PlayerbotAI* ai)
     {
         return new ActionNode ("kick",
@@ -84,7 +84,7 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
 
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL), NULL);
+    return NextAction::array(0, new NextAction("mutilate", ACTION_NORMAL), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

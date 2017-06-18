@@ -190,7 +190,20 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
-            engine->addStrategies("dps", "threat", "dps assist", NULL);
+			if (tab == 0)
+			{
+				if (player->getLevel() > 9)
+					engine->addStrategies("assa dps", "dps assist", "threat", NULL);
+
+				else engine->addStrategies("combat dps", "dps assist", "threat", NULL);
+			}
+			if (tab == 0)
+				engine->addStrategies("assa dps", "dps assist", "threat", NULL);
+			else if (tab == 1)
+				engine->addStrategies("combat dps", "dps assist", "threat", NULL);
+			else if (tab == 2)
+				engine->addStrategies("sub dps", "dps assist", "threat", NULL);
+			break;
             break;
         case CLASS_WARLOCK:
             
