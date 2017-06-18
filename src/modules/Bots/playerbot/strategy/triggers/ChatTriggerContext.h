@@ -75,9 +75,11 @@ namespace ai
             creators["formation"] = &ChatTriggerContext::formation;
             creators["sendmail"] = &ChatTriggerContext::sendmail;
             creators["outfit"] = &ChatTriggerContext::outfit;
+            creators["go"] = &ChatTriggerContext::go;
         }
 
     private:
+        static Trigger* go(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "go"); }
         static Trigger* outfit(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "outfit"); }
         static Trigger* sendmail(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "sendmail"); }
         static Trigger* formation(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "formation"); }
