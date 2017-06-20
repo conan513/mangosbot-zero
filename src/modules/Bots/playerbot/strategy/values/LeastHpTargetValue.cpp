@@ -17,6 +17,14 @@ public:
 public:
     virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
     {
+        Group* group = ai->GetBot()->GetGroup();
+        if (group)
+        {
+            uint64 guid = group->GetTargetIcon(4);
+            if (guid && attacker->GetObjectGuid() == ObjectGuid(guid))
+                return;
+        }
+
         if (!result || result->GetHealth() > attacker->GetHealth())
             result = attacker;
     }
