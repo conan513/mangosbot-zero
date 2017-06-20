@@ -181,3 +181,6 @@ AiPlayerbot.RandomBotTeleLevel = 3
 
 # Command server port, 0 - disabled
 #AiPlayerbot.CommandServerPort = 8888
+
+# auto-login all player alts as bots on player login
+#AiPlayerbot.BotAutologin = 0
