@@ -2,6 +2,7 @@
 
 #include "../Action.h"
 #include "../../PlayerbotAIConfig.h"
+#include "PlayerbotAI.h"
 
 #define BEGIN_SPELL_ACTION(clazz, name) \
 class clazz : public CastSpellAction \
@@ -42,6 +43,7 @@ class clazz : public BuffOnPartyAction \
         public: \
         clazz(PlayerbotAI* ai) : BuffOnPartyAction(ai, name) {}
 
+
 namespace ai
 {
     class CastSpellAction : public Action
@@ -55,7 +57,9 @@ namespace ai
 
 		virtual string GetTargetName() { return "current target"; };
         virtual bool Execute(Event event);
-        virtual bool isPossible();
+		Item * FindPoison() const;
+		Item* FindConsumable(uint32 displayId) const;
+		virtual bool isPossible();
 		virtual bool isUseful();
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_SINGLE; }
 
@@ -362,4 +366,5 @@ namespace ai
         }
         virtual string getName() { return spell + " on enemy healer"; }
     };
+
 }

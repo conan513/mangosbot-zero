@@ -27,7 +27,8 @@ uint32 PlayerbotFactory::tradeSkills[] =
     SKILL_BLACKSMITHING,
     SKILL_COOKING,
     SKILL_FIRST_AID,
-    SKILL_FISHING
+    SKILL_FISHING,
+	SKILL_POISONS
 };
 
 void PlayerbotFactory::Randomize()
@@ -931,10 +932,14 @@ void PlayerbotFactory::InitTradeSkills()
     case CLASS_SHAMAN:
     case CLASS_DRUID:
     case CLASS_HUNTER:
-    case CLASS_ROGUE:
         firstSkills.push_back(SKILL_SKINNING);
         secondSkills.push_back(SKILL_LEATHERWORKING);
         break;
+	case CLASS_ROGUE:
+		firstSkills.push_back(SKILL_SKINNING);
+		secondSkills.push_back(SKILL_LEATHERWORKING);
+		SetRandomSkill(SKILL_POISONS);
+		break;
     default:
         firstSkills.push_back(SKILL_TAILORING);
         secondSkills.push_back(SKILL_ENCHANTING);
@@ -991,6 +996,7 @@ void PlayerbotFactory::InitSkills()
     SetRandomSkill(SKILL_WANDS);
     SetRandomSkill(SKILL_POLEARMS);
     SetRandomSkill(SKILL_FIST_WEAPONS);
+	SetRandomSkill(SKILL_POISONS);
 
     if (bot->getLevel() >= 70)
         bot->SetSkill(SKILL_RIDING, 300, 300);
@@ -1010,6 +1016,9 @@ void PlayerbotFactory::InitSkills()
     case CLASS_PALADIN:
         bot->SetSkill(SKILL_PLATE_MAIL, skillLevel, skillLevel);
         break;
+	case CLASS_ROGUE:
+		bot->SetSkill(SKILL_POISONS, skillLevel, skillLevel);
+		break;
     case CLASS_SHAMAN:
     case CLASS_HUNTER:
         bot->SetSkill(SKILL_MAIL, skillLevel, skillLevel);
@@ -1441,7 +1450,55 @@ void PlayerbotFactory::InitInventorySkill()
     if (bot->HasSkill(SKILL_SKINNING)) {
         StoreItem(7005, 1); // Skinning Knife
     }
-}
+	if (bot->HasSkill(SKILL_POISONS)) 
+	
+
+		if (bot->getLevel()>19)
+		{
+			StoreItem(6947, 10); //ip
+		}
+		else if (bot->getLevel()>27)
+		{
+			StoreItem(6949, 10); //ip
+		}
+		else if (bot->getLevel()>29)
+		{
+			StoreItem(2892, 10); //dp
+		}
+		else if (bot->getLevel()>35)
+		{
+			StoreItem(6950, 10); //ip
+		}
+		else if (bot->getLevel()>37)
+		{
+			StoreItem(2893, 10); //dp
+		}
+		else if (bot->getLevel()>43)
+		{
+			StoreItem(8926, 10); //ip
+		}
+		else if (bot->getLevel()>45)
+		{
+			StoreItem(8984, 10); //dp
+		}
+		else if (bot->getLevel()>51)
+		{
+			StoreItem(8927, 10); //ip
+		}
+		else if (bot->getLevel()>53)
+		{
+			StoreItem(8985, 10); //dp
+		}
+		else if (bot->getLevel()>59)
+		{
+			StoreItem(8928, 10); //ip
+		}
+		else if (bot->getLevel()>59)
+		{
+			StoreItem(20844, 10); //dp		
+		}
+	
+	}
 
 Item* PlayerbotFactory::StoreItem(uint32 itemId, uint32 count)
 {

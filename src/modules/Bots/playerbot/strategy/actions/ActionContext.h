@@ -91,6 +91,7 @@ namespace ai
             creators["random bot update"] = &ActionContext::random_bot_update;
             creators["delay"] = &ActionContext::delay;
             creators["greet"] = &ActionContext::greet;
+			creators["poisoning"] = &ActionContext::poisoning; //need a timer trigger
         }
 
     private:
@@ -153,6 +154,7 @@ namespace ai
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
         static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
+		static Action* poisoning(PlayerbotAI *ai) { return new UseItemAction(ai, "poisoning"); }
     };
 
 };
