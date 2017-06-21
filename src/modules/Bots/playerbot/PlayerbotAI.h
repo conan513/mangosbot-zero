@@ -64,36 +64,6 @@ enum BotState
 
 #define BOT_STATE_MAX 3
 
-enum RoguePoisonDisplayId
-{
-	DEADLY_POISON_DISPLAYID = 13707,
-	CRIPPLING_POISON_DISPLAYID = 13708,
-	MIND_NUMBLING_POISON_DISPLAYID = 13709,
-	INSTANT_POISON_DISPLAYID = 13710,
-	WOUND_POISON_DISPLAYID = 13708
-};
-
-
-enum SharpeningStoneDisplayId
-{
-	ROUGH_SHARPENING_DISPLAYID = 24673,
-	COARSE_SHARPENING_DISPLAYID = 24674,
-	HEAVY_SHARPENING_DISPLAYID = 24675,
-	SOLID_SHARPENING_DISPLAYID = 24676,
-	DENSE_SHARPENING_DISPLAYID = 24677,
-	CONSECRATED_SHARPENING_DISPLAYID = 24674,    // will not be used because bot can not know if it will face undead targets
-	ELEMENTAL_SHARPENING_DISPLAYID = 21072
-};
-
-enum WeightStoneDisplayId
-{
-	ROUGH_WEIGHTSTONE_DISPLAYID = 24683,
-	COARSE_WEIGHTSTONE_DISPLAYID = 24684,
-	HEAVY_WEIGHTSTONE_DISPLAYID = 24685,
-	SOLID_WEIGHTSTONE_DISPLAYID = 24686,
-	DENSE_WEIGHTSTONE_DISPLAYID = 24687
-};
-
 class PacketHandlingHelper
 {
 public:
@@ -171,6 +141,7 @@ public:
     void RemoveShapeshift();
     void WaitForSpellCast(Spell *spell);
     bool PlaySound(uint32 emote);
+
     virtual bool CanCastSpell(string name, Unit* target);
     virtual bool CastSpell(string name, Unit* target);
     virtual bool HasAura(string spellName, Unit* player);
@@ -188,7 +159,6 @@ public:
 
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
-	
 
 public:
 	Player* GetBot() { return bot; }
@@ -216,12 +186,5 @@ protected:
     CompositeChatFilter chatFilter;
     PlayerbotSecurity security;
     map<string, time_t> whispers;
-	
-private:
-	Item* FindConsumable(uint32 displayId) const;
-	Item* FindPoison() const;
-	//Item* FindStoneFor(Item* weapon) const;
-
-	
 };
 
