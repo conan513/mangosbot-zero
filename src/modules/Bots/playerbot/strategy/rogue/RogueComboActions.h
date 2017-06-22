@@ -13,6 +13,12 @@ namespace ai
 	    }
 	};
 
+	class CastHemorrhageAction : public CastComboAction
+	{
+	public:
+		CastHemorrhageAction(PlayerbotAI* ai) : CastComboAction(ai, "hemorrhage") {}
+	};
+
 	class CastSinisterStrikeAction : public CastComboAction
 	{
 	public:
