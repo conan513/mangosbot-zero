@@ -760,7 +760,7 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
             return;
 
         uint32 money = GetTaskValue(owner, guildId, "payment");
-        SetTaskValue(owner, guildId, "payment", money + auctionbot.GetBuyPrice(proto) * obtained, rewardTime - 45);
+        SetTaskValue(owner, guildId, "payment", money + auctionbot.GetBuyPrice(proto) * obtained, rewardTime + 300);
     }
 
     if (obtained >= count)
@@ -844,6 +844,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         ChatHandler(player->GetSession()).PSendSysMessage("Guild task reward is pending");
 
     SetTaskValue(owner, guildId, "activeTask", 0, 0);
+    SetTaskValue(owner, guildId, "payment", 0, 0);
     return true;
 }
 
