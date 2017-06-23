@@ -36,6 +36,12 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     if (!sPlayerbotAIConfig.guildTaskEnabled)
         return;
 
+    if (!GetTaskValue(0, 0, "advert_cleanup"))
+    {
+        CleanupAdverts();
+        SetTaskValue(0, 0, "advert_cleanup", 1, sPlayerbotAIConfig.guildTaskAdvertCleanupTime);
+    }
+
     uint32 guildId = guildMaster->GetGuildId();
     if (!guildId || !guildMaster->GetPlayerbotAI() || !guildMaster->GetGuildId())
         return;
@@ -897,5 +903,31 @@ void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
             }
         }
         ChatHandler(player->GetSession()).PSendSysMessage("You have completed a guild task");
+    }
+}
+
+void GuildTaskMgr::CleanupAdverts()
+{
+    uint32 deliverTime = time(0) - sPlayerbotAIConfig.maxGuildTaskChangeTime;
+    QueryResult *result = CharacterDatabase.PQuery("select id, receiver from mail where subject like 'Guild Task%%' and deliver_time <= '%u'", deliverTime);
+    if (!result)
+        return;
+
+    int count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+        uint32 receiver = fields[1].GetUInt32();
+        Player *player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, receiver));
+        if (player) player->RemoveMail(id);
+        count++;
+    } while (result->NextRow());
+    delete result;
+
+    if (count > 0)
+    {
+        CharacterDatabase.PExecute("delete from mail where subject like 'Guild Task%%' and deliver_time <= '%u'", deliverTime);
+        sLog.outBasic("%d old gtask adverts removed", count);
     }
 }
