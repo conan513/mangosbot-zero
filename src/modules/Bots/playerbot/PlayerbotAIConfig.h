@@ -30,6 +30,7 @@ public:
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
 
+    uint32 openGoSpell;
     bool randomBotAutologin;
     bool botAutologin;
     std::string randomBotMapsAsString;
