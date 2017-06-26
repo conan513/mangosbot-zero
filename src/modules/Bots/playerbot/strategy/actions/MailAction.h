@@ -11,6 +11,9 @@ namespace ai
         MailAction(PlayerbotAI* ai) : InventoryAction(ai, "mail") {}
 
         virtual bool Execute(Event event);
+
+    private:
+        void RemoveMail(uint32 id, ObjectGuid mailbox);
     };
 
 }

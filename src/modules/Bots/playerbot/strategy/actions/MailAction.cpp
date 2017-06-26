@@ -35,6 +35,7 @@ bool MailAction::Execute(Event event)
     {
         ai->TellMaster("--- Mailbox ---");
         time_t cur_time = time(0);
+        int index = 1;
         for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
         {
             if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
@@ -43,6 +44,7 @@ bool MailAction::Execute(Event event)
             Mail *mail = *itr;
             int days = (cur_time - mail->deliver_time) / 3600 / 24;
             ostringstream out;
+            out << "#" << index++ << " ";
             out << "|cffffffff" << mail->subject;
             if (mail->money)
                 out << ", |cffffff00" << ChatHelper::formatMoney(mail->money);
@@ -72,14 +74,14 @@ bool MailAction::Execute(Event event)
             if (mail->money)
             {
                 ostringstream out;
-                out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money);
+                out << mail->subject << ", |cffffff00" << ChatHelper::formatMoney(mail->money) << "|cff00ff00 processed";
                 ai->TellMaster(out.str());
 
                 WorldPacket packet;
                 packet << mailbox;
                 packet << mail->messageID;
                 bot->GetSession()->HandleMailTakeMoney(packet);
-                bot->RemoveMail(mail->messageID);
+                RemoveMail(mail->messageID, mailbox);
                 continue;
             }
 
@@ -91,7 +93,7 @@ bool MailAction::Execute(Event event)
                     if (proto)
                     {
                         ostringstream out;
-                        out << mail->subject << ", " << ChatHelper::formatItem(proto);
+                        out << mail->subject << ", " << ChatHelper::formatItem(proto) << "|cff00ff00 processed";
                         ai->TellMaster(out.str());
                     }
                 }
@@ -100,13 +102,45 @@ bool MailAction::Execute(Event event)
                 packet << mailbox;
                 packet << mail->messageID;
                 bot->GetSession()->HandleMailTakeItem(packet);
-                bot->RemoveMail(mail->messageID);
+                RemoveMail(mail->messageID, mailbox);
                 continue;
             }
         }
     }
+    else if (text.find("delete ") != string::npos)
+    {
+        time_t cur_time = time(0);
+        int index = 1;
+        vector<string> ids = split(text.substr(7), ',');
+        vector<string>::iterator i = ids.begin();
+        for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
+        {
+            if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
+                continue;
+
+            Mail *mail = *itr;
+            if (index++ == atoi(i->c_str()))
+            {
+                ostringstream out;
+                out << "|cffffffff" << mail->subject << "|cffff0000 deleted";
+                ai->TellMaster(out.str());
+                RemoveMail(mail->messageID, mailbox);
+                ++i;
+                if (i == ids.end())
+                    break;
+            }
+        }
+    }
     else
-        ai->TellMaster("whisper 'mail ?' to query mailbox, 'mail take' to take all items");
+        ai->TellMaster("whisper 'mail ?' to query mailbox, 'mail take' to take all items, 'mail delete N' to delete mail #N");
 
     return true;
+}
+
+void MailAction::RemoveMail(uint32 id, ObjectGuid mailbox)
+{
+    WorldPacket packet;
+    packet << mailbox;
+    packet << id;
+    bot->GetSession()->HandleMailDelete(packet);
 }
