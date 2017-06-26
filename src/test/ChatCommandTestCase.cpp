@@ -72,6 +72,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( sendmail );
       CPPUNIT_TEST( outfit );
       CPPUNIT_TEST( go );
+      CPPUNIT_TEST( mail );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -476,6 +477,11 @@ protected:
     void go()
     {
         assertParametrizedCommand("go", "go");
+    }
+
+    void mail()
+    {
+        assertParametrizedCommand("mail", "mail");
     }
 };
 
