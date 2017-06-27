@@ -62,15 +62,22 @@ bool MailAction::Execute(Event event)
         }
         return true;
     }
-    else if (text == "take")
+    else if (text.find("take ") != string::npos)
     {
         time_t cur_time = time(0);
+        int index = 1;
+        vector<string> ids = split(text.substr(5), ',');
+        vector<string>::iterator i = ids.begin();
         for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
         {
             if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
                 continue;
 
             Mail *mail = *itr;
+
+            if (index++ != atoi(i->c_str()) && *i != "*")
+                continue;
+
             if (mail->money)
             {
                 ostringstream out;
@@ -82,10 +89,8 @@ bool MailAction::Execute(Event event)
                 packet << mail->messageID;
                 bot->GetSession()->HandleMailTakeMoney(packet);
                 RemoveMail(mail->messageID, mailbox);
-                continue;
             }
-
-            if (!mail->items.empty())
+            else if (!mail->items.empty())
             {
                 for (MailItemInfoVec::iterator i = mail->items.begin(); i != mail->items.end(); ++i)
                 {
@@ -103,7 +108,13 @@ bool MailAction::Execute(Event event)
                 packet << mail->messageID;
                 bot->GetSession()->HandleMailTakeItem(packet);
                 RemoveMail(mail->messageID, mailbox);
-                continue;
+            }
+
+            if (*i != "*")
+            {
+                ++i;
+                if (i == ids.end())
+                    break;
             }
         }
     }
