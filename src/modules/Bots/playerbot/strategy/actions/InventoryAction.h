@@ -13,8 +13,8 @@ namespace ai
 
     protected:
         void IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
-        void TellItems(map<uint32, int> items);
-        void TellItem(ItemPrototype const * proto, int count);
+        void TellItems(map<uint32, int> items, map<uint32, bool> soulbound);
+        void TellItem(ItemPrototype const * proto, int count, bool soulbound);
         list<Item*> parseItems(string text);
 
     private:
