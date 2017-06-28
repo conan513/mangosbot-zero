@@ -638,7 +638,7 @@ GameObject* PlayerbotAI::GetGameObject(ObjectGuid guid)
 bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securityLevel)
 {
     Player* master = GetMaster();
-    if (!master)
+    if (!master || master->IsBeingTeleported())
         return false;
 
     if (!GetSecurity()->CheckLevelFor(securityLevel, true, master))
