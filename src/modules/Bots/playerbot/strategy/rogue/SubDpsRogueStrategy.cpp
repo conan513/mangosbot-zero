@@ -10,7 +10,7 @@ class SubDpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
 public:
 	SubDpsRogueStrategyActionNodeFactory()
 	{
-		//creators["mutilate"] = &mutilate;
+		creators["cheap shot"] = &cheap_shot;
 		creators["hemorrhage"] = &hemorrhage;
 		creators["kick"] = &kick;
 		creators["kidney shot"] = &kidney_shot;
@@ -24,15 +24,15 @@ private:
 		return new ActionNode("melee",
 			/*P*/ NULL,
 			/*A*/ NULL,
-			/*C*/ NULL);
+			/*C*/ NextAction::array(0, new NextAction("hemorrhage"), NULL));
 	}
-	//static ActionNode* mutilate(PlayerbotAI* ai)
-	//{
-	//	return new ActionNode("mutilate",
-	//		/*P*/ NULL,
-	//		/*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
-	//		/*C*/ NULL);
-	//}
+	static ActionNode* cheap_shot(PlayerbotAI* ai)
+	{
+		return new ActionNode("cheap shot",
+			/*P*/ NextAction::array(0, new NextAction("stealth"), NULL),
+			/*A*/ NULL,
+			/*C*/ NextAction::array(0, new NextAction("melee"), NULL));
+	}
 	static ActionNode* hemorrhage(PlayerbotAI* ai)
 	{
 		return new ActionNode("hemorrhage",
@@ -92,9 +92,17 @@ void SubDpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	MeleeCombatStrategy::InitTriggers(triggers);
 
 	triggers.push_back(new TriggerNode(
+		"cheap shot open",
+		NextAction::array(0, new NextAction("cheap shot", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"can open from behind",
+		NextAction::array(0, new NextAction("garrote", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
 		"combo points available",
-		NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 2),
-			new NextAction("rupture", ACTION_HIGH), NULL)));
+		NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 2),
+			new NextAction("slice and dice", ACTION_HIGH), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"medium threat",

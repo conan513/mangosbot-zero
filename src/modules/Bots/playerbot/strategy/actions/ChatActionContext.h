@@ -51,6 +51,8 @@
 #include "../values/Formations.h"
 #include "SendMailAction.h"
 #include "SkipSpellsListAction.h"
+#include "../Bots/playerbot/strategy/druid/DruidActions.h"
+#include "../Bots/playerbot/strategy/rogue/RogueActions.h"
 
 namespace ai
 {
@@ -119,9 +121,13 @@ namespace ai
             creators["tell attackers"] = &ChatActionContext::tell_attackers;
             creators["formation"] = &ChatActionContext::formation;
             creators["sendmail"] = &ChatActionContext::sendmail;
+			creators["stealth"] = &ChatActionContext::stealth;
+			creators["stealth"] = &ChatActionContext::prowl;
         }
 
     private:
+		static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
+		static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
         static Action* sendmail(PlayerbotAI* ai) { return new SendMailAction(ai); }
         static Action* formation(PlayerbotAI* ai) { return new SetFormationAction(ai); }
         static Action* tell_attackers(PlayerbotAI* ai) { return new TellAttackersAction(ai); }

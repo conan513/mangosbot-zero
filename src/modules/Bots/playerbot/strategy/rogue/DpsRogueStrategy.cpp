@@ -11,7 +11,7 @@ public:
     DpsRogueStrategyActionNodeFactory()
     {
         creators["mutilate"] = &mutilate;
-        //creators["sinister strike"] = &sinister_strike;
+        creators["cheap shot"] = &cheap_shot;
         creators["kick"] = &kick;
         creators["kidney shot"] = &kidney_shot;
         creators["rupture"] = &rupture;
@@ -24,7 +24,7 @@ private:
         return new ActionNode ("melee",
             /*P*/ NULL,
             /*A*/ NULL,
-            /*C*/ NULL);
+            /*C*/ NextAction::array(0, new NextAction("mutilate"), NULL));
     }
     static ActionNode* mutilate(PlayerbotAI* ai)
     {
@@ -33,13 +33,13 @@ private:
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
-   // static ActionNode* sinister_strike(PlayerbotAI* ai)
-    //{
-    //    return new ActionNode ("sinister strike",
-    //        /*P*/ NULL,
-    //        /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-    //        /*C*/ NULL);
-    //}
+	static ActionNode* cheap_shot(PlayerbotAI* ai)
+	{
+		return new ActionNode("cheap shot",
+			/*P*/ NextAction::array(0, new NextAction("stealth"), NULL),
+			/*A*/ NULL,
+			/*C*/ NextAction::array(0, new NextAction("melee"), NULL));
+	}
     static ActionNode* kick(PlayerbotAI* ai)
     {
         return new ActionNode ("kick",
@@ -89,7 +89,17 @@ NextAction** DpsRogueStrategy::getDefaultActions()
 
 void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    MeleeCombatStrategy::InitTriggers(triggers);
+	MeleeCombatStrategy::InitTriggers(triggers);
+
+
+	triggers.push_back(new TriggerNode(
+		"cheap shot open",
+		NextAction::array(0, new NextAction("cheap shot", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"can open from behind",
+		NextAction::array(0, new NextAction("garrote", ACTION_NORMAL + 8), NULL)));
+
 
     triggers.push_back(new TriggerNode(
         "combo points available",
@@ -119,6 +129,5 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"light aoe",
 		NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), NULL)));
-
 
 }
