@@ -142,6 +142,34 @@ bool MailAction::Execute(Event event)
             }
         }
     }
+    else if (text.find("read ") != string::npos)
+    {
+        time_t cur_time = time(0);
+        int index = 1;
+        vector<string> ids = split(text.substr(5), ',');
+        vector<string>::iterator i = ids.begin();
+        for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
+        {
+            if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
+                continue;
+
+            Mail *mail = *itr;
+            if (index++ == atoi(i->c_str()))
+            {
+                ostringstream out, body;
+                out << "|cffffffff" << mail->subject;
+                ai->TellMaster(out.str());
+                if (mail->itemTextId)
+                {
+                    body << "\n" << sObjectMgr.GetItemText(mail->itemTextId);
+                    ai->TellMaster(body.str());
+                }
+                ++i;
+                if (i == ids.end())
+                    break;
+            }
+        }
+    }
     else
         ai->TellMaster("whisper 'mail ?' to query mailbox, 'mail take' to take all items, 'mail delete N' to delete mail #N");
 
