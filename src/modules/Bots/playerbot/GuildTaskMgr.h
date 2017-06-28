@@ -39,6 +39,7 @@ class GuildTaskMgr
         bool CreateItemTask(uint32 owner, uint32 guildId);
         bool CreateKillTask(uint32 owner, uint32 guildId);
         uint32 GetMaxItemTaskCount(uint32 itemId);
+        void CleanupAdverts();
 };
 
 #define sGuildTaskMgr GuildTaskMgr::instance()

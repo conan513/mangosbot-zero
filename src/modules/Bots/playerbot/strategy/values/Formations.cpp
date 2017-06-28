@@ -274,7 +274,7 @@ float Formation::GetFollowAngle()
         }
     }
 
-    return start + (0.125f + 1.75f * index / total) * M_PI;
+    return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
 FormationValue::FormationValue(PlayerbotAI* ai) : ManualSetValue<Formation*>(ai, new NearFormation(ai), "formation")

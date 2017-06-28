@@ -149,7 +149,7 @@ uint32 OpenLootAction::GetOpeningSpell(LootObject& lootObject, GameObject* go)
             return spellId;
     }
 
-    return 0; //Spell 3365 = Opening?
+    return sPlayerbotAIConfig.openGoSpell;
 }
 
 bool OpenLootAction::CanOpenLock(LootObject& lootObject, const SpellEntry* pSpellInfo, GameObject* go)

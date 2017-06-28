@@ -50,6 +50,7 @@
 #include "SaveManaAction.h"
 #include "../values/Formations.h"
 #include "GoAction.h"
+#include "MailAction.h"
 #include "SendMailAction.h"
 #include "SkipSpellsListAction.h"
 
@@ -120,10 +121,12 @@ namespace ai
             creators["tell attackers"] = &ChatActionContext::tell_attackers;
             creators["formation"] = &ChatActionContext::formation;
             creators["sendmail"] = &ChatActionContext::sendmail;
+            creators["mail"] = &ChatActionContext::mail;
             creators["go"] = &ChatActionContext::go;
         }
 
     private:
+        static Action* mail(PlayerbotAI* ai) { return new MailAction(ai); }
         static Action* go(PlayerbotAI* ai) { return new GoAction(ai); }
         static Action* sendmail(PlayerbotAI* ai) { return new SendMailAction(ai); }
         static Action* formation(PlayerbotAI* ai) { return new SetFormationAction(ai); }
