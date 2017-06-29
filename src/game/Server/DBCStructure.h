@@ -193,6 +193,32 @@ struct ChrRacesEntry
     // 28       m_hairCustomization
 };
 
+enum CharSectionFlags
+{
+    SECTION_FLAG_PLAYER       = 0x01
+};
+
+enum CharSectionType
+{
+    SECTION_TYPE_SKIN         = 0,
+    SECTION_TYPE_FACE         = 1,
+    SECTION_TYPE_FACIAL_HAIR  = 2,
+    SECTION_TYPE_HAIR         = 3,
+    SECTION_TYPE_UNDERWEAR    = 4
+};
+
+struct CharSectionsEntry
+{
+    //uint32 Id;
+    uint32 Race;
+    uint32 Gender;
+    uint32 GenType;
+    //char* TexturePath[3];
+    uint32 Type;
+    uint32 Color;
+    uint32 Flags;
+};
+
 /**
 * \struct CinematicSequencesEntry
 */
