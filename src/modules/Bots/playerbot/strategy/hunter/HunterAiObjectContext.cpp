@@ -81,9 +81,11 @@ namespace ai
                 creators["aspect of the viper"] = &TriggerFactoryInternal::aspect_of_the_viper;
                 creators["trueshot aura"] = &TriggerFactoryInternal::trueshot_aura;
                 creators["serpent sting on attacker"] = &TriggerFactoryInternal::serpent_sting_on_attacker;
+                creators["pet not happy"] = &TriggerFactoryInternal::pet_not_happy;
             }
 
         private:
+            static Trigger* pet_not_happy(PlayerbotAI* ai) { return new HunterPetNotHappy(ai); }
             static Trigger* serpent_sting_on_attacker(PlayerbotAI* ai) { return new SerpentStingOnAttackerTrigger(ai); }
             static Trigger* trueshot_aura(PlayerbotAI* ai) { return new TrueshotAuraTrigger(ai); }
             static Trigger* aspect_of_the_viper(PlayerbotAI* ai) { return new HunterAspectOfTheViperTrigger(ai); }
@@ -145,9 +147,11 @@ namespace ai
                 creators["trueshot aura"] = &AiObjectContextInternal::trueshot_aura;
                 creators["feign death"] = &AiObjectContextInternal::feign_death;
                 creators["wing clip"] = &AiObjectContextInternal::wing_clip;
+                creators["feed pet"] = &AiObjectContextInternal::feed_pet;
             }
 
         private:
+            static Action* feed_pet(PlayerbotAI* ai) { return new FeedPetAction(ai); }
             static Action* feign_death(PlayerbotAI* ai) { return new CastFeignDeathAction(ai); }
             static Action* trueshot_aura(PlayerbotAI* ai) { return new CastTrueshotAuraAction(ai); }
             static Action* auto_shot(PlayerbotAI* ai) { return new CastAutoShotAction(ai); }

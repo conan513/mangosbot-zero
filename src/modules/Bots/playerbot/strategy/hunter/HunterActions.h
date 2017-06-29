@@ -155,4 +155,11 @@ namespace ai
     public:
         CastSerpentStingOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "serpent sting") {}
     };
+
+    class FeedPetAction : public Action
+    {
+    public:
+        FeedPetAction(PlayerbotAI* ai) : Action(ai, "feed pet") {}
+        virtual bool Execute(Event event);
+    };
 }

@@ -68,6 +68,7 @@ protected:
 	void tickWithNoPet();
 	void tickWithPetLowHealth(int amount);
     void tickWithPetDead();
+    void tickWithPetUnhappy();
 	void tickWithLowMana(int amount);
 	void tickWithTargetLowHealth(int amount);
 	void tickWithTargetIsMoving();

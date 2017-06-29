@@ -106,6 +106,7 @@ namespace ai
             creators["combo"] = &ValueContext::combo;
             creators["dead"] = &ValueContext::dead;
             creators["pet dead"] = &ValueContext::pet_dead;
+            creators["pet happy"] = &ValueContext::pet_happy;
             creators["has mana"] = &ValueContext::has_mana;
             creators["attacker count"] = &ValueContext::attacker_count;
             creators["my attacker count"] = &ValueContext::my_attacker_count;
@@ -213,6 +214,7 @@ namespace ai
         static UntypedValue* mana(PlayerbotAI* ai) { return new ManaValue(ai); }
         static UntypedValue* combo(PlayerbotAI* ai) { return new ComboPointsValue(ai); }
         static UntypedValue* dead(PlayerbotAI* ai) { return new IsDeadValue(ai); }
+        static UntypedValue* pet_happy(PlayerbotAI* ai) { return new PetIsHappyValue(ai); }
         static UntypedValue* pet_dead(PlayerbotAI* ai) { return new PetIsDeadValue(ai); }
         static UntypedValue* has_mana(PlayerbotAI* ai) { return new HasManaValue(ai); }
         static UntypedValue* nearest_game_objects(PlayerbotAI* ai) { return new NearestGameObjects(ai); }

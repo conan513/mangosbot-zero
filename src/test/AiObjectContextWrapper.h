@@ -146,6 +146,7 @@ namespace ai
             creators["combo"] = &MockValueContext::stats;
             creators["dead"] = &MockValueContext::logical;
             creators["pet dead"] = &MockValueContext::logical;
+            creators["pet happy"] = &MockValueContext::logical;
             creators["has mana"] = &MockValueContext::logical;
             creators["combat"] = &MockValueContext::logical;
 
@@ -270,6 +271,8 @@ namespace ai
               list<ObjectGuid> players;
               players.push_back(ObjectGuid());
               GetValue<list<ObjectGuid> >("nearest non bot players")->Set(players);
+
+              GetValue<bool>("pet happy")->Set(true);
           }
 
     public:

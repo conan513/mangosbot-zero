@@ -128,22 +128,11 @@ PlayerbotAI::~PlayerbotAI()
         delete aiObjectContext;
 }
 
-void PlayerbotAI::UpdateAI(uint32 elapsed)
+void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 {
     if (bot->IsBeingTeleported())
         return;
 
-    Pet* pet = bot->GetPet();
-    if (pet && pet->getPetType() == HUNTER_PET && pet->GetHappinessState() != HAPPY)
-    {
-        pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
-    }
-
-    PlayerbotAIBase::UpdateAI(elapsed);
-}
-
-void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
-{
     ExternalEventHelper helper(aiObjectContext);
     while (!chatCommands.empty())
     {

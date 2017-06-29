@@ -83,4 +83,7 @@ namespace ai
     public:
         SerpentStingOnAttackerTrigger(PlayerbotAI* ai) : DebuffOnAttackerTrigger(ai, "serpent sting") {}
     };
+
+    BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
+    END_TRIGGER()
 }
