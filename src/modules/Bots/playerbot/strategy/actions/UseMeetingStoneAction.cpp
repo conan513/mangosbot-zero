@@ -80,13 +80,13 @@ bool SummonAction::Execute(Event event)
 
     if (Summon(master, bot))
     {
-        ai->TellMaster("Hello!");
+        ai->TellMasterNoFacing("Hello!");
         return true;
     }
 
     if (Summon(bot, master))
     {
-        ai->TellMaster("Welcome!");
+        ai->TellMasterNoFacing("Welcome!");
         return true;
     }
 
