@@ -11212,6 +11212,14 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendOpenContainer()
+{
+    DEBUG_LOG("WORLD: Sent SMSG_OPEN_CONTAINER");
+    WorldPacket data(SMSG_OPEN_CONTAINER, 8);   // opens the main bag in the UI
+    data << GetObjectGuid();
+    GetSession()->SendPacket(&data);
+}
+
 void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 param)
 {
     DEBUG_LOG("WORLD: Sent SMSG_BUY_FAILED");
@@ -13742,14 +13750,13 @@ void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver)
     }
 }
 
-void Player::SendPushToPartyResponse(Player* pPlayer, uint32 msg)
+void Player::SendPushToPartyResponse(Player* pPlayer, uint8 msg)
 {
     if (pPlayer)
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 4 + 1));
+        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << pPlayer->GetObjectGuid();
-        data << uint32(msg);                                // valid values: 0-8
-        data << uint8(0);
+        data << uint8(msg);                   // enum QuestShareMessages
         GetSession()->SendPacket(&data);
         DEBUG_LOG("WORLD: Sent MSG_QUEST_PUSH_RESULT");
     }
@@ -17465,7 +17472,7 @@ void Player::UpdateHomebindTime(uint32 time)
             // hide reminder
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
-            data << uint32(ERR_RAID_GROUP_NONE);            // error used only when timer = 0
+            data << uint32(ERR_RAID_GROUP_REQUIRED);        // error used only when timer = 0
             GetSession()->SendPacket(&data);
         }
         // instance is valid, reset homebind timer
@@ -17488,7 +17495,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
-        data << uint32(ERR_RAID_GROUP_NONE);                // error used only when timer = 0
+        data << uint32(ERR_RAID_GROUP_REQUIRED);        // error used only when timer = 0
         GetSession()->SendPacket(&data);
         DEBUG_LOG("PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName(), GetGUIDLow());
     }
