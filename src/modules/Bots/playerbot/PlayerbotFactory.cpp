@@ -29,6 +29,8 @@ uint32 PlayerbotFactory::tradeSkills[] =
     SKILL_FISHING
 };
 
+list<uint32> PlayerbotFactory::classQuestIds;
+
 void PlayerbotFactory::Randomize()
 {
     Randomize(true);
@@ -81,16 +83,16 @@ void PlayerbotFactory::Prepare()
 
 void PlayerbotFactory::Randomize(bool incremental)
 {
-    sLog.outDetail("Preparing to randomize...");
+    sLog.outBasic("Preparing to randomize...");
     Prepare();
 
-    sLog.outDetail("Resetting player...");
+    sLog.outBasic("Resetting player...");
     bot->resetTalents(true);
     ClearSpells();
     ClearInventory();
     bot->SaveToDB();
 
-    sLog.outDetail("Initializing quests...");
+    sLog.outBasic("Initializing quests...");
     InitQuests();
     // quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
@@ -99,57 +101,58 @@ void PlayerbotFactory::Randomize(bool incremental)
     CancelAuras();
     bot->SaveToDB();
 
-    sLog.outDetail("Initializing spells (step 1)...");
+    sLog.outBasic("Initializing spells (step 1)...");
     InitAvailableSpells();
 
-    sLog.outDetail("Initializing skills (step 1)...");
+    sLog.outBasic("Initializing skills (step 1)...");
     InitSkills();
     InitTradeSkills();
 
-    sLog.outDetail("Initializing talents...");
+    sLog.outBasic("Initializing talents...");
     InitTalents();
 
-    sLog.outDetail("Initializing spells (step 2)...");
+    sLog.outBasic("Initializing spells (step 2)...");
     InitAvailableSpells();
     InitSpecialSpells();
 
-    sLog.outDetail("Initializing mounts...");
+    sLog.outBasic("Initializing mounts...");
     InitMounts();
 
-    sLog.outDetail("Initializing skills (step 2)...");
+    sLog.outBasic("Initializing skills (step 2)...");
     UpdateTradeSkills();
     bot->SaveToDB();
 
-    sLog.outDetail("Initializing equipmemt...");
+    sLog.outBasic("Initializing equipmemt...");
     InitEquipment(incremental);
 
-    sLog.outDetail("Initializing bags...");
+    sLog.outBasic("Initializing bags...");
     InitBags();
 
-    sLog.outDetail("Initializing ammo...");
+    sLog.outBasic("Initializing ammo...");
     InitAmmo();
 
-    sLog.outDetail("Initializing food...");
+    sLog.outBasic("Initializing food...");
     InitFood();
 
-    sLog.outDetail("Initializing potions...");
+    sLog.outBasic("Initializing potions...");
     InitPotions();
 
-    sLog.outDetail("Initializing second equipment set...");
+    sLog.outBasic("Initializing second equipment set...");
     InitSecondEquipmentSet();
 
-    sLog.outDetail("Initializing inventory...");
+    sLog.outBasic("Initializing inventory...");
     InitInventory();
 
-    sLog.outDetail("Initializing guilds...");
+    sLog.outBasic("Initializing guilds...");
     InitGuild();
 
-    sLog.outDetail("Initializing pet...");
+    sLog.outBasic("Initializing pet...");
     InitPet();
 
-    sLog.outDetail("Saving to DB...");
+    sLog.outBasic("Saving to DB...");
     bot->SetMoney(urand(level * 1000, level * 5 * 1000));
     bot->SaveToDB();
+    sLog.outBasic("Done.");
 }
 
 void PlayerbotFactory::InitPet()
@@ -1172,36 +1175,41 @@ void AddPrevQuests(uint32 questId, list<uint32>& questIds)
 
 void PlayerbotFactory::InitQuests()
 {
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
-    list<uint32> questIds;
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+    if (classQuestIds.empty())
     {
-        uint32 questId = i->first;
-        Quest const *quest = i->second;
+        ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
+        for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+        {
+            uint32 questId = i->first;
+            Quest const *quest = i->second;
 
-        if (!quest->GetRequiredClasses() ||
-                quest->GetMinLevel() > bot->getLevel() ||
-                quest->IsRepeatable())
-            continue;
+            if (!quest->GetRequiredClasses() || quest->IsRepeatable())
+                continue;
 
-        AddPrevQuests(questId, questIds);
-        questIds.remove(questId);
-        questIds.push_back(questId);
+            AddPrevQuests(questId, classQuestIds);
+            classQuestIds.remove(questId);
+            classQuestIds.push_back(questId);
+        }
     }
 
-    for (list<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
+    int count = 0;
+    for (list<uint32>::iterator i = classQuestIds.begin(); i != classQuestIds.end(); ++i)
     {
         uint32 questId = *i;
         Quest const *quest = sObjectMgr.GetQuestTemplate(questId);
 
         if (!bot->SatisfyQuestClass(quest, false) ||
+                quest->GetMinLevel() > bot->getLevel() ||
                 !bot->SatisfyQuestRace(quest, false))
             continue;
 
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
         bot->RewardQuest(quest, 0, bot, false);
-        ClearInventory();
+        if (!(count++ % 10))
+            ClearInventory();
     }
+    ClearInventory();
+    sLog.outBasic("%d quests rewarded", count);
 }
 
 void PlayerbotFactory::ClearInventory()
