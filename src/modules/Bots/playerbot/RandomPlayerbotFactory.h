@@ -24,7 +24,7 @@ class RandomPlayerbotFactory
         static void CreateRandomGuilds();
 
 	private:
-        string CreateRandomBotName();
+        string CreateRandomBotName(uint8 gender);
         static string CreateRandomGuildName();
 
     private:
