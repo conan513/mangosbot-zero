@@ -13,6 +13,7 @@ class HunterNonCombatTestCase : public EngineTestBase
     CPPUNIT_TEST( lowMana );
     CPPUNIT_TEST( summonPet );
 	CPPUNIT_TEST( buffIfPackUnavailable );
+    CPPUNIT_TEST( feedPet );
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -68,6 +69,13 @@ protected:
         tickWithSpellUnavailable("aspect of the pack");
 
 		assertActions(">S:aspect of the cheetah");
+    }
+
+    void feedPet()
+    {
+        tickWithPetUnhappy();
+
+		assertActions(">S:feed pet");
     }
 };
 

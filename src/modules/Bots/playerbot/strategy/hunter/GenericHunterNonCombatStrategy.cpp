@@ -55,4 +55,8 @@ void GenericHunterNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigg
     triggers.push_back(new TriggerNode(
         "hunters pet low health",
         NextAction::array(0, new NextAction("mend pet", 60.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "pet not happy",
+        NextAction::array(0, new NextAction("feed pet", 60.0f), NULL)));
 }

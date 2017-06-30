@@ -29,6 +29,15 @@ bool PetIsDeadValue::Calculate()
     return bot->GetPet() && bot->GetPet()->GetDeathState() != ALIVE;
 }
 
+bool PetIsHappyValue::Calculate()
+{
+    PetDatabaseStatus status = Pet::GetStatusFromDB(bot);
+    if (status == PET_DB_DEAD)
+        return true;
+
+    return !bot->GetPet() || bot->GetPet()->GetHappinessState() == HAPPY;
+}
+
 
 uint8 RageValue::Calculate()
 {
@@ -127,3 +136,4 @@ uint8 SpeedValue::Calculate()
 
     return (uint8) (100.0f * target->GetSpeedRate(MOVE_RUN));
 }
+

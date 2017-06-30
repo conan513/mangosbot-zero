@@ -76,12 +76,37 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     if (name.empty())
         return false;
 
-	uint8 skin = urand(0, 7);
-	uint8 face = urand(0, 7);
-	uint8 hairStyle = urand(0, 7);
-	uint8 hairColor = urand(0, 7);
-	uint8 facialHair = urand(0, 7);
-	uint8 outfitId = 0;
+    vector<uint8> skinColors, facialHairTypes;
+    vector<pair<uint8,uint8>> faces, hairs;
+    for (CharSectionsMap::const_iterator itr = sCharSectionMap.begin(); itr != sCharSectionMap.end(); ++itr)
+    {
+        CharSectionsEntry const* entry = itr->second;
+        if (entry->Race != race || entry->Gender != gender)
+            continue;
+
+        switch (entry->GenType)
+        {
+        case SECTION_TYPE_SKIN:
+            skinColors.push_back(entry->Color);
+            break;
+        case SECTION_TYPE_FACE:
+            faces.push_back(pair<uint8,uint8>(entry->Type, entry->Color));
+            break;
+        case SECTION_TYPE_FACIAL_HAIR:
+            facialHairTypes.push_back(entry->Type);
+            break;
+        case SECTION_TYPE_HAIR:
+            hairs.push_back(pair<uint8,uint8>(entry->Type, entry->Color));
+            break;
+        }
+    }
+
+    uint8 skinColor = skinColors[urand(0, skinColors.size() - 1)];
+    pair<uint8,uint8> face = faces[urand(0, faces.size() - 1)];
+    pair<uint8,uint8> hair = hairs[urand(0, hairs.size() - 1)];
+
+	bool excludeCheck = (race == RACE_TAUREN) || (gender == GENDER_FEMALE && race != RACE_NIGHTELF && race != RACE_UNDEAD);
+	uint8 facialHair = excludeCheck ? 0 : facialHairTypes[urand(0, facialHairTypes.size() - 1)];
 
 	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER, 0, LOCALE_enUS);
 	if (!session)
@@ -92,7 +117,12 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     }
 
     Player *player = new Player(session);
-	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender, skin, face, hairStyle, hairColor, facialHair, outfitId))
+	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender,
+	        face.second, // skinColor,
+	        face.first,
+	        hair.first,
+	        hair.second, // hairColor,
+	        facialHair, 0))
     {
         player->DeleteFromDB(player->GetObjectGuid(), accountId, true, true);
         delete session;

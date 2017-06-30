@@ -369,6 +369,13 @@ void EngineTestBase::tickWithPetDead()
     set<bool>("pet dead", false);
 }
 
+void EngineTestBase::tickWithPetUnhappy()
+{
+    set<bool>("pet happy", false);
+    tick();
+    set<bool>("pet happy", true);
+}
+
 void EngineTestBase::tickWithLowMana(int amount)
 {
     Value<float>* distance = context->GetValue<float>("distance", "current target");
