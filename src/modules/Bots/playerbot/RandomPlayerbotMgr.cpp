@@ -26,6 +26,7 @@ INSTANTIATE_SINGLETON_1(RandomPlayerbotMgr);
 RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
 {
     sPlayerbotCommandServer.Start();
+    PrepareTeleportCache();
 }
 
 RandomPlayerbotMgr::~RandomPlayerbotMgr()
@@ -315,6 +316,82 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
     }
 
     sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
+}
+
+void RandomPlayerbotMgr::PrepareTeleportCache()
+{
+    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
+    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+
+    QueryResult* results = CharacterDatabase.PQuery("select map_id, x, y, z, level from ai_playerbot_tele_cache");
+    if (results)
+    {
+        sLog.outBasic("Loading random teleport caches for %d levels...", maxLevel);
+        do
+        {
+            Field* fields = results->Fetch();
+            uint16 mapId = fields[0].GetUInt16();
+            float x = fields[1].GetFloat();
+            float y = fields[2].GetFloat();
+            float z = fields[3].GetFloat();
+            uint16 level = fields[4].GetUInt16();
+            WorldLocation loc(mapId, x, y, z, 0);
+            locsPerLevelCache[level].push_back(loc);
+        } while (results->NextRow());
+        delete results;
+    }
+    else
+    {
+        sLog.outBasic("Preparing random teleport caches for %d levels...", maxLevel);
+        BarGoLink bar(maxLevel);
+        for (uint8 level = 1; level <= maxLevel; level++)
+        {
+            QueryResult* results = WorldDatabase.PQuery("select map, position_x, position_y, position_z "
+                "from (select map, position_x, position_y, position_z, avg(t.maxlevel), avg(t.minlevel), "
+                "%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
+                "from creature c inner join creature_template t on c.id = t.entry group by t.entry) q "
+                "where delta >= 0 and delta <= %u and map in (%s) and not exists ( "
+                "select map, position_x, position_y, position_z from "
+                "("
+                "select map, c.position_x, c.position_y, c.position_z, avg(t.maxlevel), avg(t.minlevel), "
+                "%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
+                "from creature c "
+                "inner join creature_template t on c.id = t.entry group by t.entry "
+                ") q1 "
+                "where delta > %u and q1.map = q.map "
+                "and sqrt("
+                "(q1.position_x - q.position_x)*(q1.position_x - q.position_x) +"
+                "(q1.position_y - q.position_y)*(q1.position_y - q.position_y) +"
+                "(q1.position_z - q.position_z)*(q1.position_z - q.position_z)"
+                ") < %u)",
+                level,
+                sPlayerbotAIConfig.randomBotTeleLevel,
+                sPlayerbotAIConfig.randomBotMapsAsString.c_str(),
+                level,
+                sPlayerbotAIConfig.randomBotTeleLevel,
+                (uint32)sPlayerbotAIConfig.sightDistance
+                );
+            if (results)
+            {
+                do
+                {
+                    Field* fields = results->Fetch();
+                    uint16 mapId = fields[0].GetUInt16();
+                    float x = fields[1].GetFloat();
+                    float y = fields[2].GetFloat();
+                    float z = fields[3].GetFloat();
+                    WorldLocation loc(mapId, x, y, z, 0);
+                    locsPerLevelCache[level].push_back(loc);
+
+                    CharacterDatabase.PExecute("insert into ai_playerbot_tele_cache (level, map_id, x, y, z) values (%u, %u, %f, %f, %f)",
+                            level, mapId, x, y, z);
+                } while (results->NextRow());
+                delete results;
+            }
+            bar.step();
+        }
+    }
 }
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)

@@ -128,6 +128,11 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(QueryResult * dummy, SqlQuery
     botSession->HandlePlayerLogin(lqh); // will delete lqh
 
 	Player* bot = botSession->GetPlayer();
+	if (!bot)
+	{
+	    sLog.outError("Error logging in bot %d, please try to reset all random bots", lqh->GetGuid().GetRawValue());
+	    return;
+	}
     PlayerbotMgr *mgr = bot->GetPlayerbotMgr();
     bot->SetPlayerbotMgr(NULL);
     delete mgr;
