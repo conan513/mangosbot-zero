@@ -30,6 +30,8 @@ uint32 PlayerbotFactory::tradeSkills[] =
     SKILL_FISHING
 };
 
+list<uint32> PlayerbotFactory::classQuestIds;
+
 void PlayerbotFactory::Randomize()
 {
     Randomize(true);
@@ -154,6 +156,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     sLog.outString("Saving to DB...");
     bot->SetMoney(urand(level * 1000, level * 5 * 1000));
     bot->SaveToDB();
+    sLog.outDetail("Done.");
 }
 
 void PlayerbotFactory::InitPet()
@@ -1190,36 +1193,40 @@ void AddPrevQuests(uint32 questId, list<uint32>& questIds)
 
 void PlayerbotFactory::InitQuests()
 {
-    ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
-    list<uint32> questIds;
-    for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+    if (classQuestIds.empty())
     {
-        uint32 questId = i->first;
-        Quest const *quest = i->second;
+        ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
+        for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+        {
+            uint32 questId = i->first;
+            Quest const *quest = i->second;
 
-        if (!quest->GetRequiredClasses() ||
-                quest->GetMinLevel() > bot->getLevel() ||
-                quest->IsRepeatable())
-            continue;
+            if (!quest->GetRequiredClasses() || quest->IsRepeatable())
+                continue;
 
-        AddPrevQuests(questId, questIds);
-        questIds.remove(questId);
-        questIds.push_back(questId);
+            AddPrevQuests(questId, classQuestIds);
+            classQuestIds.remove(questId);
+            classQuestIds.push_back(questId);
+        }
     }
 
-    for (list<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
+    int count = 0;
+    for (list<uint32>::iterator i = classQuestIds.begin(); i != classQuestIds.end(); ++i)
     {
         uint32 questId = *i;
         Quest const *quest = sObjectMgr.GetQuestTemplate(questId);
 
         if (!bot->SatisfyQuestClass(quest, false) ||
+                quest->GetMinLevel() > bot->getLevel() ||
                 !bot->SatisfyQuestRace(quest, false))
             continue;
 
         bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
         bot->RewardQuest(quest, 0, bot, false);
-        ClearInventory();
+        if (!(count++ % 10))
+            ClearInventory();
     }
+    ClearInventory();
 }
 
 void PlayerbotFactory::ClearInventory()

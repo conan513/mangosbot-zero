@@ -72,7 +72,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     uint8 gender = rand() % 2 ? GENDER_MALE : GENDER_FEMALE;
 
     uint8 race = availableRaces[cls][urand(0, availableRaces[cls].size() - 1)];
-    string name = CreateRandomBotName();
+    string name = CreateRandomBotName(gender);
     if (name.empty())
         return false;
 
@@ -142,22 +142,20 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     return true;
 }
 
-string RandomPlayerbotFactory::CreateRandomBotName()
+string RandomPlayerbotFactory::CreateRandomBotName(uint8 gender)
 {
     QueryResult* result = CharacterDatabase.Query("SELECT MAX(name_id) FROM ai_playerbot_names");
     if (!result)
     {
-        sLog.outError("No more names left for random guilds");
+        sLog.outError("No more names left for random bots");
         return "";
     }
 
     Field *fields = result->Fetch();
     uint32 maxId = fields[0].GetUInt32();
+    delete result;
 
-    uint32 id = urand(0, maxId);
-    result = CharacterDatabase.PQuery("SELECT n.name FROM ai_playerbot_names n "
-            "LEFT OUTER JOIN characters e ON e.name = n.name "
-            "WHERE e.guid IS NULL AND n.name_id >= '%u' LIMIT 1", id);
+    result = CharacterDatabase.PQuery("SELECT n.name FROM ai_playerbot_names n LEFT OUTER JOIN characters e ON e.name = n.name WHERE e.guid IS NULL and n.gender = '%u' order by rand() limit 1", gender);
     if (!result)
     {
         sLog.outError("No more names left for random bots");
