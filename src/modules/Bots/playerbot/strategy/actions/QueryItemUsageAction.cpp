@@ -129,6 +129,7 @@ string QueryItemUsageAction::QueryItemPrice(ItemPrototype const *item)
             Item* sell = *i;
             sellPrice = sell->GetCount() * auctionbot.GetSellPrice(sell->GetProto()) * sRandomPlayerbotMgr.GetSellMultiplier(bot);
             msg << "Sell: " << chat->formatMoney(sellPrice);
+            break;
         }
     }
 
