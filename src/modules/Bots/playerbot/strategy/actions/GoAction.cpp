@@ -26,6 +26,26 @@ bool GoAction::Execute(Event event)
         return true;
     }
 
+    list<ObjectGuid> gos = ChatHelper::parseGameobjects(param);
+    if (!gos.empty())
+    {
+        for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); ++i)
+        {
+            GameObject* go = ai->GetGameObject(*i);
+            if (go && go->isSpawned())
+            {
+                if (bot->GetDistance2d(go) > sPlayerbotAIConfig.reactDistance)
+                {
+                    ai->TellMaster("It is too far away");
+                    return false;
+                }
+
+                return MoveNear(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 0.5f, sPlayerbotAIConfig.followDistance);
+            }
+        }
+        return false;
+    }
+
     if (param.find(",") == string::npos)
     {
         ai->TellMaster("Whisper 'go x,y' in map coords and I'll go there");
