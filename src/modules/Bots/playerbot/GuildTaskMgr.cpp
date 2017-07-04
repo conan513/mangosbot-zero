@@ -39,6 +39,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     if (!GetTaskValue(0, 0, "advert_cleanup"))
     {
         CleanupAdverts();
+        RemoveDuplicatedAdverts();
         SetTaskValue(0, 0, "advert_cleanup", 1, sPlayerbotAIConfig.guildTaskAdvertCleanupTime);
     }
 
@@ -676,6 +677,13 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
         return true;
     }
 
+    if (cmd == "cleanup")
+    {
+        sGuildTaskMgr.CleanupAdverts();
+        sGuildTaskMgr.RemoveDuplicatedAdverts();
+        return true;
+    }
+
     if (cmd == "reward")
     {
         sLog.outString("Usage: gtask reward <player name>");
@@ -930,4 +938,60 @@ void GuildTaskMgr::CleanupAdverts()
         CharacterDatabase.PExecute("delete from mail where subject like 'Guild Task%%' and deliver_time <= '%u'", deliverTime);
         sLog.outBasic("%d old gtask adverts removed", count);
     }
+}
+
+void GuildTaskMgr::RemoveDuplicatedAdverts()
+{
+    uint32 deliverTime = time(0);
+    QueryResult *result = CharacterDatabase.PQuery(
+            "select m.id, m.receiver from (SELECT max(id) as id, subject, receiver FROM mail where subject like 'Guild Task%%' and deliver_time <= '%u' group by subject, receiver) q "
+            "join mail m on m.subject = q.subject where m.id <> q.id and m.deliver_time <= '%u'",
+            deliverTime, deliverTime);
+    if (!result)
+        return;
+
+    list<uint32> ids;
+    int count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+        uint32 receiver = fields[1].GetUInt32();
+        Player *player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, receiver));
+        if (player) player->RemoveMail(id);
+        count++;
+        ids.push_back(id);
+    } while (result->NextRow());
+    delete result;
+
+    if (count > 0)
+    {
+        list<uint32> buffer;
+        for (list<uint32>::iterator i = ids.begin(); i != ids.end(); ++i)
+        {
+            buffer.push_back(*i);
+            if (buffer.size() > 50)
+            {
+                DeleteMail(buffer);
+                buffer.clear();
+            }
+        }
+        DeleteMail(buffer);
+        sLog.outBasic("%d duplicated gtask adverts removed", count);
+    }
+
+}
+
+void GuildTaskMgr::DeleteMail(list<uint32> buffer)
+{
+    ostringstream sql;
+    sql << "delete from mail where id in ( ";
+    bool first = true;
+    for (list<uint32>::iterator j = buffer.begin(); j != buffer.end(); ++j)
+    {
+        if (first) first = false; else sql << ",";
+        sql << "'" << *j << "'";
+    }
+    sql << ")";
+    CharacterDatabase.PExecute(sql.str().c_str());
 }
