@@ -85,7 +85,7 @@ bool GoAction::Execute(Event event)
         return MoveNear(bot->GetMapId(), x, y, z + 0.5f, sPlayerbotAIConfig.followDistance);
     }
 
-    ai::Position& pos = context->GetValue<ai::Position&>("position", param)->Get();
+    ai::Position pos = context->GetValue<ai::PositionMap&>("position")->Get()[param];
     if (pos.isSet())
     {
         if (bot->GetDistance2d(pos.x, pos.y) > sPlayerbotAIConfig.reactDistance)

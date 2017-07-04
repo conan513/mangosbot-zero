@@ -12,7 +12,6 @@ namespace ai
         {}
 
         virtual bool Execute(Event event);
-
     };
 
     class MoveToPositionAction : public MovementAction

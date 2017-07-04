@@ -8,6 +8,7 @@
 
 #include "LootObjectStack.h"
 #include "strategy/values/Formations.h"
+#include "strategy/values/PositionValue.h"
 INSTANTIATE_SINGLETON_1(PlayerbotDbStore);
 
 using namespace std;
@@ -84,6 +85,17 @@ void PlayerbotDbStore::Save(PlayerbotAI *ai)
     uint32 saveMana = (uint32)round(ai->GetAiObjectContext()->GetValue<double>("mana save level")->Get());
     ostringstream outSaveMana; outSaveMana << "save mana " << saveMana;
     SaveValue(guid, "save mana", outSaveMana.str());
+
+    ai::PositionMap& posMap = ai->GetAiObjectContext()->GetValue<ai::PositionMap&>("position")->Get();
+    for (ai::PositionMap::iterator i = posMap.begin(); i != posMap.end(); ++i)
+    {
+        ai::Position pos = i->second;
+        if (pos.isSet())
+        {
+            ostringstream out; out << "position " << i->first << " " << pos.x << "," << pos.y << "," << pos.z;
+            SaveValue(guid, "position", out.str());
+        }
+    }
 }
 
 string PlayerbotDbStore::FormatStrategies(string type, list<string> strategies)
