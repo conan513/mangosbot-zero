@@ -433,12 +433,38 @@ uint32 GuildTaskMgr::GetMaxItemTaskCount(uint32 itemId)
     if (!proto)
         return 0;
 
-    if (proto->Quality == ITEM_QUALITY_NORMAL && proto->Stackable && proto->GetMaxStackSize() > 1)
-        return urand(2, 4) * proto->GetMaxStackSize();
-    else if (proto->Quality < ITEM_QUALITY_RARE && proto->Stackable && proto->GetMaxStackSize() > 1)
-        return proto->GetMaxStackSize();
-    else if (proto->Stackable && proto->GetMaxStackSize() > 1)
-        return urand(1 + proto->GetMaxStackSize() / 4, proto->GetMaxStackSize());
+    if (!proto->Stackable || proto->GetMaxStackSize() == 1)
+        return 1;
+
+    if (proto->Quality == ITEM_QUALITY_NORMAL)
+    {
+        switch (proto->GetMaxStackSize())
+        {
+        case 5:
+            return urand(1, 3) * proto->GetMaxStackSize();
+        case 10:
+            return urand(2, 6) * proto->GetMaxStackSize() / 2;
+        case 20:
+            return urand(4, 12) * proto->GetMaxStackSize() / 4;
+        default:
+            return proto->GetMaxStackSize();
+        }
+    }
+
+    if (proto->Quality < ITEM_QUALITY_RARE)
+    {
+        switch (proto->GetMaxStackSize())
+        {
+        case 5:
+            return proto->GetMaxStackSize();
+        case 10:
+            return urand(1, 2) * proto->GetMaxStackSize() / 2;
+        case 20:
+            return urand(1, 4) * proto->GetMaxStackSize() / 4;
+        default:
+            return proto->GetMaxStackSize();
+        }
+    }
 
     return 1;
 }
