@@ -78,6 +78,30 @@ bool MailAction::Execute(Event event)
             if (index++ != atoi(i->c_str()) && *i != "*")
                 continue;
 
+            uint32 totalused = 0, total = 16;
+            for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+            {
+                if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    totalused++;
+            }
+            uint32 totalfree = 16 - totalused;
+            for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+            {
+                if (const Bag* const pBag = (Bag*) bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
+                {
+                    ItemPrototype const* pBagProto = pBag->GetProto();
+                    if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+                        totalfree += pBag->GetFreeSlots();
+                }
+
+            }
+
+            if (totalfree < 2)
+            {
+                ai->TellMaster("Not enough bag space");
+                return false;
+            }
+
             if (mail->money)
             {
                 ostringstream out;
