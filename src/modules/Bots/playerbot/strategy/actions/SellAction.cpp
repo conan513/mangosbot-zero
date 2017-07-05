@@ -76,20 +76,23 @@ void SellAction::Sell(FindItemVisitor* visitor)
 void SellAction::Sell(Item* item)
 {
     Player* master = GetMaster();
-    ObjectGuid vendorguid = master->GetSelectionGuid();
-    if (!vendorguid)
+    list<ObjectGuid> vendors = ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("nearest npcs")->Get();
+    bool bought = false;
+    for (list<ObjectGuid>::iterator i = vendors.begin(); i != vendors.end(); ++i)
     {
-        ai->TellMaster("Select a vendor first");
-        return;
+        ObjectGuid vendorguid = *i;
+        Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
+        if (!pCreature)
+            continue;
+
+        ObjectGuid itemguid = item->GetObjectGuid();
+        uint32 count = item->GetCount();
+
+        WorldPacket p;
+        p << vendorguid << itemguid << count;
+        bot->GetSession()->HandleSellItemOpcode(p);
+
+        ostringstream out; out << "Selling " << chat->formatItem(item->GetProto());
+        ai->TellMaster(out);
     }
-
-    ObjectGuid itemguid = item->GetObjectGuid();
-    uint32 count = item->GetCount();
-
-    WorldPacket p;
-    p << vendorguid << itemguid << count;
-    bot->GetSession()->HandleSellItemOpcode(p);
-
-    ostringstream out; out << chat->formatItem(item->GetProto()) << " sold";
-    ai->TellMaster(out);
 }

@@ -19,35 +19,34 @@ bool BuyAction::Execute(Event event)
     if (!master)
         return false;
 
-    ObjectGuid vendorguid = master->GetSelectionGuid();
-    if (!vendorguid)
-        return false;
-
-    Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
-    if (!pCreature)
+    list<ObjectGuid> vendors = ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("nearest npcs")->Get();
+    bool bought = false;
+    for (list<ObjectGuid>::iterator i = vendors.begin(); i != vendors.end(); ++i)
     {
-        ai->TellMaster("Cannot talk to vendor");
-        return false;
-    }
+        ObjectGuid vendorguid = *i;
+        Creature *pCreature = bot->GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
+        if (!pCreature)
+            continue;
 
-    VendorItemData const* tItems = pCreature->GetVendorItems();
-    if (!tItems)
-    {
-        ai->TellMaster("This vendor has no items");
-        return false;
-    }
+        VendorItemData const* tItems = pCreature->GetVendorItems();
+        if (!tItems)
+            continue;
 
-    for (ItemIds::iterator i = itemIds.begin(); i != itemIds.end(); i++)
-    {
-        for (uint32 slot = 0; slot < tItems->GetItemCount(); slot++)
+        for (ItemIds::iterator i = itemIds.begin(); i != itemIds.end(); i++)
         {
-            if (tItems->GetItem(slot)->item == *i)
+            for (uint32 slot = 0; slot < tItems->GetItemCount(); slot++)
             {
-                bot->BuyItemFromVendor(vendorguid, *i, 1, NULL_BAG, NULL_SLOT);
-                ai->TellMaster("Bought item");
+                const ItemPrototype* proto = sObjectMgr.GetItemPrototype(*i);
+                if (proto && tItems->GetItem(slot)->item == *i)
+                {
+                    bot->BuyItemFromVendor(vendorguid, *i, 1, NULL_BAG, NULL_SLOT);
+                    ostringstream out; out << "Buying " << ChatHelper::formatItem(proto);
+                    ai->TellMaster(out.str());
+                    bought = true;
+                }
             }
         }
     }
 
-    return true;
+    return bought;
 }
