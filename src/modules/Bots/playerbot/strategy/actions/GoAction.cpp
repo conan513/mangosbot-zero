@@ -80,7 +80,9 @@ bool GoAction::Execute(Event event)
             return false;
         }
 
-        ostringstream out; out << "Moving to " << x << "," << y;
+        float x1 = x, y1 = y;
+        Map2ZoneCoordinates(x1, y1, bot->GetZoneId());
+        ostringstream out; out << "Moving to " << x1 << "," << y1;
         ai->TellMasterNoFacing(out.str());
         return MoveNear(bot->GetMapId(), x, y, z + 0.5f, sPlayerbotAIConfig.followDistance);
     }

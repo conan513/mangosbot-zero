@@ -9,7 +9,11 @@ void TellPosition(PlayerbotAI* ai, string name, ai::Position pos)
 {
     ostringstream out; out << "Position " << name;
     if (pos.isSet())
-        out << " is set to " << pos.x << "," << pos.y;
+    {
+        float x = pos.x, y = pos.y;
+        Map2ZoneCoordinates(x, y, ai->GetBot()->GetZoneId());
+        out << " is set to " << x << "," << y;
+    }
     else
         out << " is not set";
     ai->TellMaster(out);
