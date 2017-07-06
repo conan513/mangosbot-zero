@@ -32,22 +32,52 @@ bool SendMailAction::Execute(Event event)
 
     string text = event.getParam();
 
+    ItemIds ids = chat->parseItems(text);
+    if (ids.size() > 1)
+    {
+        ai->TellMaster("You can not request more than one item");
+        return false;
+    }
+
+    if (ids.empty())
+    {
+        uint32 money = chat->parseMoney(text);
+        if (!money)
+            return false;
+
+        if (bot->GetMoney() < money)
+        {
+            ai->TellMaster("I don't have enough money");
+            return false;
+        }
+
+        ostringstream body;
+        body << "Hello, " << master->GetName() << ",\n";
+        body << "\n";
+        body << "Here is the money you asked for";
+        body << "\n";
+        body << "Thanks,\n";
+        body << bot->GetName() << "\n";
+
+
+        MailDraft draft("Money you asked for", body.str());
+        draft.SetMoney(money);
+        bot->SetMoney(bot->GetMoney() - money);
+        draft.SendMailTo(MailReceiver(master), MailSender(bot));
+
+        ai->TellMaster("Mail sent");
+        return true;
+    }
+
     ostringstream body;
     body << "Hello, " << master->GetName() << ",\n";
     body << "\n";
-    body << "Here are the items you asked for";
+    body << "Here are the item(s) you asked for";
     body << "\n";
     body << "Thanks,\n";
     body << bot->GetName() << "\n";
 
-    ItemIds ids = chat->parseItems(text);
-    if (ids.size() > 12)
-    {
-        ai->TellMaster("You can request no more than 12 items");
-        return false;
-    }
-
-    MailDraft draft("Items you asked for", body.str());
+    MailDraft draft("Item(s) you asked for", body.str());
     for (ItemIds::iterator i =ids.begin(); i != ids.end(); i++)
     {
         FindItemByIdVisitor visitor(*i);
@@ -70,11 +100,12 @@ bool SendMailAction::Execute(Event event)
             item->SetOwnerGuid(master->GetObjectGuid());
             item->SaveToDB();
             draft.AddItem(item);
+            draft.SendMailTo(MailReceiver(master), MailSender(bot));
+
+            ai->TellMaster("Mail sent");
+            return true;
         }
     }
 
-    draft.SendMailTo(MailReceiver(master), MailSender(bot));
-
-    ai->TellMaster("Mail sent");
-    return true;
+    return false;
 }
