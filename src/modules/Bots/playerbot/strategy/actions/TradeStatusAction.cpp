@@ -92,7 +92,7 @@ void TradeStatusAction::BeginTrade()
     ListItemsVisitor visitor;
     IterateItems(&visitor);
 
-    ai->TellMaster("=== Trade ===");
+    ai->TellMaster("=== Inventory ===");
     TellItems(visitor.items, visitor.soulbound);
 
     if (sRandomPlayerbotMgr.IsRandomBot(bot))
