@@ -868,6 +868,10 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         rewardType = RANDOM_ITEM_GUILD_TASK_REWARD_TRADE;
     }
 
+    uint32 payment = GetTaskValue(owner, guildId, "payment");
+    if (payment)
+        SendThanks(owner, guildId);
+
     MailDraft draft("Thank You", body.str());
 
     uint32 itemId = sRandomItemMgr.GetRandomItem(rewardType);
@@ -878,7 +882,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         draft.AddItem(item);
     }
 
-    draft.SetMoney(GetTaskValue(owner, guildId, "payment")).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
+    draft.SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
     Player* player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner));
     if (player)
         ChatHandler(player->GetSession()).PSendSysMessage("Guild task reward is pending");
