@@ -33,7 +33,7 @@ bool MailAction::Execute(Event event)
     string text = event.getParam();
     if (text == "?")
     {
-        ai->TellMaster("--- Mailbox ---");
+        ai->TellMaster("=== Mailbox ===");
         time_t cur_time = time(0);
         int index = 1;
         for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
