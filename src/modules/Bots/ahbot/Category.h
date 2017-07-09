@@ -202,7 +202,7 @@ namespace ahbot
                 proto->Class == ITEM_CLASS_ARMOR) && proto->ItemLevel > 1;
         }
         virtual string GetName() { return "equip"; }
-        virtual string GetLabel() { return "equipment"; }
+        virtual string GetLabel() { return "armor and weapons"; }
         virtual uint32 GetMaxAllowedItemAuctionCount(ItemPrototype const* proto)
         {
             return 1;

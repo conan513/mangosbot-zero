@@ -74,13 +74,17 @@ namespace ai
             creators["attackers"] = &ChatTriggerContext::attackers;
             creators["formation"] = &ChatTriggerContext::formation;
             creators["sendmail"] = &ChatTriggerContext::sendmail;
+            creators["mail"] = &ChatTriggerContext::mail;
             creators["outfit"] = &ChatTriggerContext::outfit;
 			creators["stealth"] = &ChatTriggerContext::stealth;
+            creators["go"] = &ChatTriggerContext::go;
         }
 
     private:
 		static Trigger* stealth(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "stealth"); }
+        static Trigger* go(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "go"); }
         static Trigger* outfit(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "outfit"); }
+        static Trigger* mail(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "mail"); }
         static Trigger* sendmail(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "sendmail"); }
         static Trigger* formation(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "formation"); }
         static Trigger* attackers(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "attackers"); }

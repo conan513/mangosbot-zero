@@ -249,22 +249,32 @@ namespace ai
 float Formation::GetFollowAngle()
 {
     Player* master = GetMaster();
-    Group* group = master ? master->GetGroup() : bot->GetGroup();
-    if (!group)
-        return 0.0f;
-
-    int index = 1;
-    for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+    Group* group = bot->GetGroup();
+    int index = 0, total = 1;
+    float start = (master ? master->GetOrientation() : 0.0f);
+    if (!group && master)
     {
-        if( ref->getSource() == master)
-            continue;
-
-        if( ref->getSource() == bot)
-            return 2 * M_PI / (group->GetMembersCount() -1) * index;
-
-        index++;
+        for (PlayerBotMap::const_iterator i = master->GetPlayerbotMgr()->GetPlayerBotsBegin(); i != master->GetPlayerbotMgr()->GetPlayerBotsEnd(); ++i)
+        {
+            if (i->second == bot) index = total;
+            total++;
+        }
     }
-    return 0;
+    else
+    {
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            if( ref->getSource() == master)
+                continue;
+
+            if( ref->getSource() == bot)
+                index = total;
+
+            total++;
+        }
+    }
+
+    return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
 FormationValue::FormationValue(PlayerbotAI* ai) : ManualSetValue<Formation*>(ai, new NearFormation(ai), "formation")

@@ -29,6 +29,7 @@ public:
     uint32 maxItemLevel, maxRequiredLevel;
     float underPriceProbability;
     std::set<uint32> ignoreItemIds;
+    bool sendmail;
 
     float GetSellPriceMultiplier(string category)
     {

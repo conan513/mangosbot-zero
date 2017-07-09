@@ -66,9 +66,12 @@ void InventoryAction::IterateItems(IterateItemsVisitor* visitor, IterateItemsMas
 
 void InventoryAction::IterateItemsInBags(IterateItemsVisitor* visitor)
 {
-
-
     for(int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (!visitor->Visit(pItem))
+                return;
+
+    for(int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
         if (Item *pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (!visitor->Visit(pItem))
                 return;
@@ -116,7 +119,7 @@ bool compare_items_by_level(const Item* item1, const Item* item2)
     return compare_items(item1->GetProto(), item2->GetProto());
 }
 
-void InventoryAction::TellItems(map<uint32, int> itemMap)
+void InventoryAction::TellItems(map<uint32, int> itemMap, map<uint32, bool> soulbound)
 {
     list<ItemPrototype const*> items;
     for (map<uint32, int>::iterator i = itemMap.begin(); i != itemMap.end(); i++)
@@ -175,13 +178,17 @@ void InventoryAction::TellItems(map<uint32, int> itemMap)
             }
         }
 
-        TellItem(proto, itemMap[proto->ItemId]);
+        TellItem(proto, itemMap[proto->ItemId], soulbound[proto->ItemId]);
     }
 }
 
-void InventoryAction::TellItem(ItemPrototype const * proto, int count)
+void InventoryAction::TellItem(ItemPrototype const * proto, int count, bool soulbound)
 {
-    ai->TellMaster(chat->formatItem(proto, count));
+    ostringstream out;
+    out << chat->formatItem(proto, count);
+    if (soulbound)
+        out << " (soulbound)";
+    ai->TellMaster(out.str());
 }
 
 list<Item*> InventoryAction::parseItems(string text)

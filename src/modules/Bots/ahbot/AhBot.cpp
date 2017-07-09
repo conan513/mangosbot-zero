@@ -16,6 +16,7 @@
 #include "AccountMgr.h"
 #include "playerbot/playerbot.h"
 #include "Player.h"
+#include "Mail.h"
 
 using namespace ahbot;
 
@@ -304,10 +305,18 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         if (!curPrice) curPrice = entry->startbid;
         if (!curPrice) curPrice = entry->buyout;
 
+        uint32 bidder = GetRandomBidder(auctionIds[auction]);
+        if (!bidder)
+        {
+            sLog.outError( "No bidders for auction %d", auctionIds[auction]);
+            break;
+        }
+
         if (curPrice > buyoutPrice)
         {
             sLog.outDetail( "%s (x%d) in auction %d: price %d > %d (buyout price)",
                     proto->Name1, item->GetCount(), auctionIds[auction], curPrice, buyoutPrice);
+            CheckSendMail(bidder, buyoutPrice, entry);
             continue;
         }
 
@@ -332,6 +341,7 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
         {
             sLog.outDetail( "%s (x%d) in auction %d: %d (startbid) > %d (minBid)",
                     proto->Name1, item->GetCount(), auctionIds[auction], entry->startbid, minBid);
+            CheckSendMail(bidder, minBid, entry);
             continue;
         }
 
@@ -342,13 +352,6 @@ int AhBot::Answer(int auction, Category* category, ItemBag* inAuctionItems)
             sLog.outDetail( "%s (x%d) in auction %d: will buy/bid in %d seconds",
                     proto->Name1, item->GetCount(), auctionIds[auction], buytime - time(0));
             continue;
-        }
-
-        uint32 bidder = GetRandomBidder(auctionIds[auction]);
-        if (!bidder)
-        {
-            sLog.outError( "No bidders for auction %d", auctionIds[auction]);
-            break;
         }
 
         entry->bidder = bidder;
@@ -852,12 +855,24 @@ void AhBot::CheckCategoryMultipliers()
 
     CharacterDatabase.PExecute("DELETE FROM ahbot_category");
 
+    set<string> tmp;
     for (int i = 0; i < CategoryList::instance.size(); i++)
     {
         string name = CategoryList::instance[i]->GetName();
+        if (tmp.find(name) != tmp.end())
+            continue;
+
+        tmp.insert(name);
         if (categoryMultiplierExpireTimes[name] <= time(0) || categoryMultipliers[name] <= 0)
         {
-            categoryMultipliers[name] = (double)urand(20, 100) / 20.0;
+            uint32 k = urand(1, 100);
+            double m = 1.0;
+            double r = (double)urand(100, 200) / 100.0;
+            if (k < 50) m = r; // 1..2
+            else if (k < 80) m = 1 + r; // 2..3
+            else if (k < 90) m = 2 + r; // 3..4
+            else m = 3 + r; // 4..5
+            categoryMultipliers[name] = m;
             uint32 maxAllowedAuctionCount = CategoryList::instance[i]->GetMaxAllowedAuctionCount();
             categoryMaxAuctionCount[name] = urand(maxAllowedAuctionCount / 2, maxAllowedAuctionCount);
             categoryMultiplierExpireTimes[name] = time(0) + urand(4, 7) * 3600 * 24;
@@ -1049,6 +1064,58 @@ bool AhBot::IsUsedBySkill(const ItemPrototype* proto, uint32 skillId)
     }
 
     return false;
+}
+
+void AhBot::CheckSendMail(uint32 bidder, uint32 price, AuctionEntry *entry)
+{
+    if (!sAhBotConfig.sendmail)
+        return;
+
+    time_t entryTime = GetTime("entry", entry->Id, entry->auctionHouseEntry->houseId, AHBOT_SENDMAIL);
+    if (entryTime > time(0))
+        return;
+
+    const AuctionHouseEntry* ahEntry = sAuctionHouseStore.LookupEntry(entry->auctionHouseEntry->houseId);
+    if (!ahEntry)
+        return;
+
+    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(ahEntry);
+    const AuctionHouseObject::AuctionEntryMap& auctionEntryMap = auctionHouse->GetAuctions();
+    for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = auctionEntryMap.begin(); itr != auctionEntryMap.end(); ++itr)
+    {
+        AuctionEntry *otherEntry = itr->second;
+        if (otherEntry->owner == entry->owner && otherEntry->Id != entry->Id && otherEntry->itemTemplate == entry->itemTemplate)
+        {
+            time_t otherEntryTime = GetTime("entry", otherEntry->Id, entry->auctionHouseEntry->houseId, AHBOT_SENDMAIL);
+            if (otherEntryTime > time(0))
+                return;
+        }
+    }
+
+    ostringstream body;
+    body << "Hello,\n";
+    body << "\n";
+    Item *item = sAuctionMgr.GetAItem(entry->itemGuidLow);
+    if (!item)
+        return;
+    body << "I see you posted " << ChatHelper::formatItem(item->GetProto(), item->GetCount());
+    body << " to the AH and I really need that at the moment. Could you lower your price at least to ";
+    body << ChatHelper::formatMoney(PricingStrategy::RoundPrice(price)) << "? I'll buy it then.\n";
+    body << "\n";
+    body << "Regards,\n";
+
+    string name;
+    if (!sObjectMgr.GetPlayerNameByGUID((uint64)bidder, name))
+        return;
+
+    body << name << "\n";
+
+    ostringstream title; title << "AH Proposition: " << item->GetProto()->Name1;
+    MailDraft draft(title.str(), body.str());
+    ObjectGuid receiverGuid(HIGHGUID_PLAYER, entry->owner);
+    draft.SendMailTo(MailReceiver(receiverGuid), MailSender(MAIL_NORMAL, bidder));
+
+    SetTime("entry", entry->Id, entry->auctionHouseEntry->houseId, AHBOT_SENDMAIL, entry->expireTime);
 }
 
 INSTANTIATE_SINGLETON_1( ahbot::AhBot );

@@ -200,7 +200,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     {
         if (!GetEventValue(bot, "dead"))
         {
-            sLog.outString("Setting dead flag for bot %d", bot);
+            sLog.outDetail("Setting dead flag for bot %d", bot);
             uint32 randomTime = urand(sPlayerbotAIConfig.minRandomBotReviveTime, sPlayerbotAIConfig.maxRandomBotReviveTime);
             SetEventValue(bot, "dead", 1, randomTime);
             SetEventValue(bot, "revive", 1, randomTime - 60);
@@ -247,7 +247,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     uint32 teleport = GetEventValue(bot, "teleport");
     if (!teleport)
     {
-        sLog.outString("Random teleporting bot %d", bot);
+        sLog.outDetail("Random teleporting bot %d", bot);
         RandomTeleportForLevel(player);
         SetEventValue(bot, "teleport", 1, sPlayerbotAIConfig.maxRandomBotInWorldTime);
         return true;
@@ -259,7 +259,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
 void RandomPlayerbotMgr::Revive(Player* player)
 {
     uint32 bot = player->GetGUIDLow();
-    sLog.outString("Reviving dead bot %d", bot);
+    sLog.outDetail("Reviving dead bot %d", bot);
     SetEventValue(bot, "dead", 0, 0);
     SetEventValue(bot, "revive", 0, 0);
     RandomTeleport(player);
@@ -306,7 +306,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
             continue;
 
         z = 0.05f + ground;
-        sLog.outString("Random teleporting bot %s to %s %f,%f,%f (%u/%u locations)",
+        sLog.outDetail("Random teleporting bot %s to %s %f,%f,%f (%u/%u locations)",
                 bot->GetName(), area->area_name[0], x, y, z, attemtps, locs.size());
 
         bot->GetMotionMaster()->Clear();
@@ -319,7 +319,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
 
 void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 {
-    sLog.outString("Preparing location to random teleporting bot %s for level %u", bot->GetName(), bot->getLevel());
+    sLog.outDetail("Preparing location to random teleporting bot %s for level %u", bot->GetName(), bot->getLevel());
 
     if (locsPerLevelCache[bot->getLevel()].empty()) {
         QueryResult* results = WorldDatabase.PQuery("select map, position_x, position_y, position_z "
@@ -504,7 +504,7 @@ uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, 
 
 void RandomPlayerbotMgr::Refresh(Player* bot)
 {
-    sLog.outString("Refreshing bot %s", bot->GetName());
+    sLog.outDetail("Refreshing bot %s", bot->GetName());
     if (bot->IsDead())
     {
         bot->ResurrectPlayer(1.0f);

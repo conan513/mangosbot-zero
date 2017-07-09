@@ -11,11 +11,12 @@ namespace ai
         virtual bool Execute(Event event);
 
     protected:
-        void QueryItemsUsage(ItemIds items);
-        bool QueryItemUsage(ItemPrototype const *item);
-        void QueryItemPrice(ItemPrototype const *item);
-        void QueryQuestItem(uint32 itemId, const Quest *questTemplate, const QuestStatusData *questStatus);
-        void QueryQuestItem(uint32 itemId);
+        uint32 GetCount(ItemPrototype const *item);
+        string QueryItem(ItemPrototype const *item, uint32 count, uint32 total);
+        string QueryItemUsage(ItemPrototype const *item);
+        string QueryItemPrice(ItemPrototype const *item);
+        string QueryQuestItem(uint32 itemId, const Quest *questTemplate, const QuestStatusData *questStatus);
+        string QueryQuestItem(uint32 itemId);
 
     private:
         ostringstream out;

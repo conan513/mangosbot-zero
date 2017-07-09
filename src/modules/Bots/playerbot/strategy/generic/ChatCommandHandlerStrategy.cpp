@@ -188,8 +188,10 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("save mana");
     supported.push_back("formation");
     supported.push_back("sendmail");
+    supported.push_back("mail");
     supported.push_back("outfit");
 	supported.push_back("stealth");
+    supported.push_back("go");
 	supported.push_back("prowl");
 	supported.push_back("poisoning");
 }

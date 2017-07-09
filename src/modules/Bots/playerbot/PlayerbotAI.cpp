@@ -638,7 +638,7 @@ GameObject* PlayerbotAI::GetGameObject(ObjectGuid guid)
 bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securityLevel)
 {
     Player* master = GetMaster();
-    if (!master)
+    if (!master || master->IsBeingTeleported())
         return false;
 
     if (!GetSecurity()->CheckLevelFor(securityLevel, true, master))
@@ -663,7 +663,7 @@ bool PlayerbotAI::TellMaster(string text, PlayerbotSecurityLevel securityLevel)
     if (!TellMasterNoFacing(text, securityLevel))
         return false;
 
-    if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId())
+    if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId() && !bot->IsTaxiFlying())
     {
         if (!bot->IsInFront(master, sPlayerbotAIConfig.sightDistance, M_PI / 2))
             bot->SetFacingTo(bot->GetAngle(master));
@@ -949,7 +949,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     }
 
 
-    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2) && !bot->IsTaxiFlying())
     {
         bot->SetFacingTo(bot->GetAngle(faceTo));
         spell->cancel();

@@ -104,6 +104,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
                     this->guid = guid;
                 }
                 break;
+            case LOCK_KEY_NONE:
+                this->guid = guid;
+                break;
             }
         }
     }

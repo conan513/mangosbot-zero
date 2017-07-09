@@ -30,7 +30,9 @@ public:
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
 
+    uint32 openGoSpell;
     bool randomBotAutologin;
+    bool botAutologin;
     std::string randomBotMapsAsString;
     std::vector<uint32> randomBotMaps;
     std::list<uint32> randomBotQuestItems;
@@ -69,6 +71,7 @@ public:
     uint32 minGuildTaskChangeTime, maxGuildTaskChangeTime;
     uint32 minGuildTaskAdvertisementTime, maxGuildTaskAdvertisementTime;
     uint32 minGuildTaskRewardTime, maxGuildTaskRewardTime;
+    uint32 guildTaskAdvertCleanupTime;
 
     uint32 iterationsPerTick;
 

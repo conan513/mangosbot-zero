@@ -374,6 +374,9 @@ bool SetFacingTargetAction::Execute(Event event)
     if (!target)
         return false;
 
+    if (bot->IsTaxiFlying())
+        return true;
+
     bot->SetFacingTo(bot->GetAngle(target));
     ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
     return true;

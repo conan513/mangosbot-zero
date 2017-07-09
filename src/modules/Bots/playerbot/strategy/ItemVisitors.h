@@ -224,6 +224,7 @@ namespace ai
         ListItemsVisitor() : IterateItemsVisitor() {}
 
         map<uint32, int> items;
+        map<uint32, bool> soulbound;
 
         virtual bool Visit(Item* item)
         {
@@ -233,6 +234,7 @@ namespace ai
                 items[id] = 0;
 
             items[id] += item->GetCount();
+            soulbound[id] = item->IsSoulBound();
             return true;
         }
     };

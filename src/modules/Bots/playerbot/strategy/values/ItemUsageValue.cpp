@@ -29,7 +29,15 @@ ItemUsage ItemUsageValue::Calculate()
     if (bot->GetGuildId() && sGuildTaskMgr.IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
-    return QueryItemUsageForEquip(proto);
+    ItemUsage equip = QueryItemUsageForEquip(proto);
+    if (equip != ITEM_USAGE_NONE)
+        return equip;
+
+    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP &&
+            bot->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
+        return ITEM_USAGE_DISENCHANT;
+
+    return ITEM_USAGE_NONE;
 }
 
 ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const * item)

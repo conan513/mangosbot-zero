@@ -32,7 +32,6 @@ bool LootRollAction::Execute(Event event)
             if (!proto)
                 continue;
 
-            QueryItemUsage(proto);
             if (IsLootAllowed(itemId, bot->GetPlayerbotAI()))
             {
                 vote = ROLL_NEED;

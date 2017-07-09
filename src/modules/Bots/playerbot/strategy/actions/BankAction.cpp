@@ -110,24 +110,27 @@ void BankAction::ListItems()
     ai->TellMaster("=== Bank ===");
 
     map<uint32, int> items;
-    for (uint8 bag = BANK_SLOT_BAG_START; bag < BANK_SLOT_BAG_END; ++bag)
-    {
-        const Bag* const pBag = static_cast<Bag *>(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag));
-        if (pBag)
-        {
-            const ItemPrototype* const pBagProto = pBag->GetProto();
-            std::string bagName = pBagProto->Name1;
-
-            for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
+    map<uint32, bool> soulbound;
+    for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem)
             {
-                Item* const item = bot->GetItemByPos(bag, slot);
-                if (item)
-                    items[item->GetProto()->ItemId] = item->GetCount();
+                items[pItem->GetProto()->ItemId] += pItem->GetCount();
+                soulbound[pItem->GetProto()->ItemId] = pItem->IsSoulBound();
             }
-        }
-    }
 
-    TellItems(items);
+    for (int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pBag)
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                    if (Item* pItem = pBag->GetItemByPos(j))
+                        if (pItem)
+                        {
+                            items[pItem->GetProto()->ItemId] += pItem->GetCount();
+                            soulbound[pItem->GetProto()->ItemId] = pItem->IsSoulBound();
+                        }
+
+    TellItems(items, soulbound);
 }
 
 Item* BankAction::FindItemInBank(uint32 ItemId)
