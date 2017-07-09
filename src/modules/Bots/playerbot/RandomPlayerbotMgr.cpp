@@ -841,10 +841,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
         }
     }
 
-    if (player->GetPlayerbotAI())
-        return;
-
-    players.push_back(player);
+    if (!IsRandomBot(player)) players.push_back(player);
 }
 
 Player* RandomPlayerbotMgr::GetRandomPlayer()
