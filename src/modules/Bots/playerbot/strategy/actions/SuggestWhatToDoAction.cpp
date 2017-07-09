@@ -125,7 +125,10 @@ void SuggestWhatToDoAction::grindMaterials()
                 {
                     string item = category->GetLabel();
                     transform(item.begin(), item.end(), item.begin(), tolower);
-                    ostringstream msg;
+                    ostringstream itemout, msg;
+                    itemout << "|c0000FF00" << item << "|cffffffff";
+                    item = itemout.str();
+                    msg << "|cffffffff";
                     switch (urand(0, 4))
                     {
                     case 0:
