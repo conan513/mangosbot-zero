@@ -320,6 +320,7 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
 
     ostringstream subject;
     subject << "Guild Task: " << proto->Name1;
+    if (count > 1) subject << " (x" << count << ")";
     MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
     return true;
