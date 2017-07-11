@@ -45,16 +45,27 @@ bool MailAction::Execute(Event event)
             int days = (cur_time - mail->deliver_time) / 3600 / 24;
             ostringstream out;
             out << "#" << index++ << " ";
-            out << "|cffffffff" << mail->subject;
+            if (!mail->money && !mail->has_items)
+                out << "|cffffffff" << mail->subject;
+
             if (mail->money)
-                out << ", |cffffff00" << ChatHelper::formatMoney(mail->money);
+            {
+                out << "|cffffff00" << ChatHelper::formatMoney(mail->money);
+                if (!mail->subject.empty()) out << " |cffa0a0a0(" << mail->subject << ")";
+            }
+
             if (mail->has_items)
             {
                 for (MailItemInfoVec::iterator i = mail->items.begin(); i != mail->items.end(); ++i)
                 {
+                    Item* item = bot->GetMItem(i->item_guid);
+                    int count = item ? item->GetCount() : 1;
                     ItemPrototype const *proto = sObjectMgr.GetItemPrototype(i->item_template);
                     if (proto)
-                        out << ", " << ChatHelper::formatItem(proto);
+                    {
+                        out << ChatHelper::formatItem(proto, count);
+                        if (!mail->subject.empty()) out << " |cffa0a0a0(" << mail->subject << ")";
+                    }
                 }
             }
             out  << ", |cff00ff00" << days << " day(s)";
