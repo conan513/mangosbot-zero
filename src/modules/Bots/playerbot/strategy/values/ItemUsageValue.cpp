@@ -108,11 +108,14 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemPrototype const * proto)
                 return true;
             if (bot->HasSkill(SKILL_COOKING) && auctionbot.IsUsedBySkill(proto, SKILL_COOKING))
                 return true;
-            if (bot->HasSkill(SKILL_MINING) && auctionbot.IsUsedBySkill(proto, SKILL_MINING))
+            if (bot->HasSkill(SKILL_MINING) &&
+                    (auctionbot.IsUsedBySkill(proto, SKILL_MINING) || auctionbot.IsUsedBySkill(proto, SKILL_BLACKSMITHING) || auctionbot.IsUsedBySkill(proto, SKILL_ENGINEERING)))
                 return true;
-            if (bot->HasSkill(SKILL_SKINNING) && auctionbot.IsUsedBySkill(proto, SKILL_SKINNING))
+            if (bot->HasSkill(SKILL_SKINNING) &&
+                    (auctionbot.IsUsedBySkill(proto, SKILL_SKINNING) || auctionbot.IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
                 return true;
-            if (bot->HasSkill(SKILL_HERBALISM) && auctionbot.IsUsedBySkill(proto, SKILL_HERBALISM))
+            if (bot->HasSkill(SKILL_HERBALISM) &&
+                    (auctionbot.IsUsedBySkill(proto, SKILL_HERBALISM) || auctionbot.IsUsedBySkill(proto, SKILL_ALCHEMY)))
                 return true;
 
             return false;
