@@ -17,32 +17,48 @@ bool AcceptQuestAction::Execute(Event event)
         return false;
 
     Player *bot = ai->GetBot();
-    uint64 guid;
-    uint32 quest;
+    uint64 guid = 0;
+    uint32 quest = 0;
 
     string text = event.getParam();
     PlayerbotChatHandler ch(master);
     quest = ch.extractQuestId(text);
-    if (quest)
+
+    if (event.getPacket().empty())
     {
-        guid = master->GetSelectionGuid().GetRawValue();
-        if (!guid)
+        list<ObjectGuid> npcs = AI_VALUE(list<ObjectGuid>, "nearest npcs");
+        for (list<ObjectGuid>::iterator i = npcs.begin(); i != npcs.end(); i++)
         {
-            ai->TellMaster("Please select quest giver NPC");
-            return false;
+            Unit* unit = ai->GetUnit(*i);
+            if (unit && quest && unit->HasQuest(quest))
+            {
+                guid = unit->GetObjectGuid().GetRawValue();
+                break;
+            }
+            if (unit && text == "*" && bot->GetDistance(unit) <= INTERACTION_DISTANCE)
+                QuestAction::ProcessQuests(unit);
+        }
+        list<ObjectGuid> gos = AI_VALUE(list<ObjectGuid>, "nearest game objects");
+        for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); i++)
+        {
+            GameObject* go = ai->GetGameObject(*i);
+            if (go && quest && go->HasQuest(quest))
+            {
+                guid = go->GetObjectGuid().GetRawValue();
+                break;
+            }
+            if (go && text == "*" && bot->GetDistance(go) <= INTERACTION_DISTANCE)
+                QuestAction::ProcessQuests(go);
         }
     }
-    else if (!event.getPacket().empty())
+    else
     {
         WorldPacket& p = event.getPacket();
         p.rpos(0);
         p >> guid >> quest;
     }
-    else if (text == "*")
-    {
-        return QuestAction::Execute(event);
-    }
-    else
+
+    if (!quest || !guid)
         return false;
 
     Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest);
