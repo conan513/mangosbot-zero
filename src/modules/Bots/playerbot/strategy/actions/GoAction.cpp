@@ -8,6 +8,7 @@
 using namespace ai;
 
 vector<string> split(const string &s, char delim);
+char *strstri(const char *haystack, const char *needle);
 
 bool GoAction::Execute(Event event)
 {
@@ -47,6 +48,22 @@ bool GoAction::Execute(Event event)
             }
         }
         return false;
+    }
+
+    list<ObjectGuid> units;
+    list<ObjectGuid> npcs = AI_VALUE(list<ObjectGuid>, "nearest npcs");
+    units.insert(units.end(), npcs.begin(), npcs.end());
+    list<ObjectGuid> players = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
+    units.insert(units.end(), players.begin(), players.end());
+    for (list<ObjectGuid>::iterator i = units.begin(); i != units.end(); i++)
+    {
+        Unit* unit = ai->GetUnit(*i);
+        if (unit && strstri(unit->GetName(), param.c_str()))
+        {
+            ostringstream out; out << "Moving to " << unit->GetName();
+            ai->TellMasterNoFacing(out.str());
+            return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig.followDistance);
+        }
     }
 
     if (param.find(",") != string::npos)
@@ -101,6 +118,6 @@ bool GoAction::Execute(Event event)
         return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z + 0.5f, sPlayerbotAIConfig.followDistance);
     }
 
-    ai->TellMaster("Whisper 'go x,y', 'go [game object]' or 'go position' and I will go there");
+    ai->TellMaster("Whisper 'go x,y', 'go [game object]', 'go unit' or 'go position' and I will go there");
     return false;
 }
