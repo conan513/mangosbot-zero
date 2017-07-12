@@ -15,7 +15,7 @@ bool BankAction::Execute(Event event)
     for (list<ObjectGuid>::iterator i = npcs.begin(); i != npcs.end(); i++)
     {
         Unit* npc = ai->GetUnit(*i);
-        if (!npc || !bot->GetNPCIfCanInteractWith(npc->GetObjectGuid(), UNIT_NPC_FLAG_BANKER))
+        if (!npc || !npc->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER))
             continue;
 
         return Execute(text, npc);
