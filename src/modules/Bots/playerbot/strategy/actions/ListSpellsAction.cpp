@@ -163,9 +163,12 @@ bool ListSpellsAction::Execute(Event event)
                     materials << chat->formatItem(proto, itemcount);
 
                     FindItemByIdVisitor visitor(itemid);
-                    uint32 craftable = InventoryAction::GetItemCount(&visitor) / itemcount;
+                    uint32 reagentCount = InventoryAction::GetItemCount(&visitor);
+                    uint32 craftable = reagentCount / itemcount;
                     if (!craftCount || craftCount > craftable)
                         craftCount = craftable;
+                    if (reagentCount)
+                        materials << " (x" << reagentCount << ")";
                 }
             }
         }
