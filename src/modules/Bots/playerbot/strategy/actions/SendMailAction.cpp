@@ -31,6 +31,13 @@ bool SendMailAction::Execute(Event event)
     }
 
     string text = event.getParam();
+    Player* receiver = master;
+    vector<string> ss = split(text, ' ');
+    if (ss.size() > 1)
+    {
+        Player* p = sObjectMgr.GetPlayer(ss[ss.size() - 1].c_str());
+        if (p) receiver = p;
+    }
 
     ItemIds ids = chat->parseItems(text);
     if (ids.size() > 1)
@@ -52,7 +59,7 @@ bool SendMailAction::Execute(Event event)
         }
 
         ostringstream body;
-        body << "Hello, " << master->GetName() << ",\n";
+        body << "Hello, " << receiver->GetName() << ",\n";
         body << "\n";
         body << "Here is the money you asked for";
         body << "\n";
@@ -63,14 +70,15 @@ bool SendMailAction::Execute(Event event)
         MailDraft draft("Money you asked for", body.str());
         draft.SetMoney(money);
         bot->SetMoney(bot->GetMoney() - money);
-        draft.SendMailTo(MailReceiver(master), MailSender(bot));
+        draft.SendMailTo(MailReceiver(receiver), MailSender(bot));
 
-        ai->TellMaster("Mail sent");
+        ostringstream out; out << "Sending mail to " << receiver->GetName();
+        ai->TellMaster(out.str());
         return true;
     }
 
     ostringstream body;
-    body << "Hello, " << master->GetName() << ",\n";
+    body << "Hello, " << receiver->GetName() << ",\n";
     body << "\n";
     body << "Here are the item(s) you asked for";
     body << "\n";
@@ -100,9 +108,10 @@ bool SendMailAction::Execute(Event event)
             item->SetOwnerGuid(master->GetObjectGuid());
             item->SaveToDB();
             draft.AddItem(item);
-            draft.SendMailTo(MailReceiver(master), MailSender(bot));
+            draft.SendMailTo(MailReceiver(receiver), MailSender(bot));
 
-            ai->TellMaster("Mail sent");
+            ostringstream out; out << "Sending mail to " << receiver->GetName();
+            ai->TellMaster(out.str());
             return true;
         }
     }
