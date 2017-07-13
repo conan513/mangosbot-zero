@@ -271,3 +271,16 @@ list<Item*> InventoryAction::parseItems(string text)
 
     return result;
 }
+
+uint32 InventoryAction::GetItemCount(FindItemVisitor* visitor, IterateItemsMask mask)
+{
+    IterateItems(visitor, mask);
+    uint32 count = 0;
+    list<Item*>& items = visitor->GetResult();
+    for (list<Item*>::iterator i = items.begin(); i != items.end(); ++i)
+    {
+        Item* item = *i;
+        count += item->GetCount();
+    }
+    return count;
+}

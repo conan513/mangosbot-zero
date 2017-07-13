@@ -16,6 +16,7 @@ namespace ai
         void TellItems(map<uint32, int> items, map<uint32, bool> soulbound);
         void TellItem(ItemPrototype const * proto, int count, bool soulbound);
         list<Item*> parseItems(string text);
+        uint32 GetItemCount(FindItemVisitor* visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
 
     private:
         void IterateItemsInBags(IterateItemsVisitor* visitor);
