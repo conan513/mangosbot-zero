@@ -117,6 +117,10 @@ bool ListSpellsAction::Execute(Event event)
         filter.erase(remove(filter.begin(), filter.end(), '+'), filter.end());
     }
 
+    uint32 slot = chat->parseSlot(filter);
+    if (slot != EQUIPMENT_SLOT_END)
+        filter = "";
+
     list<pair<uint32, string> > spells;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr) {
         const uint32 spellId = itr->first;
@@ -181,7 +185,13 @@ bool ListSpellsAction::Execute(Event event)
                             out << "|cffffff00(x" << craftCount << ")|r ";
                         out << chat->formatItem(proto);
 
-                        if ((minLevel || maxLevel) && proto->RequiredLevel && (proto->RequiredLevel < minLevel || proto->RequiredLevel > maxLevel))
+                        if ((minLevel || maxLevel) && (!proto->RequiredLevel || proto->RequiredLevel < minLevel || proto->RequiredLevel > maxLevel))
+                        {
+                            filtered = true;
+                            break;
+                        }
+
+                        if (slot != EQUIPMENT_SLOT_END && bot->FindEquipSlot(proto, slot, true) != slot)
                         {
                             filtered = true;
                             break;
