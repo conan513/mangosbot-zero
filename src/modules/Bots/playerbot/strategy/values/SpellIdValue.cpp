@@ -13,13 +13,23 @@ SpellIdValue::SpellIdValue(PlayerbotAI* ai) :
 uint32 SpellIdValue::Calculate()
 {
     string namepart = qualifier;
+    ItemIds itemIds = ChatHelper::parseItems(namepart);
+
+    PlayerbotChatHandler handler(bot);
+    uint32 extractedSpellId = handler.extractSpellId(namepart);
+    if (extractedSpellId)
+    {
+        const SpellEntry* pSpellInfo = sSpellStore.LookupEntry(extractedSpellId);
+        if (pSpellInfo) namepart = pSpellInfo->SpellName[0];
+    }
+
     wstring wnamepart;
 
     if (!Utf8toWStr(namepart, wnamepart))
         return 0;
 
     wstrToLower(wnamepart);
-    char firstSymbol = tolower(qualifier[0]);
+    char firstSymbol = tolower(namepart[0]);
     int spellLength = wnamepart.length();
 
     int loc = bot->GetSession()->GetSessionDbcLocale();
@@ -41,8 +51,18 @@ uint32 SpellIdValue::Calculate()
         if (pSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL)
             continue;
 
+        bool useByItem = false;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (pSpellInfo->Effect[i] == SPELL_EFFECT_CREATE_ITEM && itemIds.find(pSpellInfo->EffectItemType[i]) != itemIds.end())
+            {
+                useByItem = true;
+                break;
+            }
+        }
+
         char* spellName = pSpellInfo->SpellName[loc];
-        if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
+        if (!useByItem && (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
             continue;
 
         bool usesNoReagents = (pSpellInfo->Reagent[0] <= 0);

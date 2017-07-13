@@ -73,8 +73,6 @@ bool ListSpellsAction::Execute(Event event)
         }
     }
 
-    int loc = master->GetSession()->GetSessionDbcLocale();
-
     std::ostringstream posOut;
     std::ostringstream negOut;
 
@@ -140,9 +138,8 @@ bool ListSpellsAction::Execute(Event event)
         if (!(ignoreList.find(comp) == std::string::npos && alreadySeenList.find(comp) == std::string::npos))
             continue;
 
-        if (!filter.empty() && !strstri(pSpellInfo->SpellName[loc], filter.c_str()))
+        if (!filter.empty() && !strstri(pSpellInfo->SpellName[0], filter.c_str()))
             continue;
-
 
         bool first = true;
         int craftCount = 0;
@@ -203,7 +200,8 @@ bool ListSpellsAction::Execute(Event event)
                 }
             }
         }
-        else
+
+        if (out.str().empty())
             out << chat->formatSpell(pSpellInfo);
 
         if (filtered)
@@ -218,7 +216,7 @@ bool ListSpellsAction::Execute(Event event)
             continue;
 
         spells.push_back(pair<uint32, string>(spellId, out.str()));
-        alreadySeenList += pSpellInfo->SpellName[loc];
+        alreadySeenList += pSpellInfo->SpellName[0];
         alreadySeenList += ",";
     }
 
