@@ -206,7 +206,7 @@ list<Item*> InventoryAction::parseItems(string text)
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    if (text == "drink")
+    if (text == "drink" || text == "water")
     {
         FindFoodVisitor visitor(bot, 59);
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);

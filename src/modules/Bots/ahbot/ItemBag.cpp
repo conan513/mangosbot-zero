@@ -127,16 +127,20 @@ bool ItemBag::Add(ItemPrototype const* proto)
     if (strstri(proto->Name1, "qa") || strstri(proto->Name1, "test") || strstri(proto->Name1, "deprecated"))
         return false;
 
+    bool contains = false;
     for (int i = 0; i < CategoryList::instance.size(); i++)
     {
         if (CategoryList::instance[i]->Contains(proto))
         {
             content[CategoryList::instance[i]].push_back(proto->ItemId);
-            return true;
+            contains = true;
         }
     }
 
-    return false;
+    if (!contains)
+        sLog.outDetail("Item %s does not included in any category", proto->Name1);
+
+    return contains;
 }
 
 void AvailableItemsBag::Load()

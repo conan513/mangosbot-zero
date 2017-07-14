@@ -17,6 +17,13 @@ bool CastCustomSpellAction::Execute(Event event)
         target = bot;
 
     string text = event.getParam();
+    int pos = text.find_last_of(" ");
+    int castCount = 1;
+    if (pos != string::npos)
+    {
+        castCount = atoi(text.substr(pos + 1).c_str());
+        text = text.substr(0, pos);
+    }
 
     uint32 spell = AI_VALUE2(uint32, "spell id", text);
 
@@ -56,7 +63,17 @@ bool CastCustomSpellAction::Execute(Event event)
     bool result = spell ? ai->CastSpell(spell, target) : ai->CastSpell(text, target);
     if (result)
     {
-        msg << "Casting " << ChatHelper::formatSpell(pSpellInfo) << " on " << target->GetName();
+        msg << "Casting " << ChatHelper::formatSpell(pSpellInfo);
+        if (target != bot)
+            msg << " on " << target->GetName();
+
+        if (castCount > 1)
+        {
+            ostringstream cmd;
+            cmd << "cast " << text << " " << (castCount - 1);
+            ai->HandleCommand(CHAT_MSG_WHISPER, cmd.str(), *master);
+            msg << "|cffffff00(x" << (castCount-1) << " left)|r";
+        }
         ai->TellMasterNoFacing(msg.str());
     }
     else

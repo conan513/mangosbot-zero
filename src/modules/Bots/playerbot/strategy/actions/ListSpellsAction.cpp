@@ -165,7 +165,7 @@ bool ListSpellsAction::Execute(Event event)
                     if (!craftCount || craftCount > craftable)
                         craftCount = craftable;
                     if (reagentCount)
-                        materials << " (x" << reagentCount << ")";
+                        materials << "|cffffff00(x" << reagentCount << ")|r ";
                 }
             }
         }

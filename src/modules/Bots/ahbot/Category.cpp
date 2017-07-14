@@ -80,6 +80,16 @@ bool TradeSkill::Contains(ItemPrototype const* proto)
     if (!Trade::Contains(proto))
         return false;
 
+    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    {
+        SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        if (!skillLine || skillLine->skillId != skill)
+            continue;
+
+        if (IsCraftedBy(proto, skillLine->spellId))
+            return true;
+    }
+
     for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
     {
         CreatureInfo const* co = sCreatureStorage.LookupEntry<CreatureInfo>(id);
@@ -138,8 +148,32 @@ bool TradeSkill::Contains(ItemPrototype const* proto)
     return false;
 }
 
+bool TradeSkill::IsCraftedBySpell(ItemPrototype const* proto, uint32 spellId)
+{
+    SpellEntry const *entry = sSpellStore.LookupEntry(spellId);
+    if (!entry)
+        return false;
+
+    for (uint32 x = 0; x < MAX_SPELL_REAGENTS; ++x)
+    {
+        if (entry->Reagent[x] <= 0)
+            { continue; }
+
+        if (proto->ItemId == entry->Reagent[x])
+        {
+            sLog.outDetail("%s is crafted by %s", proto->Name1, entry->SpellName[0]);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool TradeSkill::IsCraftedBy(ItemPrototype const* proto, uint32 spellId)
 {
+    if (IsCraftedBySpell(proto, spellId))
+        return true;
+
     SpellEntry const *entry = sSpellStore.LookupEntry(spellId);
     if (!entry)
         return false;
@@ -170,29 +204,29 @@ string TradeSkill::GetName()
     switch (skill)
     {
     case SKILL_TAILORING:
-        return "tailoring reagent";
+        return "tailoring";
     case SKILL_LEATHERWORKING:
-        return "leatherworking reagent";
+        return "leatherworking";
     case SKILL_ENGINEERING:
-        return "engineering reagent";
+        return "engineering";
     case SKILL_BLACKSMITHING:
-        return "blacksmithing reagent";
+        return "blacksmithing";
     case SKILL_ALCHEMY:
-        return "alchemy reagent";
+        return "alchemy";
     case SKILL_COOKING:
-        return "cooking reagent";
+        return "cooking";
     case SKILL_FISHING:
-        return "fishing reagent";
+        return "fishing";
     case SKILL_ENCHANTING:
-        return "enchanting reagent";
+        return "enchanting";
     case SKILL_MINING:
-        return "mining reagent";
+        return "mining";
     case SKILL_SKINNING:
-        return "skinning reagent";
+        return "skinning";
     case SKILL_HERBALISM:
-        return "herbalism reagent";
+        return "herbalism";
     case SKILL_FIRST_AID:
-        return "first aid reagent";
+        return "firstaid";
     }
 }
 
