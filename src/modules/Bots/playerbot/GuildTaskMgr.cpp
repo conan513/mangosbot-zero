@@ -39,6 +39,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     if (!GetTaskValue(0, 0, "advert_cleanup"))
     {
         CleanupAdverts();
+        RemoveDuplicatedAdverts();
         SetTaskValue(0, 0, "advert_cleanup", 1, sPlayerbotAIConfig.guildTaskAdvertCleanupTime);
     }
 
@@ -319,6 +320,7 @@ bool GuildTaskMgr::SendItemAdvertisement(uint32 itemId, uint32 owner, uint32 gui
 
     ostringstream subject;
     subject << "Guild Task: " << proto->Name1;
+    if (count > 1) subject << " (x" << count << ")";
     MailDraft(subject.str(), body.str()).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
 
     return true;
@@ -432,12 +434,38 @@ uint32 GuildTaskMgr::GetMaxItemTaskCount(uint32 itemId)
     if (!proto)
         return 0;
 
-    if (proto->Quality == ITEM_QUALITY_NORMAL && proto->Stackable && proto->GetMaxStackSize() > 1)
-        return urand(2, 4) * proto->GetMaxStackSize();
-    else if (proto->Quality < ITEM_QUALITY_RARE && proto->Stackable && proto->GetMaxStackSize() > 1)
-        return proto->GetMaxStackSize();
-    else if (proto->Stackable && proto->GetMaxStackSize() > 1)
-        return urand(1 + proto->GetMaxStackSize() / 4, proto->GetMaxStackSize());
+    if (!proto->Stackable || proto->GetMaxStackSize() == 1)
+        return 1;
+
+    if (proto->Quality == ITEM_QUALITY_NORMAL)
+    {
+        switch (proto->GetMaxStackSize())
+        {
+        case 5:
+            return urand(1, 3) * proto->GetMaxStackSize();
+        case 10:
+            return urand(2, 6) * proto->GetMaxStackSize() / 2;
+        case 20:
+            return urand(4, 12) * proto->GetMaxStackSize() / 4;
+        default:
+            return proto->GetMaxStackSize();
+        }
+    }
+
+    if (proto->Quality < ITEM_QUALITY_RARE)
+    {
+        switch (proto->GetMaxStackSize())
+        {
+        case 5:
+            return proto->GetMaxStackSize();
+        case 10:
+            return urand(1, 2) * proto->GetMaxStackSize() / 2;
+        case 20:
+            return urand(1, 4) * proto->GetMaxStackSize() / 4;
+        default:
+            return proto->GetMaxStackSize();
+        }
+    }
 
     return 1;
 }
@@ -676,6 +704,13 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
         return true;
     }
 
+    if (cmd == "cleanup")
+    {
+        sGuildTaskMgr.CleanupAdverts();
+        sGuildTaskMgr.RemoveDuplicatedAdverts();
+        return true;
+    }
+
     if (cmd == "reward")
     {
         sLog.outString("Usage: gtask reward <player name>");
@@ -834,6 +869,10 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         rewardType = RANDOM_ITEM_GUILD_TASK_REWARD_TRADE;
     }
 
+    uint32 payment = GetTaskValue(owner, guildId, "payment");
+    if (payment)
+        SendThanks(owner, guildId);
+
     MailDraft draft("Thank You", body.str());
 
     uint32 itemId = sRandomItemMgr.GetRandomItem(rewardType);
@@ -844,7 +883,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
         draft.AddItem(item);
     }
 
-    draft.SetMoney(GetTaskValue(owner, guildId, "payment")).SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
+    draft.SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
     Player* player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner));
     if (player)
         ChatHandler(player->GetSession()).PSendSysMessage("Guild task reward is pending");
@@ -930,4 +969,60 @@ void GuildTaskMgr::CleanupAdverts()
         CharacterDatabase.PExecute("delete from mail where subject like 'Guild Task%%' and deliver_time <= '%u'", deliverTime);
         sLog.outBasic("%d old gtask adverts removed", count);
     }
+}
+
+void GuildTaskMgr::RemoveDuplicatedAdverts()
+{
+    uint32 deliverTime = time(0);
+    QueryResult *result = CharacterDatabase.PQuery(
+            "select m.id, m.receiver from (SELECT max(id) as id, subject, receiver FROM mail where subject like 'Guild Task%%' and deliver_time <= '%u' group by subject, receiver) q "
+            "join mail m on m.subject = q.subject where m.id <> q.id and m.deliver_time <= '%u'",
+            deliverTime, deliverTime);
+    if (!result)
+        return;
+
+    list<uint32> ids;
+    int count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+        uint32 receiver = fields[1].GetUInt32();
+        Player *player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, receiver));
+        if (player) player->RemoveMail(id);
+        count++;
+        ids.push_back(id);
+    } while (result->NextRow());
+    delete result;
+
+    if (count > 0)
+    {
+        list<uint32> buffer;
+        for (list<uint32>::iterator i = ids.begin(); i != ids.end(); ++i)
+        {
+            buffer.push_back(*i);
+            if (buffer.size() > 50)
+            {
+                DeleteMail(buffer);
+                buffer.clear();
+            }
+        }
+        DeleteMail(buffer);
+        sLog.outBasic("%d duplicated gtask adverts removed", count);
+    }
+
+}
+
+void GuildTaskMgr::DeleteMail(list<uint32> buffer)
+{
+    ostringstream sql;
+    sql << "delete from mail where id in ( ";
+    bool first = true;
+    for (list<uint32>::iterator j = buffer.begin(); j != buffer.end(); ++j)
+    {
+        if (first) first = false; else sql << ",";
+        sql << "'" << *j << "'";
+    }
+    sql << ")";
+    CharacterDatabase.PExecute(sql.str().c_str());
 }

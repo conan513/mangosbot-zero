@@ -33,7 +33,7 @@ bool MailAction::Execute(Event event)
     string text = event.getParam();
     if (text == "?")
     {
-        ai->TellMaster("--- Mailbox ---");
+        ai->TellMaster("=== Mailbox ===");
         time_t cur_time = time(0);
         int index = 1;
         for (PlayerMails::iterator itr = bot->GetMailBegin(); itr != bot->GetMailEnd(); ++itr)
@@ -45,16 +45,27 @@ bool MailAction::Execute(Event event)
             int days = (cur_time - mail->deliver_time) / 3600 / 24;
             ostringstream out;
             out << "#" << index++ << " ";
-            out << "|cffffffff" << mail->subject;
+            if (!mail->money && !mail->has_items)
+                out << "|cffffffff" << mail->subject;
+
             if (mail->money)
-                out << ", |cffffff00" << ChatHelper::formatMoney(mail->money);
+            {
+                out << "|cffffff00" << ChatHelper::formatMoney(mail->money);
+                if (!mail->subject.empty()) out << " |cffa0a0a0(" << mail->subject << ")";
+            }
+
             if (mail->has_items)
             {
                 for (MailItemInfoVec::iterator i = mail->items.begin(); i != mail->items.end(); ++i)
                 {
+                    Item* item = bot->GetMItem(i->item_guid);
+                    int count = item ? item->GetCount() : 1;
                     ItemPrototype const *proto = sObjectMgr.GetItemPrototype(i->item_template);
                     if (proto)
-                        out << ", " << ChatHelper::formatItem(proto);
+                    {
+                        out << ChatHelper::formatItem(proto, count);
+                        if (!mail->subject.empty()) out << " |cffa0a0a0(" << mail->subject << ")";
+                    }
                 }
             }
             out  << ", |cff00ff00" << days << " day(s)";
@@ -77,6 +88,30 @@ bool MailAction::Execute(Event event)
 
             if (index++ != atoi(i->c_str()) && *i != "*")
                 continue;
+
+            uint32 totalused = 0, total = 16;
+            for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+            {
+                if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    totalused++;
+            }
+            uint32 totalfree = 16 - totalused;
+            for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+            {
+                if (const Bag* const pBag = (Bag*) bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
+                {
+                    ItemPrototype const* pBagProto = pBag->GetProto();
+                    if (pBagProto->Class == ITEM_CLASS_CONTAINER && pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
+                        totalfree += pBag->GetFreeSlots();
+                }
+
+            }
+
+            if (totalfree < 2)
+            {
+                ai->TellMaster("Not enough bag space");
+                return false;
+            }
 
             if (mail->money)
             {

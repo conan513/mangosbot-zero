@@ -24,24 +24,28 @@ bool WhoAction::Execute(Event event)
     if (!owner)
         return false;
 
-    string tell = "";
+    ostringstream out;
     string text = event.getParam();
     if (!text.empty())
     {
         if (!sRandomPlayerbotMgr.IsRandomBot(bot))
             return false;
 
-        tell = QuerySkill(text);
-        if (tell.empty())
-        {
-            tell = QueryTrade(text);
-        }
+        out << QuerySkill(text);
+        out << QueryTrade(text);
     }
     else
     {
-        tell = QuerySpec(text);
+        out << QuerySpec(text);
     }
 
+    if (ai->GetMaster())
+    {
+        if (!out.str().empty()) out << ", ";
+        out << "playing with " << ai->GetMaster()->GetName();
+    }
+
+    string tell = out.str();
     if (tell.empty())
         return false;
 

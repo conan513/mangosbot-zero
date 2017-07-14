@@ -10,6 +10,7 @@ map<string, uint32> ChatHelper::consumableSubClasses;
 map<string, uint32> ChatHelper::tradeSubClasses;
 map<string, uint32> ChatHelper::itemQualities;
 map<string, uint32> ChatHelper::slots;
+map<string, uint32> ChatHelper::skills;
 map<string, ChatMsg> ChatHelper::chats;
 map<uint8, string> ChatHelper::classes;
 map<uint8, string> ChatHelper::races;
@@ -82,6 +83,19 @@ ChatHelper::ChatHelper(PlayerbotAI* ai) : PlayerbotAIAware(ai)
     slots["off hand"] = EQUIPMENT_SLOT_OFFHAND;
     slots["ranged"] = EQUIPMENT_SLOT_RANGED;
     slots["tabard"] = EQUIPMENT_SLOT_TABARD;
+
+    skills["first aid"] = SKILL_FIRST_AID;
+    skills["fishing"] = SKILL_FISHING;
+    skills["cooking"] = SKILL_COOKING;
+    skills["alchemy"] = SKILL_ALCHEMY;
+    skills["enchanting"] = SKILL_ENCHANTING;
+    skills["engineering"] = SKILL_ENGINEERING;
+    skills["leatherworking"] = SKILL_LEATHERWORKING;
+    skills["blacksmithing"] = SKILL_BLACKSMITHING;
+    skills["tailoring"] = SKILL_TAILORING;
+    skills["herbalism"] = SKILL_HERBALISM;
+    skills["mining"] = SKILL_MINING;
+    skills["skinning"] = SKILL_SKINNING;
 
     chats["party"] = CHAT_MSG_PARTY;
     chats["p"] = CHAT_MSG_PARTY;
@@ -416,6 +430,7 @@ bool ChatHelper::parseable(string text)
             substrContainsInMap<uint32>(text, itemQualities) ||
             substrContainsInMap<uint32>(text, slots) ||
             substrContainsInMap<ChatMsg>(text, chats) ||
+            substrContainsInMap<uint32>(text, skills) ||
             parseMoney(text) > 0;
 }
 
@@ -447,4 +462,23 @@ string ChatHelper::formatClass(uint8 cls)
 string ChatHelper::formatRace(uint8 race)
 {
     return races[race];
+}
+
+uint32 ChatHelper::parseSkill(string& text)
+{
+    if (skills.find(text) != skills.end())
+        return skills[text];
+
+    return SKILL_NONE;
+}
+
+string ChatHelper::formatSkill(uint32 skill)
+{
+    for (map<string, uint32>::iterator i = skills.begin(); i != skills.end(); ++i)
+    {
+        if (i->second == skill)
+            return i->first;
+    }
+
+    return "";
 }

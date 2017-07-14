@@ -30,10 +30,12 @@ namespace ai
         static string formatClass(Player* player, int spec);
         static string formatClass(uint8 cls);
         static string formatRace(uint8 race);
+        static string formatSkill(uint32 skill);
 
         static uint32 parseItemQuality(string text);
         static bool parseItemClass(string text, uint32 *itemClass, uint32 *itemSubClass);
         static uint32 parseSlot(string text);
+        uint32 parseSkill(string& text);
 
         static bool parseable(string text);
 
@@ -42,6 +44,7 @@ namespace ai
         static map<string, uint32> tradeSubClasses;
         static map<string, uint32> itemQualities;
         static map<string, uint32> slots;
+        static map<string, uint32> skills;
         static map<string, ChatMsg> chats;
         static map<uint8, string> classes;
         static map<uint8, string> races;

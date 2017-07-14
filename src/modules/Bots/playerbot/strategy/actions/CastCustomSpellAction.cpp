@@ -21,6 +21,21 @@ bool CastCustomSpellAction::Execute(Event event)
     uint32 spell = AI_VALUE2(uint32, "spell id", text);
 
     ostringstream msg;
+    if (!spell)
+    {
+        msg << "Unknown spell " << text;
+        ai->TellMaster(msg.str());
+        return false;
+    }
+
+    SpellEntry const *pSpellInfo = sSpellStore.LookupEntry(spell);
+    if (!spell)
+    {
+        msg << "Unknown spell " << text;
+        ai->TellMaster(msg.str());
+        return false;
+    }
+
     if (target != bot && !bot->IsInFront(target, sPlayerbotAIConfig.sightDistance, M_PI / 2))
     {
         bot->SetFacingTo(bot->GetAngle(target));
@@ -30,9 +45,10 @@ bool CastCustomSpellAction::Execute(Event event)
         return true;
     }
 
+
     if (!ai->CanCastSpell(spell, target))
     {
-        msg << "Cannot cast " << text << " on " << target->GetName();
+        msg << "Cannot cast " << ChatHelper::formatSpell(pSpellInfo) << " on " << target->GetName();
         ai->TellMaster(msg.str());
         return false;
     }
@@ -40,12 +56,12 @@ bool CastCustomSpellAction::Execute(Event event)
     bool result = spell ? ai->CastSpell(spell, target) : ai->CastSpell(text, target);
     if (result)
     {
-        msg << "Casting " << text << " on " << target->GetName();
+        msg << "Casting " << ChatHelper::formatSpell(pSpellInfo) << " on " << target->GetName();
         ai->TellMasterNoFacing(msg.str());
     }
     else
     {
-        msg << "Cast " << text << " on " << target->GetName() << " is failed";
+        msg << "Cast " << ChatHelper::formatSpell(pSpellInfo) << " on " << target->GetName() << " is failed";
         ai->TellMaster(msg.str());
     }
 
