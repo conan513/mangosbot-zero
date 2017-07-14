@@ -36,6 +36,7 @@ namespace ahbot
 					proto->SubClass != ITEM_SUBCLASS_EXPLOSIVES;
         }
 
-        virtual string GetName() { return "devices and explosives"; }
+        virtual string GetName() { return "othertrade"; }
+        virtual string GetLabel() { return "devices and explosives"; }
     };
 };
