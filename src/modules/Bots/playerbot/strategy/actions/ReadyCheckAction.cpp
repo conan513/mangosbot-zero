@@ -5,6 +5,118 @@
 
 using namespace ai;
 
+class ReadyChecker
+{
+public:
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context) = 0;
+    virtual string GetName() = 0;
+    virtual bool PrintAlways() { return true; }
+
+    static list<ReadyChecker*> checkers;
+};
+
+list<ReadyChecker*> ReadyChecker::checkers;
+
+class HealthChecker : public ReadyChecker
+{
+public:
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
+    }
+    virtual string GetName() { return "HP"; }
+};
+
+class ManaChecker : public ReadyChecker
+{
+public:
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        return !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
+    }
+    virtual string GetName() { return "MP"; }
+};
+
+class DistanceChecker : public ReadyChecker
+{
+public:
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        Player* bot = ai->GetBot();
+        Player* master = ai->GetMaster();
+        if (master)
+        {
+            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.sightDistance;
+            if (!distance)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    virtual bool PrintAlways() { return false; }
+    virtual string GetName() { return "Far away"; }
+};
+
+class HunterChecker : public ReadyChecker
+{
+public:
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        Player* bot = ai->GetBot();
+        if (bot->getClass() == CLASS_HUNTER)
+        {
+            if (!bot->GetUInt32Value(PLAYER_AMMO_ID))
+            {
+                ai->TellMaster("Out of ammo!");
+                return false;
+            }
+
+            if (!bot->GetPet())
+            {
+                ai->TellMaster("No pet!");
+                return false;
+            }
+
+            if (bot->GetPet()->GetHappinessState() == UNHAPPY)
+            {
+                ai->TellMaster("Pet is unhappy!");
+                return false;
+            }
+        }
+        return true;
+    }
+    virtual bool PrintAlways() { return false; }
+    virtual string GetName() { return "Far away"; }
+};
+
+
+class ItemCountChecker : public ReadyChecker
+{
+public:
+    ItemCountChecker(string item, string name) { this->item = item; this->name = name; }
+
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        return AI_VALUE2(uint8, "item count", item) > 0;
+    }
+    virtual string GetName() { return name; }
+
+private:
+    string item, name;
+};
+
+class ManaPotionChecker : public ItemCountChecker
+{
+public:
+    ManaPotionChecker(string item, string name) : ItemCountChecker(item, name) {}
+
+    virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
+    {
+        return !AI_VALUE2(bool, "has mana", "self target") || ItemCountChecker::Check(ai, context);
+    }
+};
+
 bool ReadyCheckAction::Execute(Event event)
 {
     WorldPacket &p = event.getPacket();
@@ -22,51 +134,34 @@ bool ReadyCheckAction::Execute(Event event)
 
 bool ReadyCheckAction::ReadyCheck()
 {
-    bool health = AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
-    if (!health)
+    if (ReadyChecker::checkers.empty())
     {
-        ai->TellMaster("Low health!");
-        return false;
+        ReadyChecker::checkers.push_back(new HealthChecker());
+        ReadyChecker::checkers.push_back(new ManaChecker());
+        ReadyChecker::checkers.push_back(new DistanceChecker());
+        ReadyChecker::checkers.push_back(new HunterChecker());
+
+        ReadyChecker::checkers.push_back(new ItemCountChecker("food", "Food"));
+        ReadyChecker::checkers.push_back(new ManaPotionChecker("drink", "Water"));
+        ReadyChecker::checkers.push_back(new ItemCountChecker("healing potion", "Hpot"));
+        ReadyChecker::checkers.push_back(new ManaPotionChecker("mana potion", "Mpot"));
     }
 
-    bool mana = !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
-    if (!mana)
+    ostringstream out;
+    bool result = true;
+    for (list<ReadyChecker*>::iterator i = ReadyChecker::checkers.begin(); i != ReadyChecker::checkers.end(); ++i)
     {
-        ai->TellMaster("Low mana!");
-        return false;
-    }
-
-    Player* master = GetMaster();
-    if (master)
-    {
-        bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.sightDistance;
-        if (!distance)
+        ReadyChecker* checker = *i;
+        bool ok = checker->Check(ai, context);
+        result = result && ok;
+        if (checker->PrintAlways() || !ok)
         {
-            ai->TellMaster("Too far away!");
-            return false;
+            if (!out.str().empty()) out << " ";
+            out << (ok ? "|cff00ff00" : "|cffff0000") << checker->GetName();
         }
     }
-
-    if (bot->getClass() == CLASS_HUNTER)
-    {
-        if (!bot->GetUInt32Value(PLAYER_AMMO_ID))
-        {
-            ai->TellMaster("Out of ammo!");
-            return false;
-        }
-
-        if (!bot->GetPet())
-        {
-            ai->TellMaster("No pet!");
-            return false;
-        }
-
-        if (bot->GetPet()->GetHappinessState() == UNHAPPY)
-        {
-            ai->TellMaster("Pet is unhappy!");
-            return false;
-        }
-    }
+    ai->TellMaster(out.str());
+    return result;
 
     WorldPacket* const packet = new WorldPacket(MSG_RAID_READY_CHECK);
     *packet << bot->GetObjectGuid();
