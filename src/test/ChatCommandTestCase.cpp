@@ -73,6 +73,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( outfit );
       CPPUNIT_TEST( go );
       CPPUNIT_TEST( mail );
+      CPPUNIT_TEST( ready );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -483,6 +484,12 @@ protected:
     {
         assertParametrizedCommand("mail", "mail");
     }
-};
+
+    void ready()
+    {
+        trigger("ready");
+        tick();
+        assertActions(">S:ready check");
+    }};
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ChatCommandTestCase );

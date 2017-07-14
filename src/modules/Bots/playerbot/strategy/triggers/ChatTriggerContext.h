@@ -77,6 +77,7 @@ namespace ai
             creators["mail"] = &ChatTriggerContext::mail;
             creators["outfit"] = &ChatTriggerContext::outfit;
             creators["go"] = &ChatTriggerContext::go;
+            creators["ready"] = &ChatTriggerContext::ready_check;
         }
 
     private:
@@ -146,5 +147,6 @@ namespace ai
         static Trigger* release(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "release"); }
         static Trigger* reset_ai(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "reset ai"); }
         static Trigger* spell(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "spell"); }
+        static Trigger* ready_check(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "ready check"); }
     };
 };
