@@ -6414,28 +6414,6 @@ void Unit::Mount(uint32 mount, uint32 spellId)
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNTING);
 
     SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, mount);
-
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        // Called by Taxi system / GM command
-        if (!spellId)
-            { ((Player*)this)->UnsummonPetTemporaryIfAny(); }
-        // Called by mount aura
-        else
-        {
-            // Normal case (Unsummon only permanent pet)
-            if (Pet* pet = GetPet())
-            {
-                if (pet->IsPermanentPetFor((Player*)this) &&
-                    sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
-                {
-                    ((Player*)this)->UnsummonPetTemporaryIfAny();
-                }
-                else
-                    { pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS, true); }
-            }
-        }
-    }
 }
 
 void Unit::Unmount(bool from_aura)
@@ -6453,17 +6431,6 @@ void Unit::Unmount(bool from_aura)
         WorldPacket data(SMSG_DISMOUNT, 8);
         data << GetPackGUID();
         SendMessageToSet(&data, true);
-    }
-
-    // only resummon old pet if the player is already added to a map
-    // this prevents adding a pet to a not created map which would otherwise cause a crash
-    // (it could probably happen when logging in after a previous crash)
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        if (Pet* pet = GetPet())
-            { pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS, false); }
-        else
-            { ((Player*)this)->ResummonPetTemporaryUnSummonedIfAny(); }
     }
 }
 
@@ -8533,10 +8500,31 @@ void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         { return; }
 
-    WorldPacket data(SMSG_PET_CAST_FAILED, 4 + 1);
+    WorldPacket data(SMSG_PET_CAST_FAILED, 4 + 1 + 1);
     data << uint32(spellid);
+    data << uint8(0);               // unknown, maybe unused
     data << uint8(msg);
-    ((Player*)owner)->GetSession()->SendPacket(&data);
+    switch (msg)
+    {
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS:
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND:
+    case SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND:
+        data << int32(0);           // required and actual item class?
+        data << int32(0);
+        break;
+    case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
+        data << int32(0);           // required spellfocus id?
+        break;
+    case SPELL_FAILED_REQUIRES_AREA:
+        data << int32(GetAreaId()); // untested
+        break;
+    case SPELL_FAILED_PREVENTED_BY_MECHANIC:
+        data << int32(0);           // mechanic id?
+        break;
+    default:
+        break;
+    }
+    owner->ToPlayer()->SendDirectMessage(&data);
 }
 
 void Unit::SendPetActionFeedback(uint8 msg)
