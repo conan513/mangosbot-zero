@@ -53,50 +53,12 @@ protected:
         engine->addStrategy("stay");
         engine->addStrategy("dps assist");
 
-		tick();
 		tickWithNoTarget();
-
-		assertActions(">S:stay>Dps:dps assist");		
-    }		
-		
-		
-	void tankAssist()		
-	{		
-		engine->addStrategy("stay");		
-		engine->addStrategy("tank assist");		
-
+        set<Unit*>("current target", MockedTargets::GetTargetForDps());
 		tick();
-		tickWithNoTarget();		
-		
-		assertActions(">S:stay>Tank:tank assist");		
-	}		
-		
-	void attackRti()		
-	{		
-		engine->addStrategy("stay");		
-		engine->addStrategy("attack rti");
 
-		tick();
-		tickWithNoTarget();		 +    }
-		
-		assertActions(">S:stay>Rti:attack rti target");		
-	}		
-		
-	void attackWeak()		
-	{		
-		engine->addStrategy("stay");		
-		engine->addStrategy("attack weak");		
-		
-		set<Unit*>("current target", MockedTargets::GetLeastHpTarget());		
-		tick();		
-		
-		tickWithNoTarget();		
-		
-		set<Unit*>("current target", MockedTargets::GetCurrentTarget()); // means any other		
-		tick();		
-		
-		assertActions(">S:stay>LeastHp:attack least hp target>LeastHp:attack least hp target");		
-	}
+		assertActions(">Dps:dps assist>S:stay");
+    }
 
 	void pvp()
 	{
