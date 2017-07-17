@@ -17,7 +17,7 @@ bool GreetAction::Execute(Event event)
     Player* player = dynamic_cast<Player*>(ai->GetUnit(guid));
     if (!player) return false;
 
-    if (!bot->IsInFront(player, sPlayerbotAIConfig.sightDistance, M_PI / 6.0f) && !bot->IsTaxiFlying())
+    if (!bot->IsInFront(player, sPlayerbotAIConfig.sightDistance, M_PI / 3.0f) && !bot->IsTaxiFlying())
     {
         bot->SetFacingToObject(player);
         return true;

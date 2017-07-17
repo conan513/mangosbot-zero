@@ -10,7 +10,7 @@ class CombatDpsRogueStrategyActionNodeFactory : public NamedObjectFactory<Action
 public:
 	CombatDpsRogueStrategyActionNodeFactory()
 	{
-		//creators["mutilate"] = &mutilate;
+		creators["cheap shot"] = &cheap_shot;
 		creators["sinister strike"] = &sinister_strike;
 		creators["kick"] = &kick;
 		creators["kidney shot"] = &kidney_shot;
@@ -24,15 +24,15 @@ private:
 		return new ActionNode("melee",
 			/*P*/ NULL,
 			/*A*/ NULL,
-			/*C*/ NULL);
+			/*C*/ NextAction::array(0, new NextAction("sinister strike"), NULL));
 	}
-	//static ActionNode* mutilate(PlayerbotAI* ai)
-	//{
-	//	return new ActionNode("mutilate",
-	//		/*P*/ NULL,
-	//		/*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
-	//		/*C*/ NULL);
-	//}
+	static ActionNode* cheap_shot(PlayerbotAI* ai)
+	{
+		return new ActionNode("cheap shot",
+			/*P*/ NextAction::array(0, new NextAction("stealth"), NULL),
+			/*A*/ NULL,
+			/*C*/ NextAction::array(0, new NextAction("melee"), NULL));
+	}
 	static ActionNode* sinister_strike(PlayerbotAI* ai)
 	{
 		return new ActionNode("sinister strike",
@@ -68,13 +68,7 @@ private:
 			/*A*/ NextAction::array(0, new NextAction("rupture"), NULL),
 			/*C*/ NULL);
 	}
-	static ActionNode* backstab(PlayerbotAI* ai)
-	{
-		return new ActionNode("backstab",
-			/*P*/ NULL,
-			/*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
-			/*C*/ NULL);
-	}
+
 };
 
 CombatDpsRogueStrategy::CombatDpsRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
@@ -90,6 +84,15 @@ NextAction** CombatDpsRogueStrategy::getDefaultActions()
 void CombatDpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
 	MeleeCombatStrategy::InitTriggers(triggers);
+
+
+	triggers.push_back(new TriggerNode(
+		"cheap shot open",
+		NextAction::array(0, new NextAction("cheap shot", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"can open from behind",
+		NextAction::array(0, new NextAction("garrote", ACTION_NORMAL + 8), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"combo points available",
@@ -111,10 +114,6 @@ void CombatDpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"kick on enemy healer",
 		NextAction::array(0, new NextAction("kick on enemy healer", ACTION_INTERRUPT + 1), NULL)));
-
-	triggers.push_back(new TriggerNode(
-		"behind target",
-		NextAction::array(0, new NextAction("backstab", ACTION_NORMAL), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"light aoe",

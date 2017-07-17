@@ -135,6 +135,18 @@ void ChatCommandHandlerStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "ready",
         NextAction::array(0, new NextAction("ready check", relevance), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"stealth",
+		NextAction::array(0, new NextAction("stealth", relevance), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"stealth",
+		NextAction::array(0, new NextAction("prowl", relevance), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"poisoning",
+		NextAction::array(0, new NextAction("poisoning", relevance), NULL)));
 }
 
 
@@ -182,5 +194,8 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("sendmail");
     supported.push_back("mail");
     supported.push_back("outfit");
+	supported.push_back("stealth");
     supported.push_back("go");
+	supported.push_back("prowl");
+	supported.push_back("poisoning");
 }

@@ -21,6 +21,8 @@
 #include "SayAction.h"
 #include "OutfitAction.h"
 #include "RandomBotUpdateAction.h"
+#include "../Bots/playerbot/strategy/druid/DruidActions.h"
+#include "../Bots/playerbot/strategy/rogue/RogueActions.h"
 
 namespace ai
 {
@@ -91,9 +93,13 @@ namespace ai
             creators["random bot update"] = &ActionContext::random_bot_update;
             creators["delay"] = &ActionContext::delay;
             creators["greet"] = &ActionContext::greet;
+			creators["stealth"] = &ActionContext::stealth;
+			creators["prowl"] = &ActionContext::prowl;
         }
 
     private:
+		static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
+		static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
         static Action* greet(PlayerbotAI* ai) { return new GreetAction(ai); }
         static Action* check_mail(PlayerbotAI* ai) { return new CheckMailAction(ai); }
         static Action* drop_target(PlayerbotAI* ai) { return new DropTargetAction(ai); }

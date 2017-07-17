@@ -362,4 +362,5 @@ namespace ai
         }
         virtual string getName() { return spell + " on enemy healer"; }
     };
+
 }

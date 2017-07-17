@@ -57,6 +57,8 @@ namespace ai
                 creators["slice and dice"] = &TriggerFactoryInternal::slice_and_dice;
                 creators["expose armor"] = &TriggerFactoryInternal::expose_armor;
                 creators["kick on enemy healer"] = &TriggerFactoryInternal::kick_on_enemy_healer;
+				creators["cheap shot open"] = &TriggerFactoryInternal::cheap_shot_open;
+				creators["can open from behind"] = &TriggerFactoryInternal::can_open_from_behind;
             }
 
         private:
@@ -65,6 +67,8 @@ namespace ai
             static Trigger* slice_and_dice(PlayerbotAI* ai) { return new SliceAndDiceTrigger(ai); }
             static Trigger* expose_armor(PlayerbotAI* ai) { return new ExposeArmorTrigger(ai); }
             static Trigger* kick_on_enemy_healer(PlayerbotAI* ai) { return new KickInterruptEnemyHealerSpellTrigger(ai); }
+			static Trigger* cheap_shot_open(PlayerbotAI* ai) { return new RogueCanCheapShotTrigger(ai); }
+			static Trigger* can_open_from_behind(PlayerbotAI* ai) { return new RogueCanOpenFromBehindTrigger(ai); }
         };
     };
 };
@@ -97,6 +101,8 @@ namespace ai
                 creators["expose armor"] = &AiObjectContextInternal::expose_armor;
                 creators["kick on enemy healer"] = &AiObjectContextInternal::kick_on_enemy_healer;
 				creators["stealth"] = &AiObjectContextInternal::stealth;
+				creators["cheap shot"] = &AiObjectContextInternal::cheap_shot;
+				creators["garrote"] = &AiObjectContextInternal::garrote;
             }
 
         private:
@@ -116,6 +122,8 @@ namespace ai
             static Action* expose_armor(PlayerbotAI* ai) { return new CastExposeArmorAction(ai); }
             static Action* kick_on_enemy_healer(PlayerbotAI* ai) { return new CastKickOnEnemyHealerAction(ai); }
 			static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
+			static Action* cheap_shot(PlayerbotAI* ai) { return new CastCheapShotAction(ai); }
+			static Action* garrote(PlayerbotAI* ai) { return new CastGarroteAction(ai); }
         };
     };
 };
