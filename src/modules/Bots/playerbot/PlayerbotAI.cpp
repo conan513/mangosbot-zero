@@ -203,6 +203,8 @@ void PlayerbotAI::Reset()
     }
 }
 
+map<string,ChatMsg> chatMap;
+
 void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPlayer)
 {
     if (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, type != CHAT_MSG_WHISPER, &fromPlayer))
@@ -218,6 +220,24 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
             return;
 
         filtered = filtered.substr(sPlayerbotAIConfig.commandPrefix.size());
+    }
+
+    if (chatMap.empty())
+    {
+        chatMap["#w "] = CHAT_MSG_WHISPER;
+        chatMap["#p "] = CHAT_MSG_PARTY;
+        chatMap["#r "] = CHAT_MSG_RAID;
+        chatMap["#a "] = CHAT_MSG_ADDON;
+        chatMap["#g "] = CHAT_MSG_GUILD;
+    }
+    for (map<string,ChatMsg>::iterator i = chatMap.begin(); i != chatMap.end(); ++i)
+    {
+        if (filtered.find(i->first) == 0)
+        {
+            filtered = filtered.substr(3);
+            currentChat = pair<ChatMsg, time_t>(i->second, time(0) + 3);
+            break;
+        }
     }
 
     filtered = chatFilter.Filter(trim((string&)filtered));
@@ -642,7 +662,18 @@ bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securit
     if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
     {
         whispers[text] = time(0);
-        bot->Whisper(text, LANG_UNIVERSAL, master->GetObjectGuid());
+
+        ChatMsg type = CHAT_MSG_WHISPER;
+        if (currentChat.second - time(0) >= 1)
+            type = currentChat.first;
+
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data,
+                type == CHAT_MSG_ADDON ? CHAT_MSG_PARTY : type,
+                text.c_str(),
+                type == CHAT_MSG_ADDON ? LANG_ADDON : LANG_UNIVERSAL,
+                CHAT_TAG_NONE, bot->GetObjectGuid(), bot->GetName());
+        master->GetSession()->SendPacket(&data);
     }
     return true;
 }
