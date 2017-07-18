@@ -136,7 +136,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(QueryResult * dummy, SqlQuery
     PlayerbotMgr *mgr = bot->GetPlayerbotMgr();
     bot->SetPlayerbotMgr(NULL);
     delete mgr;
-    sRandomPlayerbotMgr.OnPlayerLogout(bot);
+    sRandomPlayerbotMgr.OnPlayerLogin(bot);
 
     bool allowed = false;
     if (botAccountId == masterAccount)
