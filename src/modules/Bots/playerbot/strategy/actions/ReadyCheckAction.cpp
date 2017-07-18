@@ -4,6 +4,28 @@
 #include "../../PlayerbotAIConfig.h"
 
 using namespace ai;
+#include "botpch.h"
+#include "../../playerbot.h"
+#include "ReadyCheckAction.h"
+#include "../../PlayerbotAIConfig.h"
+
+using namespace ai;
+
+string formatPercent(string name, uint8 value, float percent)
+{
+    ostringstream out;
+
+    string color;
+    if (percent > 75)
+        color = "|cff00ff00";
+    else if (percent > 50)
+        color = "|cffffff00";
+    else
+        color = "|cffff0000";
+
+    out << "|cffffffff[" << name << "]" << color << "x" << (int)value;
+    return out.str();
+}
 
 class ReadyChecker
 {
@@ -147,21 +169,35 @@ bool ReadyCheckAction::ReadyCheck()
         ReadyChecker::checkers.push_back(new ManaPotionChecker("mana potion", "Mpot"));
     }
 
-    ostringstream out;
     bool result = true;
     for (list<ReadyChecker*>::iterator i = ReadyChecker::checkers.begin(); i != ReadyChecker::checkers.end(); ++i)
     {
         ReadyChecker* checker = *i;
         bool ok = checker->Check(ai, context);
         result = result && ok;
-        if (checker->PrintAlways() || !ok)
-        {
-            if (!out.str().empty()) out << " ";
-            out << (ok ? "|cff00ff00" : "|cffff0000") << checker->GetName();
-        }
     }
-    ai->TellMaster(out.str());
-    return result;
+
+    ostringstream out;
+
+    uint8 hp = AI_VALUE2(uint8, "item count", "healing potion");
+    out << formatPercent("Hp", hp, 100.0 * hp / 5);
+
+    out << ", ";
+    uint8 food = AI_VALUE2(uint8, "item count", "food");
+    out << formatPercent("Food", food, 100.0 * food / 20);
+
+    if (AI_VALUE2(bool, "has mana", "self target"))
+    {
+        out << ", ";
+        uint8 mp = AI_VALUE2(uint8, "item count", "mana potion");
+        out << formatPercent("Mp", mp, 100.0 * mp / 5);
+
+        out << ", ";
+        uint8 water = AI_VALUE2(uint8, "item count", "water");
+        out << formatPercent("Water", water, 100.0 * water / 20);
+    }
+
+    ai->TellMaster(out);
 
     WorldPacket* const packet = new WorldPacket(MSG_RAID_READY_CHECK);
     *packet << bot->GetObjectGuid();
