@@ -254,7 +254,7 @@ bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* a
         handler->PSendSysMessage(i->c_str());
     }
 
-    return false;
+    return true;
 }
 
 list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* master)
