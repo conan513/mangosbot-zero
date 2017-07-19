@@ -248,6 +248,12 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
     if (filtered.find("who") != 0 && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
         return;
 
+    if (filtered.substr(0, 6) == "debug ")
+    {
+        TellMasterNoFacing(HandleRemoteCommand(filtered.substr(6)));
+        return;
+    }
+
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != string::npos && filtered.find("award") == string::npos)
     {
         ChatCommandHolder cmd("warning", &fromPlayer, type);
