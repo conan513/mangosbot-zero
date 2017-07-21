@@ -817,12 +817,9 @@ void RandomPlayerbotMgr::OnPlayerLogout(Player* player)
         }
     }
 
-    if (!player->GetPlayerbotAI())
-    {
-        vector<Player*>::iterator i = find(players.begin(), players.end(), player);
-        if (i != players.end())
-            players.erase(i);
-    }
+    vector<Player*>::iterator i = find(players.begin(), players.end(), player);
+    if (i != players.end())
+        players.erase(i);
 }
 
 void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
@@ -851,7 +848,11 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
         }
     }
 
-    if (!IsRandomBot(player)) players.push_back(player);
+    if (!IsRandomBot(player))
+    {
+        players.push_back(player);
+        sLog.outDebug("Including non-random bot player %s into random bot update", player->GetName());
+    }
 }
 
 Player* RandomPlayerbotMgr::GetRandomPlayer()

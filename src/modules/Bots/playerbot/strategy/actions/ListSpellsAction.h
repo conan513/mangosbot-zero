@@ -14,6 +14,7 @@ namespace ai
 
     private:
         static map<uint32, SkillLineAbilityEntry const*> skillSpells;
+        static set<uint32> vendorItems;
     };
 
 }

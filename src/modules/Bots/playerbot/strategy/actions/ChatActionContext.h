@@ -49,6 +49,7 @@
 #include "WhoAction.h"
 #include "SaveManaAction.h"
 #include "../values/Formations.h"
+#include "DebugAction.h"
 #include "GoAction.h"
 #include "MailAction.h"
 #include "SendMailAction.h"
@@ -127,11 +128,13 @@ namespace ai
 			creators["stealth"] = &ChatActionContext::prowl;
             creators["mail"] = &ChatActionContext::mail;
             creators["go"] = &ChatActionContext::go;
+            creators["debug"] = &ChatActionContext::debug;
         }
 
     private:
-		static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
-		static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
+        static Action* debug(PlayerbotAI* ai) { return new DebugAction(ai); }
+        static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
+        static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
         static Action* mail(PlayerbotAI* ai) { return new MailAction(ai); }
         static Action* go(PlayerbotAI* ai) { return new GoAction(ai); }
         static Action* sendmail(PlayerbotAI* ai) { return new SendMailAction(ai); }

@@ -194,8 +194,9 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("sendmail");
     supported.push_back("mail");
     supported.push_back("outfit");
-	supported.push_back("stealth");
+    supported.push_back("stealth");
     supported.push_back("go");
-	supported.push_back("prowl");
-	supported.push_back("poisoning");
+    supported.push_back("debug");
+    supported.push_back("prowl");
+    supported.push_back("poisoning");
 }

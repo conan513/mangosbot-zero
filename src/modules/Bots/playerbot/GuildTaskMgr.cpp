@@ -60,6 +60,8 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
     }
 
+    sLog.outDebug("%s: guild task update for player %s", guild->GetName(), player->GetName());
+
     uint32 owner = (uint32)player->GetGUIDLow();
 
     uint32 activeTask = GetTaskValue(owner, guildId, "activeTask");

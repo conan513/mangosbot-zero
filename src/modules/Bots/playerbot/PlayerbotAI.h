@@ -185,5 +185,6 @@ protected:
     CompositeChatFilter chatFilter;
     PlayerbotSecurity security;
     map<string, time_t> whispers;
+    pair<ChatMsg, time_t> currentChat;
 };
 
