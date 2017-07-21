@@ -6,6 +6,7 @@
 using namespace ai;
 
 map<uint32, SkillLineAbilityEntry const*> ListSpellsAction::skillSpells;
+set<uint32> ListSpellsAction::vendorItems;
 
 int SortSpells(pair<uint32, string>& s1, pair<uint32, string>& s2)
 {
@@ -70,6 +71,21 @@ bool ListSpellsAction::Execute(Event event)
             SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
             if (skillLine)
                 skillSpells[skillLine->spellId] = skillLine;
+        }
+    }
+
+    if (vendorItems.empty())
+    {
+        QueryResult* results = WorldDatabase.PQuery("SELECT item FROM npc_vendor where maxcount = 0");
+        if (results != NULL)
+        {
+          do
+          {
+              Field* fields = results->Fetch();
+              vendorItems.insert(fields[0].GetUInt32());
+          } while (results->NextRow());
+
+          delete results;
         }
     }
 
@@ -161,11 +177,18 @@ bool ListSpellsAction::Execute(Event event)
 
                     FindItemByIdVisitor visitor(itemid);
                     uint32 reagentCount = InventoryAction::GetItemCount(&visitor);
-                    uint32 craftable = reagentCount / itemcount;
-                    if (!craftCount || craftCount > craftable)
-                        craftCount = craftable;
+                    bool vendored = (vendorItems.find(itemid) != vendorItems.end());
+                    if (!vendored)
+                    {
+                        uint32 craftable = reagentCount / itemcount;
+                        if (!craftCount || craftCount > craftable)
+                            craftCount = craftable;
+                    }
+
                     if (reagentCount)
                         materials << "|cffffff00(x" << reagentCount << ")|r ";
+                    else if (vendored)
+                        materials << "|cffffff00(buy)|r ";
                 }
             }
         }

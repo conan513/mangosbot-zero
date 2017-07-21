@@ -8,8 +8,6 @@
 
 using namespace ai;
 
-map<uint32, string> WhoAction::skills;
-
 #ifndef WIN32
 inline int strcmpi(const char* s1, const char* s2)
 {
@@ -28,11 +26,10 @@ bool WhoAction::Execute(Event event)
     string text = event.getParam();
     if (!text.empty())
     {
-        if (!sRandomPlayerbotMgr.IsRandomBot(bot))
-            return false;
-
         out << QuerySkill(text);
-        out << QueryTrade(text);
+
+        if (sRandomPlayerbotMgr.IsRandomBot(bot))
+            out << QueryTrade(text);
     }
     else
     {
@@ -77,28 +74,22 @@ string WhoAction::QueryTrade(string text)
 string WhoAction::QuerySkill(string text)
 {
     ostringstream out;
-    InitSkills();
+    uint32 skill = chat->parseSkill(text);
+    if (!skill || !bot->HasSkill(skill))
+        return "";
 
-    for (map<uint32, string>::iterator i = skills.begin(); i != skills.end(); ++i)
-    {
-        string name = i->second;
-        uint16 skill = i->first;
-        if (!strcmpi(text.c_str(), name.c_str()) && bot->HasSkill(skill))
-        {
-            string skillName = i->second;
-            uint32 spellId = AI_VALUE2(uint32, "spell id", skillName);
-            uint16 value = bot->GetSkillValue(skill);
-            uint16 maxSkill = bot->GetMaxSkillValue(skill);
-            ObjectGuid guid = bot->GetObjectGuid();
-            string data = "0";
-            out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":"
-                    << std::hex << std::uppercase << guid.GetRawValue()
-                    << std::nouppercase << std::dec << ":" << data
-                    << "|h[" << skills[skill] << "]|h|r"
-                    << " |h|cff00ff00" << value << "|h|cffffffff/"
-                    << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
-        }
-    }
+    string skillName = chat->formatSkill(skill);
+    uint32 spellId = AI_VALUE2(uint32, "spell id", skillName);
+    uint16 value = bot->GetSkillValue(skill);
+    uint16 maxSkill = bot->GetMaxSkillValue(skill);
+    ObjectGuid guid = bot->GetObjectGuid();
+    string data = "0";
+    out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":"
+            << std::hex << std::uppercase << guid.GetRawValue()
+            << std::nouppercase << std::dec << ":" << data
+            << "|h[" << skillName << "]|h|r"
+            << " |h|cff00ff00" << value << "|h|cffffffff/"
+            << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
 
     return out.str();
 }
@@ -139,24 +130,4 @@ string WhoAction::QuerySpec(string text)
     out << ")";
 
     return out.str();
-}
-
-
-void WhoAction::InitSkills()
-{
-    if (!skills.empty())
-        return;
-
-    skills[SKILL_ALCHEMY] = "Alchemy";
-    skills[SKILL_ENCHANTING] = "Enchanting";
-    skills[SKILL_SKINNING] = "Skinning";
-    skills[SKILL_TAILORING] = "Tailoring";
-    skills[SKILL_LEATHERWORKING] = "Leatherworking";
-    skills[SKILL_ENGINEERING] = "Engineering";
-    skills[SKILL_HERBALISM] = "Herbalism";
-    skills[SKILL_MINING] = "Mining";
-    skills[SKILL_BLACKSMITHING] = "Blacksmithing";
-    skills[SKILL_COOKING] = "Cooking";
-    skills[SKILL_FIRST_AID] = "First Aid";
-    skills[SKILL_FISHING] = "Fishing";
 }
