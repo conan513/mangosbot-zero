@@ -55,7 +55,23 @@ void CheckMailAction::ProcessMail(Mail* mail, Player* owner)
         if (!item)
             continue;
 
-        sGuildTaskMgr.CheckItemTask(i->item_template, item->GetCount(), owner, bot, true);
+        if (!sGuildTaskMgr.CheckItemTask(i->item_template, item->GetCount(), owner, bot, true))
+        {
+            ostringstream body;
+            body << "Hello, " << owner->GetName() << ",\n";
+            body << "\n";
+            body << "Here are the item(s) you've sent me by mistake";
+            body << "\n";
+            body << "Thanks,\n";
+            body << bot->GetName() << "\n";
+
+            MailDraft draft("Item(s) you've sent me", body.str());
+            draft.AddItem(item);
+            bot->RemoveMItem(i->item_guid);
+            draft.SendMailTo(MailReceiver(owner), MailSender(bot));
+            return;
+        }
+
         bot->RemoveMItem(i->item_guid);
         item->DestroyForPlayer(bot);
     }
