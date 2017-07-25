@@ -22,7 +22,7 @@ class GuildTaskMgr
 	public:
         static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
         bool IsGuildTaskItem(uint32 itemId, uint32 guildId);
-        void CheckItemTask(uint32 itemId, uint32 obtained, Player* owner, Player* bot, bool byMail = false);
+        bool CheckItemTask(uint32 itemId, uint32 obtained, Player* owner, Player* bot, bool byMail = false);
         void CheckKillTask(Player* owner, Unit* victim);
         void CheckKillTaskInternal(Player* owner, Unit* victim);
 
@@ -42,6 +42,7 @@ class GuildTaskMgr
         void CleanupAdverts();
         void RemoveDuplicatedAdverts();
         void DeleteMail(list<uint32> buffer);
+        void SendCompletionMessage(Player* player, string verb);
 };
 
 #define sGuildTaskMgr GuildTaskMgr::instance()

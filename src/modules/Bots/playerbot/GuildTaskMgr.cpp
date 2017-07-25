@@ -422,7 +422,7 @@ bool GuildTaskMgr::SendThanks(uint32 owner, uint32 guildId)
 
         Player* player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner));
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage("Guild task payment is pending");
+            SendCompletionMessage(player, "payed for");
 
         return true;
     }
@@ -767,16 +767,16 @@ bool GuildTaskMgr::HandleConsoleCommand(ChatHandler* handler, char const* args)
     return false;
 }
 
-void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPlayer, Player* bot, bool byMail)
+bool GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPlayer, Player* bot, bool byMail)
 {
     uint32 guildId = bot->GetGuildId();
     if (!guildId)
-        return;
+        return false;
 
     uint32 owner = (uint32)ownerPlayer->GetGUIDLow();
 	Guild *guild = sGuildMgr.GetGuildById(bot->GetGuildId());
 	if (!guild)
-		return;
+		return false;
 
     sLog.outDebug("%s / %s: checking guild task",
 			guild->GetName().c_str(), ownerPlayer->GetName());
@@ -787,12 +787,13 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
         sLog.outDebug("%s / %s: item %u is not guild task item (%u)",
 				guild->GetName().c_str(), ownerPlayer->GetName(),
                 itemId, itemTask);
-        return;
+        SendCompletionMessage(ownerPlayer, "made a mistake with");
+        return false;
     }
 
     uint32 count = GetTaskValue(owner, guildId, "itemCount");
     if (!count) {
-        return;
+        return false;
     }
 
     uint32 rewardTime = urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime);
@@ -800,7 +801,7 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
     {
         ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
         if (!proto)
-            return;
+            return false;
 
         uint32 money = GetTaskValue(owner, guildId, "payment");
         SetTaskValue(owner, guildId, "payment", money + auctionbot.GetBuyPrice(proto) * obtained, rewardTime + 300);
@@ -813,7 +814,7 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
         SetTaskValue(owner, guildId, "reward", 1, rewardTime - 15);
         SetTaskValue(owner, guildId, "itemCount", 0, 0);
         SetTaskValue(owner, guildId, "thanks", 0, 0);
-        ChatHandler(ownerPlayer->GetSession()).PSendSysMessage("You have completed a guild task");
+        SendCompletionMessage(ownerPlayer, "completed");
     }
     else
     {
@@ -821,8 +822,9 @@ void GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
 				guild->GetName().c_str(), ownerPlayer->GetName(), obtained, count);
         SetTaskValue(owner, guildId, "itemCount", count - obtained, sPlayerbotAIConfig.maxGuildTaskChangeTime);
         SetTaskValue(owner, guildId, "thanks", 1, rewardTime - 30);
-        ChatHandler(ownerPlayer->GetSession()).PSendSysMessage("You have made a progress with a guild task");
+        SendCompletionMessage(ownerPlayer, "made a progress with");
     }
+    return true;
 }
 
 bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
@@ -888,7 +890,7 @@ bool GuildTaskMgr::Reward(uint32 owner, uint32 guildId)
     draft.SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, owner)), MailSender(leader));
     Player* player = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner));
     if (player)
-        ChatHandler(player->GetSession()).PSendSysMessage("Guild task reward is pending");
+        SendCompletionMessage(player, "rewarded for");
 
     SetTaskValue(owner, guildId, "activeTask", 0, 0);
     SetTaskValue(owner, guildId, "payment", 0, 0);
@@ -909,6 +911,31 @@ void GuildTaskMgr::CheckKillTask(Player* player, Unit* victim)
     {
         CheckKillTaskInternal(player, victim);
     }
+}
+
+void GuildTaskMgr::SendCompletionMessage(Player* player, string verb)
+{
+    ostringstream out; out << player->GetName() << " has " << verb << " a guild task";
+
+    Group* group = player->GetGroup();
+    if (group)
+    {
+        for (GroupReference* gr = group->GetFirstMember(); gr; gr = gr->next())
+        {
+            Player* member = gr->getSource();
+            if (member != player)
+                ChatHandler(member->GetSession()).PSendSysMessage(out.str().c_str());
+        }
+    }
+    else
+    {
+        PlayerbotAI *ai = player->GetPlayerbotAI();
+        if (ai && ai->GetMaster())
+            ChatHandler(ai->GetMaster()->GetSession()).PSendSysMessage(out.str().c_str());
+    }
+
+    ostringstream self; self << "You have " << verb << " a guild task";
+    ChatHandler(player->GetSession()).PSendSysMessage(self.str().c_str());
 }
 
 void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
@@ -933,17 +960,7 @@ void GuildTaskMgr::CheckKillTaskInternal(Player* player, Unit* victim)
         SetTaskValue(owner, guildId, "reward", 1,
                 urand(sPlayerbotAIConfig.minGuildTaskRewardTime, sPlayerbotAIConfig.maxGuildTaskRewardTime));
 
-        Group *group = player->GetGroup();
-        if (group)
-        {
-            for (GroupReference *gr = group->GetFirstMember(); gr; gr = gr->next())
-            {
-                Player *member = gr->getSource();
-                if (member != player)
-                    ChatHandler(member->GetSession()).PSendSysMessage("%s has completed a guild task", player->GetName());
-            }
-        }
-        ChatHandler(player->GetSession()).PSendSysMessage("You have completed a guild task");
+        SendCompletionMessage(player, "completed");
     }
 }
 
