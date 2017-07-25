@@ -4,6 +4,7 @@
 #include "Mail.h"
 
 #include "../../GuildTaskMgr.h"
+#include "../../PlayerbotAIConfig.h"
 using namespace ai;
 
 bool CheckMailAction::Execute(Event event)
@@ -24,6 +25,10 @@ bool CheckMailAction::Execute(Event event)
 
         Player* owner = sObjectMgr.GetPlayer((uint64)mail->sender);
         if (!owner)
+            continue;
+
+        uint32 account = sObjectMgr.GetPlayerAccountIdByGUID(owner->GetObjectGuid());
+        if (sPlayerbotAIConfig.IsInRandomAccountList(account))
             continue;
 
         ProcessMail(mail, owner);
