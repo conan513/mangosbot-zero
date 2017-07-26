@@ -222,8 +222,8 @@ bool StoreLootAction::Execute(Event event)
 
     if (gold > 0)
     {
-        WorldPacket* const packet = new WorldPacket(CMSG_LOOT_MONEY, 0);
-        bot->GetSession()->QueuePacket(packet);
+        WorldPacket packet(CMSG_LOOT_MONEY, 0);
+        bot->GetSession()->HandleLootMoneyOpcode(packet);
     }
 
     for (uint8 i = 0; i < items; ++i)
@@ -270,17 +270,15 @@ bool StoreLootAction::Execute(Event event)
             }
         }
 
-        WorldPacket* const packet = new WorldPacket(CMSG_AUTOSTORE_LOOT_ITEM, 1);
-        *packet << itemindex;
-        bot->GetSession()->QueuePacket(packet);
+        WorldPacket packet(CMSG_AUTOSTORE_LOOT_ITEM, 1);
+        packet << itemindex;
+        bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
     }
 
     AI_VALUE(LootObjectStack*, "available loot")->Remove(guid);
 
     // release loot
-    WorldPacket* const packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
-    *packet << guid;
-    bot->GetSession()->QueuePacket(packet);
+    bot->GetSession()->DoLootRelease(guid);
     return true;
 }
 
@@ -301,11 +299,27 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     if (max > 0 && ai->GetBot()->HasItemCount(itemid, max, true))
         return false;
 
-    if (proto->StartQuest ||
-        proto->Bonding == BIND_QUEST_ITEM ||
+    if (proto->StartQuest)
+        return true;
+
+    if (proto->Bonding == BIND_QUEST_ITEM ||
         proto->Bonding == BIND_QUEST_ITEM1 ||
         proto->Class == ITEM_CLASS_QUEST)
-        return true;
+    {
+        for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+        {
+            uint32 entry = ai->GetBot()->GetQuestSlotQuestId(slot);
+            Quest const* quest = sObjectMgr.GetQuestTemplate(entry);
+            if (!quest)
+                continue;
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (quest->ReqItemId[i] == itemid && AI_VALUE2(uint8, "item count", proto->Name1) < quest->ReqItemCount[i])
+                    return true;
+            }
+        }
+    }
 
     return lootStrategy->CanLoot(proto, context);
 }
