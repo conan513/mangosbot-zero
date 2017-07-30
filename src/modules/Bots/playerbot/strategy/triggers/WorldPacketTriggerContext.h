@@ -44,9 +44,11 @@ namespace ai
             creators["lfg leave"] = &WorldPacketTriggerContext::lfg_leave;
             creators["guild invite"] = &WorldPacketTriggerContext::guild_invite;
             creators["lfg teleport"] = &WorldPacketTriggerContext::lfg_teleport;
+            creators["inventory change failure"] = &WorldPacketTriggerContext::inventory_change_failure;
         }
 
     private:
+        static Trigger* inventory_change_failure(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "inventory change failure"); }
         static Trigger* guild_invite(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "guild invite"); }
         static Trigger* lfg_teleport(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "lfg teleport"); }
         static Trigger* lfg_leave(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "lfg leave"); }
