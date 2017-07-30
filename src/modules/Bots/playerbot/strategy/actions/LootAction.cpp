@@ -328,3 +328,16 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
 
     return lootStrategy->CanLoot(proto, context);
 }
+
+bool ReleaseLootAction::Execute(Event event)
+{
+    list<ObjectGuid> gos = context->GetValue<list<ObjectGuid> >("nearest game objects")->Get();
+    for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); i++)
+        bot->GetSession()->DoLootRelease(*i);
+
+    list<ObjectGuid> corpses = context->GetValue<list<ObjectGuid> >("nearest corpses")->Get();
+    for (list<ObjectGuid>::iterator i = corpses.begin(); i != corpses.end(); i++)
+        bot->GetSession()->DoLootRelease(*i);
+
+    return true;
+}
