@@ -17,7 +17,12 @@ bool LootAction::Execute(Event event)
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
+    LootObject prevLoot = AI_VALUE(LootObject, "loot target");
     LootObject const& lootObject = AI_VALUE(LootObjectStack*, "available loot")->GetLoot(sPlayerbotAIConfig.lootDistance);
+
+    if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
+        bot->GetSession()->DoLootRelease(prevLoot.guid);
+
     context->GetValue<LootObject>("loot target")->Set(lootObject);
     return true;
 }
@@ -63,9 +68,9 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     if (creature && creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
     {
         bot->GetMotionMaster()->Clear();
-        WorldPacket* const packet = new WorldPacket(CMSG_LOOT, 8);
-        *packet << lootObject.guid;
-        bot->GetSession()->QueuePacket(packet);
+        WorldPacket packet(CMSG_LOOT, 8);
+        packet << lootObject.guid;
+        bot->GetSession()->HandleLootOpcode(packet);
         return true;
     }
 
