@@ -481,10 +481,22 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
             return false;
         break;
     case CLASS_SHAMAN:
+		if (tab == 1) //enh
+		{
         if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2)
             return false;
+		}
+		else //ele,resto
+		{
+			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+				return false;
+		}
         break;
     case CLASS_DRUID:
         if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
@@ -514,6 +526,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
 		else //combat,sub
 		{
 			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
