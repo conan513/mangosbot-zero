@@ -253,24 +253,24 @@ bool StoreLootAction::Execute(Event event)
         if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, ai))
             continue;
 
+        ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
+        if (!proto)
+            continue;
+
         if (sRandomPlayerbotMgr.IsRandomBot(bot))
         {
-			ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
-			if (proto)
-            {
-                uint32 price = itemcount * auctionbot.GetSellPrice(proto) * sRandomPlayerbotMgr.GetSellMultiplier(bot) + gold;
-                uint32 lootAmount = sRandomPlayerbotMgr.GetLootAmount(bot);
-                if (price)
-                    sRandomPlayerbotMgr.SetLootAmount(bot, bot->GetGroup() ? lootAmount + price : 0);
+            uint32 price = itemcount * auctionbot.GetSellPrice(proto) * sRandomPlayerbotMgr.GetSellMultiplier(bot) + gold;
+            uint32 lootAmount = sRandomPlayerbotMgr.GetLootAmount(bot);
+            if (price)
+                sRandomPlayerbotMgr.SetLootAmount(bot, bot->GetGroup() ? lootAmount + price : 0);
 
-                Group* group = bot->GetGroup();
-                if (group)
+            Group* group = bot->GetGroup();
+            if (group)
+            {
+                for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
                 {
-                    for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
-                    {
-                        if( ref->getSource() != bot)
-                            sGuildTaskMgr.CheckItemTask(itemid, itemcount, ref->getSource(), bot);
-                    }
+                    if( ref->getSource() != bot)
+                        sGuildTaskMgr.CheckItemTask(itemid, itemcount, ref->getSource(), bot);
                 }
             }
         }
@@ -278,6 +278,9 @@ bool StoreLootAction::Execute(Event event)
         WorldPacket packet(CMSG_AUTOSTORE_LOOT_ITEM, 1);
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
+
+        ostringstream out; out << "Looting " << chat->formatItem(proto);
+        ai->TellMasterNoFacing(out.str());
     }
 
     AI_VALUE(LootObjectStack*, "available loot")->Remove(guid);
