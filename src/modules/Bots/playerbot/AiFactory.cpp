@@ -206,13 +206,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_ROGUE:
 			if (tab == 0)
 			{
-				if (player->getLevel() > 9)
+				if (player->getLevel() > 10)
 					engine->addStrategies("assa dps", "dps assist", "threat", NULL);
 
 				else engine->addStrategies("combat dps", "dps assist", "threat", NULL);
 			}
-			if (tab == 0)
-				engine->addStrategies("assa dps", "dps assist", "threat", NULL);
+			
 			else if (tab == 1)
 				engine->addStrategies("combat dps", "dps assist", "threat", NULL);
 			else if (tab == 2)
