@@ -458,21 +458,48 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
     case CLASS_MAGE:
     case CLASS_WARLOCK:
         if (proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+			proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_WAND &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
             return false;
         break;
     case CLASS_WARRIOR:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+		if (tab == 1) //fury
+		{
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
             return false;
-        break;
+		}
+		if ((tab == 0) && (bot->getLevel() > 10))   //arms
+		{
+			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+				return false;
+		}
+		else //prot +lowlvl
+		{
+			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
+				return false;
+		}
+		break;
     case CLASS_PALADIN:
         if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
@@ -487,7 +514,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
 			proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
 			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
 			proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2)
+            proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2)
             return false;
 		}
 		else //ele,resto
@@ -499,15 +526,25 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
 		}
         break;
     case CLASS_DRUID:
-        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+		if (tab == 1) //feral
+		{
+        if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
             return false;
+		}
+		else //ele,resto
+		{
+			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
+				return false;
+		}
         break;
     case CLASS_HUNTER:
         if (proto->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM &&
+				proto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_GUN &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
                 proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW)
@@ -523,7 +560,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
 					proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
             return false;
 		}
-		else //combat,sub
+		else 
 		{
 			if (proto->SubClass != ITEM_SUBCLASS_WEAPON_DAGGER &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_FIST &&
@@ -533,7 +570,7 @@ bool PlayerbotFactory::CanEquipWeapon(ItemPrototype const* proto)
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_CROSSBOW &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_BOW &&
 				proto->SubClass != ITEM_SUBCLASS_WEAPON_THROWN)
-				return false;
+			return false;
 		}
         break;
     }
