@@ -152,7 +152,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 2)
                 engine->addStrategies("tank", "tank aoe", NULL);
             else if (tab == 0)
-                engine->addStrategies("arms dps", "dps assist", "arms dps", "threat", NULL);
+                engine->addStrategies("arms dps", "dps assist", "arms aoe", "threat", NULL);
             else if (tab == 1)
                 engine->addStrategies("fury dps", "dps assist", "fury aoe", "threat", NULL);
             break;
