@@ -123,7 +123,8 @@ namespace ai
             static Action* kick_on_enemy_healer(PlayerbotAI* ai) { return new CastKickOnEnemyHealerAction(ai); }
 			static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
 			static Action* cheap_shot(PlayerbotAI* ai) { return new CastCheapShotAction(ai); }
-			static Action* garrote(PlayerbotAI* ai) { return new CastGarroteAction(ai); }
+			static Action* garrote(PlayerbotAI* ai) { return new CastGarroteAction(ai); 
+			}
         };
     };
 };
