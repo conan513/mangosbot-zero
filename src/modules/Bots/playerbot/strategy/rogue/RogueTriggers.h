@@ -10,6 +10,12 @@ namespace ai
         KickInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "kick") {}
     };
 
+	class BlindInterruptSpellTrigger : public InterruptSpellTrigger
+	{
+	public:
+		BlindInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "blind") {}
+	};
+
     class SliceAndDiceTrigger : public BuffTrigger
     {
     public:
@@ -33,6 +39,12 @@ namespace ai
     public:
         KickInterruptEnemyHealerSpellTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "kick") {}
     };
+
+	class BlindInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger
+	{
+	public:
+		BlindInterruptEnemyHealerSpellTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "blind") {}
+	};
 
 	class StealthTrigger : public BuffTrigger
 	{
@@ -69,5 +81,23 @@ namespace ai
 				}
 			}
 		}
+	};
+
+	class SinisterStrikeTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		SinisterStrikeTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "sinister strike") {}
+	};
+
+	class MutilateTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		MutilateTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "mutilate") {}
+	};
+
+	class HemorrhageTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		HemorrhageTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "hemorrhage") {}
 	};
 }

@@ -80,4 +80,9 @@ namespace ai
         CastKickOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "kick") {}
     };
 
+	class CastBlindOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
+	{
+	public:
+		CastBlindOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "blind") {}
+	};
 }

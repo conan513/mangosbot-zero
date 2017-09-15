@@ -53,22 +53,32 @@ namespace ai
             TriggerFactoryInternal()
             {
                 creators["kick"] = &TriggerFactoryInternal::kick;
+				creators["blind"] = &TriggerFactoryInternal::blind;
                 creators["rupture"] = &TriggerFactoryInternal::rupture;
                 creators["slice and dice"] = &TriggerFactoryInternal::slice_and_dice;
                 creators["expose armor"] = &TriggerFactoryInternal::expose_armor;
                 creators["kick on enemy healer"] = &TriggerFactoryInternal::kick_on_enemy_healer;
+				creators["blind on enemy healer"] = &TriggerFactoryInternal::blind_on_enemy_healer;
 				creators["cheap shot open"] = &TriggerFactoryInternal::cheap_shot_open;
 				creators["can open from behind"] = &TriggerFactoryInternal::can_open_from_behind;
+				creators["sinister strike"] = &TriggerFactoryInternal::sinister_strike;
+				creators["mutilate"] = &TriggerFactoryInternal::mutilate;
+				creators["hemorrhage"] = &TriggerFactoryInternal::hemorrhage;
             }
 
         private:
             static Trigger* kick(PlayerbotAI* ai) { return new KickInterruptSpellTrigger(ai); }
+			static Trigger* blind(PlayerbotAI* ai) { return new BlindInterruptSpellTrigger(ai); }
             static Trigger* rupture(PlayerbotAI* ai) { return new RuptureTrigger(ai); }
             static Trigger* slice_and_dice(PlayerbotAI* ai) { return new SliceAndDiceTrigger(ai); }
             static Trigger* expose_armor(PlayerbotAI* ai) { return new ExposeArmorTrigger(ai); }
             static Trigger* kick_on_enemy_healer(PlayerbotAI* ai) { return new KickInterruptEnemyHealerSpellTrigger(ai); }
+			static Trigger* blind_on_enemy_healer(PlayerbotAI* ai) { return new BlindInterruptEnemyHealerSpellTrigger(ai); }
 			static Trigger* cheap_shot_open(PlayerbotAI* ai) { return new RogueCanCheapShotTrigger(ai); }
 			static Trigger* can_open_from_behind(PlayerbotAI* ai) { return new RogueCanOpenFromBehindTrigger(ai); }
+			static Trigger* sinister_strike(PlayerbotAI* ai) { return new SinisterStrikeTrigger(ai); }
+			static Trigger* mutilate(PlayerbotAI* ai) { return new MutilateTrigger(ai); }
+			static Trigger* hemorrhage(PlayerbotAI* ai) { return new HemorrhageTrigger(ai); }
         };
     };
 };
@@ -96,6 +106,7 @@ namespace ai
                 creators["vanish"] = &AiObjectContextInternal::vanish;
                 creators["evasion"] = &AiObjectContextInternal::evasion;
                 creators["kick"] = &AiObjectContextInternal::kick;
+				creators["blind"] = &AiObjectContextInternal::blind;
                 creators["feint"] = &AiObjectContextInternal::feint;
                 creators["backstab"] = &AiObjectContextInternal::backstab;
                 creators["expose armor"] = &AiObjectContextInternal::expose_armor;
@@ -117,10 +128,12 @@ namespace ai
             static Action* vanish(PlayerbotAI* ai) { return new CastVanishAction(ai); }
             static Action* evasion(PlayerbotAI* ai) { return new CastEvasionAction(ai); }
             static Action* kick(PlayerbotAI* ai) { return new CastKickAction(ai); }
+			static Action* blind(PlayerbotAI* ai) { return new CastBlindAction(ai); }
             static Action* feint(PlayerbotAI* ai) { return new CastFeintAction(ai); }
             static Action* backstab(PlayerbotAI* ai) { return new CastBackstabAction(ai); }
             static Action* expose_armor(PlayerbotAI* ai) { return new CastExposeArmorAction(ai); }
             static Action* kick_on_enemy_healer(PlayerbotAI* ai) { return new CastKickOnEnemyHealerAction(ai); }
+			static Action* blind_on_enemy_healer(PlayerbotAI* ai) { return new CastBlindOnEnemyHealerAction(ai); }
 			static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
 			static Action* cheap_shot(PlayerbotAI* ai) { return new CastCheapShotAction(ai); }
 			static Action* garrote(PlayerbotAI* ai) { return new CastGarroteAction(ai); 
