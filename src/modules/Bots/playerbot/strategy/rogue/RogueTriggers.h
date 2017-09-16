@@ -88,12 +88,12 @@ namespace ai
 	public:
 		SinisterStrikeTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "sinister strike") {}
 	};
-
-	class MutilateTrigger : public SpellCanBeCastTrigger
+	//none till bc
+	/*class MutilateTrigger : public SpellCanBeCastTrigger
 	{
 	public:
 		MutilateTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "mutilate") {}
-	};
+	};*/
 
 	class HemorrhageTrigger : public SpellCanBeCastTrigger
 	{

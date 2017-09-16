@@ -63,7 +63,7 @@ CombatDpsRogueStrategy::CombatDpsRogueStrategy(PlayerbotAI* ai) : MeleeCombatStr
 
 NextAction** CombatDpsRogueStrategy::getDefaultActions()
 {
-	return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+	return NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL + 8), NULL);
 }
 
 void CombatDpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

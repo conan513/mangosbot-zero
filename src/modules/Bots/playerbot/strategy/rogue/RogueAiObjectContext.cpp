@@ -62,7 +62,7 @@ namespace ai
 				creators["cheap shot open"] = &TriggerFactoryInternal::cheap_shot_open;
 				creators["can open from behind"] = &TriggerFactoryInternal::can_open_from_behind;
 				creators["sinister strike"] = &TriggerFactoryInternal::sinister_strike;
-				creators["mutilate"] = &TriggerFactoryInternal::mutilate;
+				//creators["mutilate"] = &TriggerFactoryInternal::mutilate;  //bc
 				creators["hemorrhage"] = &TriggerFactoryInternal::hemorrhage;
             }
 
@@ -77,7 +77,7 @@ namespace ai
 			static Trigger* cheap_shot_open(PlayerbotAI* ai) { return new RogueCanCheapShotTrigger(ai); }
 			static Trigger* can_open_from_behind(PlayerbotAI* ai) { return new RogueCanOpenFromBehindTrigger(ai); }
 			static Trigger* sinister_strike(PlayerbotAI* ai) { return new SinisterStrikeTrigger(ai); }
-			static Trigger* mutilate(PlayerbotAI* ai) { return new MutilateTrigger(ai); }
+			//static Trigger* mutilate(PlayerbotAI* ai) { return new MutilateTrigger(ai); } //bc
 			static Trigger* hemorrhage(PlayerbotAI* ai) { return new HemorrhageTrigger(ai); }
         };
     };
@@ -96,7 +96,7 @@ namespace ai
             AiObjectContextInternal()
             {
                 creators["riposte"] = &AiObjectContextInternal::riposte;
-                creators["mutilate"] = &AiObjectContextInternal::mutilate;
+                //creators["mutilate"] = &AiObjectContextInternal::mutilate; //bc
 				creators["hemorrhage"] = &AiObjectContextInternal::hemorrhage;
                 creators["sinister strike"] = &AiObjectContextInternal::sinister_strike;
                 creators["kidney shot"] = &AiObjectContextInternal::kidney_shot;
@@ -118,7 +118,7 @@ namespace ai
 
         private:
             static Action* riposte(PlayerbotAI* ai) { return new CastRiposteAction(ai); }
-            static Action* mutilate(PlayerbotAI* ai) { return new CastMutilateAction(ai); }
+            //static Action* mutilate(PlayerbotAI* ai) { return new CastMutilateAction(ai); }   //bc
             static Action* hemorrhage(PlayerbotAI* ai) { return new CastHemorrhageAction(ai); }
 			static Action* sinister_strike(PlayerbotAI* ai) { return new CastSinisterStrikeAction(ai); }
             static Action* kidney_shot(PlayerbotAI* ai) { return new CastKidneyShotAction(ai); }
