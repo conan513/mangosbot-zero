@@ -112,11 +112,11 @@ public:
 	void HandleBotOutgoingPacket(const WorldPacket& packet);
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
-	Item * FindPoison() const;
-	Item * FindConsumable(uint32 displayId) const;
-	void UseItem(Item * item);
-	void UseItem(Item * item, uint8 targetInventorySlot);
-	void UseItem(Item * item, Unit * target);
+	//Item * FindPoison() const;
+	//Item * FindConsumable(uint32 displayId) const;
+	//void UseItem(Item * item);
+	//void UseItem(Item * item, uint8 targetInventorySlot);
+	//void UseItem(Item * item, Unit * target);
 	void HandleTeleportAck();
     void ChangeEngine(BotState type);
     void DoNextAction();

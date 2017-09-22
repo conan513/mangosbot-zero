@@ -45,7 +45,7 @@ namespace ai
         }
     };
 
-	class PoisoningAction : public UseItemAction
+/*	class PoisoningAction : public UseItemAction
 	{
 	public:
 		PoisoningAction(PlayerbotAI* ai) : UseItemAction(ai, "poisoning") {}
@@ -92,5 +92,5 @@ namespace ai
 		}
 
 	};
-
+	*/
 }

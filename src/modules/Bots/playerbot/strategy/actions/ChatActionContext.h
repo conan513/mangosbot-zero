@@ -129,11 +129,11 @@ namespace ai
             creators["mail"] = &ChatActionContext::mail;
             creators["go"] = &ChatActionContext::go;
             creators["debug"] = &ChatActionContext::debug;
-			creators["poison"] = &ChatActionContext::poison;
+			//creators["poisoning"] = &ChatActionContext::poisoning;
         }
 
     private:
-		static Action* poison(PlayerbotAI* ai) { return new UseItemAction(ai, "poison"); }
+		//static Action* poisoning(PlayerbotAI* ai) { return new UseItemAction(ai, "poisoning"); }
         static Action* debug(PlayerbotAI* ai) { return new DebugAction(ai); }
         static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
         static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }

@@ -1438,7 +1438,7 @@ bool ChatHandler::HandleGuildTaskCommand(char* args)
 {
     return GuildTaskMgr::HandleConsoleCommand(this, args);
 }
-
+/*
 //Find Poison ...Natsukawa
 Item* PlayerbotAI::FindPoison() const
 {
@@ -1518,4 +1518,4 @@ Item* PlayerbotAI::FindConsumable(uint32 displayId) const
 			}
 	}
 	return NULL;
-}
+}*/
