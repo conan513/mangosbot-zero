@@ -3,30 +3,22 @@
 #include "WarriorMultipliers.h"
 #include "FuryDpsWarriorStrategy.h"
 
-using namespace ai;
+using namespace ai;                           //FURY
 
 class FuryDpsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
 	FuryDpsWarriorStrategyActionNodeFactory()
 	{
-		creators["overpower"] = &overpower;
 		creators["melee"] = &melee;
 		creators["charge"] = &charge;
 		creators["bloodthirst"] = &bloodthirst;
-		//creators["mortal strike"] = &mortal_strike;
 		creators["whirlwind"] = &whirlwind;
 		creators["death wish"] = &death_wish;
 		creators["execute"] = &execute;
 	}
 private:
-	static ActionNode* overpower(PlayerbotAI* ai)
-	{
-		return new ActionNode ("overpower",
-			/*P*/ /*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-			/*C*/ NULL);
-	}
+	
 	static ActionNode* melee(PlayerbotAI* ai)
 	{
 		return new ActionNode ("melee",
@@ -38,28 +30,21 @@ private:
 	{
 		return new ActionNode ("charge",
 			/*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("reach melee"), NULL),
+			/*A*/ NextAction::array(0, new NextAction("intercept"), NULL),
 			/*C*/ NULL);
 	}
 	static ActionNode* bloodthirst(PlayerbotAI* ai)
 	{
 		return new ActionNode ("bloodthirst",
 			/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("heroic strike"), NULL),
+			/*A*/ NULL,
 			/*C*/ NULL);
-	//}
-	//static ActionNode* mortal_strike(PlayerbotAI* ai)
-	//{
-	//	return new ActionNode ("mortal strike",
-	//		/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-	//		/*A*/ NextAction::array(0, new NextAction("heroic strike"), NULL),
-	//		/*C*/ NULL);
 	}
 	static ActionNode* whirlwind(PlayerbotAI* ai)
 	{
 		return new ActionNode ("whirlwind",
 			/*P*/ NextAction::array(0, new NextAction("berserker stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("bloodthirst"), NULL),
+			/*A*/ NULL,
 			/*C*/ NULL);
 	}
 	static ActionNode* death_wish(PlayerbotAI* ai)
@@ -85,9 +70,9 @@ FuryDpsWarriorStrategy::FuryDpsWarriorStrategy(PlayerbotAI* ai) : GenericWarrior
 
 NextAction** FuryDpsWarriorStrategy::getDefaultActions()
 {
-	return NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 5),
-		new NextAction("Whirlwind", ACTION_HIGH + 3), NULL);
+	return NextAction::array(0, new NextAction("bloodthirst", ACTION_NORMAL + 7), NULL);
 }
+
 
 void FuryDpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
@@ -95,15 +80,23 @@ void FuryDpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
 		"enemy out of melee",
-		NextAction::array(0, new NextAction("charge", ACTION_NORMAL + 9), NULL)));
+		NextAction::array(0, new NextAction("charge", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"bloodthirst",
+		NextAction::array(0, new NextAction("bloodthirst", ACTION_NORMAL + 7), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"whirlwind",
+		NextAction::array(0, new NextAction("whirlwind", ACTION_NORMAL + 6), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"target critical health",
 		NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), NULL)));
 
-	triggers.push_back(new TriggerNode(
+	/*triggers.push_back(new TriggerNode(
 		"hamstring",
-		NextAction::array(0, new NextAction("hamstring", ACTION_INTERRUPT), NULL)));
+		NextAction::array(0, new NextAction("hamstring", ACTION_INTERRUPT), NULL)));*/
 
 	triggers.push_back(new TriggerNode(
 		"death wish",
