@@ -148,6 +148,9 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
     AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
+    const uint32 zone = _player->GetCachedZoneId();
+    const bool notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
+
     uint32 matchcount = 0;
     uint32 displaycount = 0;
 
@@ -202,7 +205,9 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
         {
             if (zoneids[i] == pzoneid)
             {
-                z_show = true;
+                // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                // Using the / who command while in a Battleground instance will now only display players in your instance.
+                z_show = (zone != pzoneid) || notInBattleground || (_player->GetInstanceId() == pl->GetInstanceId());
                 break;
             }
 
@@ -298,8 +303,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     if (reason)
     {
         WorldPacket data(SMSG_LOGOUT_RESPONSE, 1+4);
-        data << uint8(reason);
-        data << uint32(0);
+        data << uint32(reason);
+        data << uint8(0);
         SendPacket(&data);
         LogoutRequest(0);
         return;
@@ -310,8 +315,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
         GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
         WorldPacket data(SMSG_LOGOUT_RESPONSE, 1+4);
-        data << uint8(0);
-        data << uint32(16777216);
+        data << uint32(0);
+        data << uint8(1);
         SendPacket(&data);
         LogoutPlayer(true);
         return;
@@ -329,8 +334,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     }
 
     WorldPacket data(SMSG_LOGOUT_RESPONSE, 1 + 4);
-    data << uint8(0);
     data << uint32(0);
+    data << uint8(0);
     SendPacket(&data);
     LogoutRequest(time(NULL));
 }
@@ -1000,6 +1005,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
         data << guid;                                       // player guid
         // Rank, filling bar, PLAYER_BYTES_3, ??
         data << (uint8)pl->GetByteValue(PLAYER_FIELD_BYTES2, 0);
+        // FIXME: below must be 8*uint16, 6*uint32, uint8
         // Today Honorable and Dishonorable Kills
         data << pl->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
         // Yesterday Honorable Kills
@@ -1065,6 +1071,27 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
         { SendNotification(LANG_YOU_NOT_HAVE_PERMISSION); }
 }
 
+void WorldSession::HandleMoveSetRawPosition(WorldPacket& recv_data)
+{
+    DEBUG_LOG("WORLD: Received opcode CMSG_MOVE_SET_RAW_POSITION from %s", GetPlayer()->GetGuidStr().c_str());
+    // write in client console: setrawpos x y z o
+    // For now, it is implemented like worldport but on the same map. Consider using MSG_MOVE_SET_RAW_POSITION_ACK.
+    float PosX, PosY, PosZ, PosO;
+    recv_data >> PosX >> PosY >> PosZ >> PosO;
+    //DEBUG_LOG("Set to: X=%f, Y=%f, Z=%f, orient=%f", PosX, PosY, PosZ, PosO);
+
+    if (!GetPlayer()->IsInWorld() || GetPlayer()->IsTaxiFlying())
+    {
+        DEBUG_LOG("Player '%s' (GUID: %u) in a transfer, ignore setrawpos command.", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
+        return;
+    }
+
+    if (GetSecurity() >= SEC_ADMINISTRATOR)
+        { GetPlayer()->TeleportTo(GetPlayer()->GetMapId(), PosX, PosY, PosZ, PosO); }
+    else
+        { SendNotification(LANG_YOU_NOT_HAVE_PERMISSION); }
+}
+
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received opcode CMSG_WHOIS");
@@ -1113,7 +1140,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     std::string msg = charname + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastip;
 
-    WorldPacket data(SMSG_WHOIS, msg.size() + 1);
+    WorldPacket data(SMSG_WHOIS, msg.size() + 1);   // max CString length allowed: 256
     data << msg;
     _player->GetSession()->SendPacket(&data);
 

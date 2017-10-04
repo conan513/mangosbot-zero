@@ -591,20 +591,23 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
 
         // 1.12.1 can have only single item
         Item* item = (*itr)->items.size() > 0 ? _player->GetMItem((*itr)->items[0].item_guid) : NULL;
-        data << uint32(item ? item->GetEntry() : 0);        // entry
-        // permanent enchantment
-        data << uint32(item ? item->GetEnchantmentId((EnchantmentSlot)PERM_ENCHANTMENT_SLOT) : 0);
-        // can be negative
-        data << uint32(item ? item->GetItemRandomPropertyId() : 0);
-        // unk
-        data << uint32(item ? item->GetItemSuffixFactor() : 0);
-        // stack count
-        data << (uint8)(item ? item->GetCount() : 0);
-        data << uint32(item ? item->GetSpellCharges() : 0); // charges
-        // durability
-        data << uint32(item ? item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) : 0);
-        // durability
-        data << uint32(item ? item->GetUInt32Value(ITEM_FIELD_DURABILITY) : 0);
+
+        if (item)
+        {
+            data << uint32(item->GetEntry());
+            data << uint32(item->GetEnchantmentId((EnchantmentSlot)PERM_ENCHANTMENT_SLOT)); // permanent enchantment
+            data << uint32(item->GetItemRandomPropertyId());                                // can be negative
+            data << uint32(item->GetItemSuffixFactor());                                    // unk
+            data << uint8(item->GetCount());                                                // stack count
+            data << uint32(item->GetSpellCharges());                                        // charges
+            data << uint32(item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY));                 // durability max
+            data << uint32(item->GetUInt32Value(ITEM_FIELD_DURABILITY));                    // durability current
+        }
+        else
+        {
+            data << uint32(0) << uint32(0) << uint32(0) << uint32(0) << uint8(0) << uint32(0) << uint32(0) << uint32(0);
+        }
+
         data << uint32((*itr)->money);                      // copper
         data << uint32((*itr)->COD);                        // Cash on delivery
         data << uint32((*itr)->checked);                    // flags
@@ -641,7 +644,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recv_data)
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
     data << itemTextId;
-    data << sObjectMgr.GetItemText(itemTextId);
+    data << sObjectMgr.GetItemText(itemTextId);                 // CString TODO: max length 8000
     SendPacket(&data);
 }
 
@@ -710,54 +713,8 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recv_data)
  */
 void WorldSession::HandleQueryNextMailTime(WorldPacket& /**recv_data*/)
 {
-    WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
-
-    if (_player->unReadMails > 0)
-    {
-        data << uint32(0);                                  // float
-        data << uint32(0);                                  // count
-
-        uint32 count = 0;
-        time_t now = time(NULL);
-        for (PlayerMails::iterator itr = _player->GetMailBegin(); itr != _player->GetMailEnd(); ++itr)
-        {
-            Mail* m = (*itr);
-            // must be not checked yet
-            if (m->checked & MAIL_CHECK_MASK_READ)
-                { continue; }
-
-            // and already delivered
-            if (now < m->deliver_time)
-                { continue; }
-
-            data << ObjectGuid(HIGHGUID_PLAYER, m->sender); // sender guid
-
-            switch (m->messageType)
-            {
-                case MAIL_AUCTION:
-                    data << uint32(m->sender);              // auction house id
-                    data << uint32(MAIL_AUCTION);           // message type
-                    break;
-                default:
-                    data << uint32(0);
-                    data << uint32(0);
-                    break;
-            }
-
-            data << uint32(m->stationery);
-            data << uint32(0xC6000000);                     // float unk, time or something
-
-            ++count;
-            if (count == 2)                                 // do not display more than 2 mails
-                { break; }
-        }
-        data.put<uint32>(4, count);
-    }
-    else
-    {
-        data << uint32(0xC7A8C000);
-        data << uint32(0x00000000);
-    }
+    WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 4);
+    data << (_player->unReadMails > 0 ? float(0) : float(-1));
     SendPacket(&data);
 }
 

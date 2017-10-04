@@ -1313,7 +1313,7 @@ namespace MaNGOS
                 : i_object(obj), i_msgtype(msgtype), i_textData(textData), i_language(language), i_target(target) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = NULL;
+                char const* text;
                 if ((int32)i_textData->Content.size() > loc_idx + 1 && !i_textData->Content[loc_idx + 1].empty())
                     { text = i_textData->Content[loc_idx + 1].c_str(); }
                 else
@@ -1420,14 +1420,6 @@ void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
     data << ObjectGuid(guid);
-    SendMessageToSet(&data, true);
-}
-
-void WorldObject::SendGameObjectCustomAnim(ObjectGuid guid, uint32 animId /*= 0*/)
-{
-    WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8 + 4);
-    data << ObjectGuid(guid);
-    data << uint32(animId);
     SendMessageToSet(&data, true);
 }
 

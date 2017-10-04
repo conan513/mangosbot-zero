@@ -5677,7 +5677,7 @@ bool ChatHandler::HandleMovegensCommand(char* /*args*/)
 
             case CHASE_MOTION_TYPE:
             {
-                Unit* target = NULL;
+                Unit* target;
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     { target = static_cast<ChaseMovementGenerator<Player> const*>(*itr)->GetTarget(); }
                 else
@@ -5693,7 +5693,7 @@ bool ChatHandler::HandleMovegensCommand(char* /*args*/)
             }
             case FOLLOW_MOTION_TYPE:
             {
-                Unit* target = NULL;
+                Unit* target;
                 if (unit->GetTypeId() == TYPEID_PLAYER)
                     { target = static_cast<FollowMovementGenerator<Player> const*>(*itr)->GetTarget(); }
                 else
@@ -5770,7 +5770,7 @@ bool ChatHandler::HandleServerPLimitCommand(char* args)
 
     uint32 pLimit = sWorld.GetPlayerAmountLimit();
     AccountTypes allowedAccountType = sWorld.GetPlayerSecurityLimit();
-    char const* secName = "";
+    char const* secName;
     switch (allowedAccountType)
     {
         case SEC_PLAYER:        secName = "Player";        break;
@@ -6293,8 +6293,8 @@ bool ChatHandler::HandleSendMassMailCommand(char* args)
         return false;
     }
 
-    // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+    // GM mail
+    MailSender sender(MAIL_NORMAL, (uint32)0, MAIL_STATIONERY_GM);
 
     sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
 
@@ -6398,8 +6398,7 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
     if (!HandleSendItemsHelper(draft, args))
         { return false; }
 
-    // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, (uint32)0, MAIL_STATIONERY_GM);
 
     draft.SendMailTo(MailReceiver(receiver, receiver_guid), sender);
 
@@ -6429,8 +6428,7 @@ bool ChatHandler::HandleSendMassItemsCommand(char* args)
         return false;
     }
 
-    // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, (uint32)0, MAIL_STATIONERY_GM);
 
     sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
 
@@ -6479,8 +6477,7 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
     if (!HandleSendMoneyHelper(draft, args))
         { return false; }
 
-    // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, (uint32)0, MAIL_STATIONERY_GM);
 
     draft.SendMailTo(MailReceiver(receiver, receiver_guid), sender);
 
@@ -6510,7 +6507,7 @@ bool ChatHandler::HandleSendMassMoneyCommand(char* args)
     }
 
     // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, (uint32)0, MAIL_STATIONERY_GM);
 
     sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
 

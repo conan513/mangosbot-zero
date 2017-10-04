@@ -458,11 +458,11 @@ void AreaAura::Update(uint32 diff)
 
                 SpellEntry const* actualSpellInfo;
                 if (GetCasterGuid() == (*tIter)->GetObjectGuid()) // if caster is same as target then no need to change rank of the spell
-                    actualSpellInfo = GetSpellProto();
+                    { actualSpellInfo = GetSpellProto(); }
                 else
                     actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), (*tIter)->getLevel()); // use spell id according level of the target
                 if (!actualSpellInfo)
-                    continue;
+                    { continue; }
 
                 Unit::SpellAuraHolderBounds spair = (*tIter)->GetSpellAuraHolderBounds(actualSpellInfo->Id);
                 // we need ignore present caster self applied are auras sometime
@@ -806,7 +806,9 @@ void Aura::TriggerSpell()
 //                    case 6965: break;
                     case 9712:                              // Thaumaturgy Channel
                         if (Unit* caster = GetCaster())
+                        {
                             caster->CastSpell(caster, 21029, true);
+                        }
                         return;
                     case 23170:                             // Brood Affliction: Bronze
                     {
@@ -1098,8 +1100,10 @@ void Aura::TriggerSpell()
     if (triggeredSpellInfo)
     {
         if (triggerTargetObject)
+        {
             triggerCaster->CastSpell(triggerTargetObject->GetPositionX(), triggerTargetObject->GetPositionY(), triggerTargetObject->GetPositionZ(),
                                      triggeredSpellInfo, true, NULL, this, casterGUID);
+        }
         else
             { triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, NULL, this, casterGUID); }
     }
@@ -1183,8 +1187,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 28834:                             // Mark of Rivendare
                     case 28835:                             // Mark of Zeliek
                     {
-                        int32 damage = 0;
-
+                        int32 damage;
                         switch (GetStackAmount())
                         {
                             case 1:
@@ -1404,6 +1407,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     return;
                 }
             }
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Seal of the Crusader deals less damage with each attack. -28% damage,multiple tests.
+            if (GetSpellProto()->SpellIconID == 237 && GetSpellProto()->SpellFamilyFlags & UI64LIT(0x00000200))
+                target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, -28.0f, apply);
+
             break;
         }
     }
@@ -1733,9 +1744,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             if (target->getRace() == RACE_TAUREN)
             {
                 if (target->getGender() == GENDER_MALE)
+                {
                     target->SetObjectScale(DEFAULT_TAUREN_MALE_SCALE * target->GetObjectScaleMod());
+                }
                 else
+                {
                     target->SetObjectScale(DEFAULT_TAUREN_FEMALE_SCALE * target->GetObjectScaleMod());
+                }
             }
 
             target->SetDisplayId(target->GetNativeDisplayId());
@@ -2345,7 +2360,7 @@ void Aura::HandleModConfuse(bool apply, bool Real)
 
     // Do not remove it yet if more effects are up, do it for the last effect
     if (!apply && GetTarget()->HasAuraType(SPELL_AURA_MOD_CONFUSE))
-         return;
+        { return; }
 
     GetTarget()->SetConfused(apply, GetCasterGuid(), GetId());
 }
@@ -2450,8 +2465,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                 { return; }
 
-            uint32 spell_id = 0;
-
+            uint32 spell_id;
             switch (GetId())
             {
                 case 19386: spell_id = 24131; break;
@@ -2520,7 +2534,9 @@ void Aura::HandleModStealth(bool apply, bool Real)
 
         // Remove vanish buff if user cancel stealth
         if (m_removeMode == AURA_REMOVE_BY_CANCEL)
+        {
             target->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        }
 
         // only at real aura remove of _last_ SPELL_AURA_MOD_STEALTH
         if (Real && !target->HasAuraType(SPELL_AURA_MOD_STEALTH))

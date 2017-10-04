@@ -216,14 +216,13 @@ namespace VMAP
             return false;
         }
         printf("Read coordinate mapping...\n");
-        uint32 mapID, tileX, tileY, check = 0;
+        uint32 mapID, tileX, tileY;
         G3D::Vector3 v1, v2;
         ModelSpawn spawn;
         while (!feof(dirf))
         {
-            check = 0;
             // read mapID, tileX, tileY, Flags, adtID, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
-            check += fread(&mapID, sizeof(uint32), 1, dirf);
+            uint32 check = fread(&mapID, sizeof(uint32), 1, dirf);
             if (check == 0) // EoF...
                 { break; }
             check += fread(&tileX, sizeof(uint32), 1, dirf);
@@ -301,7 +300,6 @@ namespace VMAP
     //=================================================================
     bool TileAssembler::convertRawFile(const std::string& pModelFilename, const char *RAW_VMAP_MAGIC)
     {
-        bool success = true;
         std::string filename = iSrcDir;
         if (filename.length() > 0)
             { filename.append("/"); }
@@ -330,9 +328,7 @@ namespace VMAP
             model.SetGroupModels(groupsArray);
         }
 
-        success = model.WriteFile(iDestDir + "/" + pModelFilename + ".vmo");
-
-        return success;
+		return model.WriteFile(iDestDir + "/" + pModelFilename + ".vmo");
     }
 
     void TileAssembler::exportGameobjectModels(const char *RAW_VMAP_MAGIC)

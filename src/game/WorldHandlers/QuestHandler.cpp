@@ -489,10 +489,9 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 
     if (Player* pPlayer = ObjectAccessor::FindPlayer(_player->GetDividerGuid()))
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 4 + 1));
+        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << ObjectGuid(guid);
-        data << uint32(msg);                             // valid values: 0-8
-        data << uint8(0);
+        data << uint8(msg);               // enum QuestShareMessages
         pPlayer->GetSession()->SendPacket(&data);
         _player->ClearDividerGuid();
     }
@@ -613,8 +612,6 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
     for (GuidSet::const_iterator itr = _player->m_clientGUIDs.begin(); itr != _player->m_clientGUIDs.end(); ++itr)
     {
-        uint8 dialogStatus = DIALOG_STATUS_NONE;
-
         if (itr->IsAnyTypeCreature())
         {
             // need also pet quests case support
@@ -626,7 +623,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                 { continue; }
 
-            dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
+            uint8 dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
 
             if (dialogStatus == DIALOG_STATUS_UNDEFINED)
                 { dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE); }
@@ -645,7 +642,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
                 { continue; }
 
-            dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
+            uint8 dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
 
             if (dialogStatus == DIALOG_STATUS_UNDEFINED)
                 { dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE); }
