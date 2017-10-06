@@ -13,10 +13,6 @@ namespace ai
     BEGIN_RANGED_SPELL_ACTION(CastArcaneShotAction, "arcane shot")
     END_SPELL_ACTION()
 
-    BEGIN_RANGED_SPELL_ACTION(CastExplosiveShotAction, "explosive shot")
-    END_SPELL_ACTION()
-
-
     BEGIN_RANGED_SPELL_ACTION(CastAimedShotAction, "aimed shot")
     END_SPELL_ACTION()
 
@@ -115,18 +111,6 @@ namespace ai
 	{
 	public:
 		CastRapidFireAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "rapid fire") {}
-	};
-
-	class CastReadinessAction : public CastBuffSpellAction
-	{
-	public:
-		CastReadinessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "readiness") {}
-	};
-
-	class CastBlackArrow : public CastDebuffSpellAction
-	{
-	public:
-		CastBlackArrow(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "black arrow") {}
 	};
 
     class CastFreezingTrap : public CastDebuffSpellAction

@@ -78,7 +78,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
     ostringstream out; out << "Random bots are now scheduled to be processed in the background. Next re-schedule in " << sPlayerbotAIConfig.randomBotUpdateInterval << " seconds";
     sLog.outString(out.str().c_str());
-    sWorld.SendWorldText(3, out.str().c_str());
+    //sWorld.SendWorldText(3, out.str().c_str());
 
     PrintStats();
 }
@@ -479,10 +479,20 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
 
 void RandomPlayerbotMgr::Randomize(Player* bot)
 {
-    if (bot->getLevel() == 1)
-        RandomizeFirst(bot);
-    else
-        IncreaseLevel(bot);
+		if (bot->getLevel() == 1)
+		{
+			RandomizeFirst(bot);
+		}
+		else
+		{
+			// EJ bot wont increase level
+			if (bot->IsDead())
+				bot->ResurrectPlayer(1.0f);
+			bot->CombatStop(true);
+			IncreaseLevel(bot);
+			RandomTeleportForLevel(bot);
+		}
+	
 }
 
 void RandomPlayerbotMgr::IncreaseLevel(Player* bot)

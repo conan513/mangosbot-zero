@@ -7,8 +7,37 @@
 
 using namespace ai;
 
+class GenericRogueNonCombatStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+{
+public:
+	GenericRogueNonCombatStrategyActionNodeFactory()
+	{
+		
+		creators["stealth"] = &stealth;
+	}
+private:
+	static ActionNode* stealth(PlayerbotAI* ai)
+	{
+		return new ActionNode("stealth",
+			/*P*/ NULL,
+			/*A*/ NULL,
+			/*C*/ NULL);
+	}
+	
+};
+
+
+GenericRogueNonCombatStrategy::GenericRogueNonCombatStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai)
+{
+	actionNodeFactories.Add(new GenericRogueNonCombatStrategyActionNodeFactory());
+}
+
 void GenericRogueNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     NonCombatStrategy::InitTriggers(triggers);
+
+	triggers.push_back(new TriggerNode(
+		"often",
+		NextAction::array(0, new NextAction("poison", ACTION_NORMAL + 7), NULL)));
         
 }

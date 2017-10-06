@@ -21,6 +21,8 @@
 #include "SayAction.h"
 #include "OutfitAction.h"
 #include "RandomBotUpdateAction.h"
+#include "../Bots/playerbot/strategy/druid/DruidActions.h"
+#include "../Bots/playerbot/strategy/rogue/RogueActions.h"
 
 namespace ai
 {
@@ -34,10 +36,24 @@ namespace ai
             creators["reach spell"] = &ActionContext::ReachSpell;
             creators["reach melee"] = &ActionContext::ReachMelee;
             creators["flee"] = &ActionContext::flee;
-            creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
             creators["shoot"] = &ActionContext::shoot;
-            creators["lifeblood"] = &ActionContext::lifeblood;
-            creators["arcane torrent"] = &ActionContext::arcane_torrent;
+			creators["berserking"] = &ActionContext::berserking;			//boost? or often?
+			creators["blood fury"] = &ActionContext::blood_fury;			//boost? or often?
+			creators["cannibalize"] = &ActionContext::cannibalize;			//loot
+			creators["escape artist"] = &ActionContext::escape_artist;		//cc need trigger
+			creators["shadowmeld"] = &ActionContext::shadowmeld;
+			creators["stoneform"] = &ActionContext::stoneform;				//ch
+			creators["war stomp"] = &ActionContext::war_stomp;				//cc need trigger
+			creators["will of the forsaken"] = &ActionContext::will_of_the_forsaken;	//cc need trigger
+			creators["feedback"] = &ActionContext::feedback;						//cc need trigger
+			creators["desperate prayer"] = &ActionContext::desperate_prayer;		//ch	
+			creators["fear ward"] = &ActionContext::fear_ward;						//cc need trigger
+			creators["elune's grace"] = &ActionContext::elunes_grace;				//ch
+			creators["starshards"] = &ActionContext::starshards;					//boost? or often?
+			creators["touch of weakness"] = &ActionContext::touch_of_weakness;		//boost? or often?
+			creators["devouring plague"] = &ActionContext::ActionContext::devouring_plague;		//boost? or often?
+			creators["hex of weakness"] = &ActionContext::hex_of_weakness;			//boost? or often?
+			creators["shadowguard"] = &ActionContext::shadowguard;					//ch
             creators["end pull"] = &ActionContext::end_pull;
             creators["healthstone"] = &ActionContext::healthstone;
             creators["healing potion"] = &ActionContext::healing_potion;
@@ -78,9 +94,15 @@ namespace ai
             creators["random bot update"] = &ActionContext::random_bot_update;
             creators["delay"] = &ActionContext::delay;
             creators["greet"] = &ActionContext::greet;
+			creators["stealth"] = &ActionContext::stealth;
+			creators["prowl"] = &ActionContext::prowl;
+			//creators["poisoning"] = &ActionContext::poisoning;
         }
 
     private:
+		//static Action* poisoning(PlayerbotAI* ai) { return new UseItemAction(ai, "poisoning"); }
+		static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
+		static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
         static Action* greet(PlayerbotAI* ai) { return new GreetAction(ai); }
         static Action* check_mail(PlayerbotAI* ai) { return new CheckMailAction(ai); }
         static Action* drop_target(PlayerbotAI* ai) { return new DropTargetAction(ai); }
@@ -94,11 +116,24 @@ namespace ai
         static Action* ReachSpell(PlayerbotAI* ai) { return new ReachSpellAction(ai); }
         static Action* ReachMelee(PlayerbotAI* ai) { return new ReachMeleeAction(ai); }
         static Action* flee(PlayerbotAI* ai) { return new FleeAction(ai); }
-        static Action* gift_of_the_naaru(PlayerbotAI* ai) { return new CastGiftOfTheNaaruAction(ai); }
-        static Action* lifeblood(PlayerbotAI* ai) { return new CastLifeBloodAction(ai); }
-        static Action* arcane_torrent(PlayerbotAI* ai) { return new CastArcaneTorrentAction(ai); }
+        static Action* berserking(PlayerbotAI* ai) { return new CastBerserkingAction(ai); }
+		static Action* blood_fury(PlayerbotAI* ai) { return new CastBloodFuryAction(ai); }
+		static Action* cannibalize(PlayerbotAI* ai) { return new CastCannibalizeAction(ai); }
+		static Action* escape_artist(PlayerbotAI* ai) { return new CastEscapeArtistAction(ai); }
+		static Action* shadowmeld(PlayerbotAI* ai) { return new CastShadowmeldAction(ai); }
+		static Action* stoneform(PlayerbotAI* ai) { return new CastStoneformAction(ai); }
+		static Action* war_stomp(PlayerbotAI* ai) { return new CastWarStompAction(ai); }
+		static Action* will_of_the_forsaken(PlayerbotAI* ai) { return new CastWillOfTheForsakenAction(ai); }
+		static Action* feedback(PlayerbotAI* ai) { return new CastFeedbackAction(ai); }
+		static Action* desperate_prayer(PlayerbotAI* ai) { return new CastDesperatePrayerAction(ai); }
+		static Action* fear_ward(PlayerbotAI* ai) { return new CastFearWardAction(ai); }
+		static Action* elunes_grace(PlayerbotAI* ai) { return new CastElunesGraceAction(ai); }
+		static Action* starshards(PlayerbotAI* ai) { return new CastStarshardsAction(ai); }
+		static Action* touch_of_weakness(PlayerbotAI* ai) { return new CastTouchOfWeaknessAction(ai); }
+		static Action* devouring_plague(PlayerbotAI* ai) { return new CastDevouringPlagueAction(ai); }
+		static Action* hex_of_weakness(PlayerbotAI* ai) { return new CastHexOfWeaknessAction(ai); }
+		static Action* shadowguard(PlayerbotAI* ai) { return new CastShadowguardAction(ai); }
         static Action* end_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "-pull"); }
-
         static Action* emote(PlayerbotAI* ai) { return new EmoteAction(ai); }
         static Action* suggest_what_to_do(PlayerbotAI* ai) { return new SuggestWhatToDoAction(ai); }
         static Action* suggest_trade(PlayerbotAI* ai) { return new SuggestTradeAction(ai); }

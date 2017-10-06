@@ -134,7 +134,7 @@ void AhBot::ForceUpdate()
 
     string msg = "AhBot is now checking auctions in the background";
     sLog.outString(msg.c_str());
-    sWorld.SendWorldText(3, msg.c_str());
+    //sWorld.SendWorldText(3, msg.c_str());
     updating = true;
 
     if (!allBidders.size())
@@ -167,7 +167,7 @@ void AhBot::ForceUpdate()
     sLog.outString("AhBot auction check finished. %d auctions answered, %d new auctions added. Next check in %d seconds",
             answered, added, sAhBotConfig.updateInterval);
     ostringstream out; out << "AhBot auction check finished. Next check in " << sAhBotConfig.updateInterval << " seconds";
-    sWorld.SendWorldText(3, out.str().c_str());
+    //sWorld.SendWorldText(3, out.str().c_str());
     updating = false;
 }
 

@@ -21,6 +21,48 @@ namespace ai
 		RevengeAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "revenge") {}
 	};
 
+	class ShieldSlamAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		ShieldSlamAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "shield slam") {}
+	};
+
+	class ShieldBlockAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		ShieldBlockAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "shield block") {}
+	};
+
+	class ShieldBashAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		ShieldBashAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "shield bash") {}
+	};
+
+	class BloodthirstAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		BloodthirstAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "bloodthirst") {}
+	};
+
+	class MortalStrikeAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		MortalStrikeAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "mortal strike") {}
+	};
+
+	class WhirlwindAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		WhirlwindAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "whirlwind") {}
+	};
+
+	class OverpowerAvailableTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		OverpowerAvailableTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "overpower") {}
+	};
+
     class BloodrageDebuffTrigger : public DebuffTrigger
     {
     public:
@@ -38,18 +80,12 @@ namespace ai
     public:
         ShieldBashInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "shield bash") {}
     };
-
-    class VictoryRushTrigger : public HasAuraTrigger
-    {
-    public:
-        VictoryRushTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "victory rush") {}
-    };
-
-    class SwordAndBoardTrigger : public HasAuraTrigger
-    {
-    public:
-        SwordAndBoardTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "sword and board") {}
-    };
+	
+	class PummelInterruptSpellTrigger : public InterruptSpellTrigger
+	{
+	public:
+		PummelInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "pummel") {}
+	};
 
     class ConcussionBlowTrigger : public SnareTargetTrigger
     {
@@ -67,6 +103,12 @@ namespace ai
     {
     public:
         DeathWishTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "death wish") {}
+    };
+
+	class SweepingStrikesTrigger : public BoostTrigger
+    {
+    public:
+		SweepingStrikesTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "sweeping strikes") {}
     };
 
     class ShieldBashInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger

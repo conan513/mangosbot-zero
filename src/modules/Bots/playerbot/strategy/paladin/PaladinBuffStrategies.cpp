@@ -46,7 +46,7 @@ void PaladinBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "seal",
-        NextAction::array(0, new NextAction("seal of vengeance", 89.0f), NULL)));
+        NextAction::array(0, new NextAction("seal of command", 89.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"retribution aura",

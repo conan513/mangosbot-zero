@@ -112,6 +112,11 @@ public:
 	void HandleBotOutgoingPacket(const WorldPacket& packet);
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
+	//Item * FindPoison() const;
+	//Item * FindConsumable(uint32 displayId) const;
+	//void UseItem(Item * item);
+	//void UseItem(Item * item, uint8 targetInventorySlot);
+	//void UseItem(Item * item, Unit * target);
 	void HandleTeleportAck();
     void ChangeEngine(BotState type);
     void DoNextAction();
@@ -187,4 +192,9 @@ protected:
     map<string, time_t> whispers;
     pair<ChatMsg, time_t> currentChat;
 };
-
+enum RoguePoisonDisplayId
+{
+	DEADLY_POISON_DISPLAYID = 13707,
+	INSTANT_POISON_DISPLAYID = 13710,
+	WOUND_POISON_DISPLAYID = 37278
+};

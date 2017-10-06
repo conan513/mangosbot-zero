@@ -42,7 +42,7 @@ namespace ai
 			Unit* target = AI_VALUE(Unit*, "current target");
             return target && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig.tooCloseDistance;
         }
-    };
+	};
 
     class OutOfRangeTrigger : public Trigger {
     public:

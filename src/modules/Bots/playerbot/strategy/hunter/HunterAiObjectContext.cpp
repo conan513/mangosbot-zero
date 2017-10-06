@@ -68,7 +68,6 @@ namespace ai
             TriggerFactoryInternal()
             {
                 creators["aspect of the viper"] = &TriggerFactoryInternal::aspect_of_the_viper;
-                creators["black arrow"] = &TriggerFactoryInternal::black_arrow;
                 creators["no stings"] = &TriggerFactoryInternal::NoStings;
                 creators["hunters pet dead"] = &TriggerFactoryInternal::hunters_pet_dead;
                 creators["hunters pet low health"] = &TriggerFactoryInternal::hunters_pet_low_health;
@@ -89,7 +88,6 @@ namespace ai
             static Trigger* serpent_sting_on_attacker(PlayerbotAI* ai) { return new SerpentStingOnAttackerTrigger(ai); }
             static Trigger* trueshot_aura(PlayerbotAI* ai) { return new TrueshotAuraTrigger(ai); }
             static Trigger* aspect_of_the_viper(PlayerbotAI* ai) { return new HunterAspectOfTheViperTrigger(ai); }
-            static Trigger* black_arrow(PlayerbotAI* ai) { return new BlackArrowTrigger(ai); }
             static Trigger* NoStings(PlayerbotAI* ai) { return new HunterNoStingsActiveTrigger(ai); }
             static Trigger* hunters_pet_dead(PlayerbotAI* ai) { return new HuntersPetDeadTrigger(ai); }
             static Trigger* hunters_pet_low_health(PlayerbotAI* ai) { return new HuntersPetLowHealthTrigger(ai); }
@@ -118,8 +116,6 @@ namespace ai
             {
                 creators["auto shot"] = &AiObjectContextInternal::auto_shot;
                 creators["aimed shot"] = &AiObjectContextInternal::aimed_shot;
-                creators["chimera shot"] = &AiObjectContextInternal::chimera_shot;
-                creators["explosive shot"] = &AiObjectContextInternal::explosive_shot;
                 creators["arcane shot"] = &AiObjectContextInternal::arcane_shot;
                 creators["concussive shot"] = &AiObjectContextInternal::concussive_shot;
                 creators["distracting shot"] = &AiObjectContextInternal::distracting_shot;
@@ -134,11 +130,9 @@ namespace ai
                 creators["mend pet"] = &AiObjectContextInternal::mend_pet;
                 creators["revive pet"] = &AiObjectContextInternal::revive_pet;
                 creators["call pet"] = &AiObjectContextInternal::call_pet;
-                creators["black arrow"] = &AiObjectContextInternal::black_arrow;
                 creators["freezing trap"] = &AiObjectContextInternal::freezing_trap;
                 creators["rapid fire"] = &AiObjectContextInternal::rapid_fire;
                 creators["boost"] = &AiObjectContextInternal::rapid_fire;
-                creators["readiness"] = &AiObjectContextInternal::readiness;
                 creators["aspect of the hawk"] = &AiObjectContextInternal::aspect_of_the_hawk;
                 creators["aspect of the wild"] = &AiObjectContextInternal::aspect_of_the_wild;
                 creators["aspect of the viper"] = &AiObjectContextInternal::aspect_of_the_viper;
@@ -156,8 +150,6 @@ namespace ai
             static Action* trueshot_aura(PlayerbotAI* ai) { return new CastTrueshotAuraAction(ai); }
             static Action* auto_shot(PlayerbotAI* ai) { return new CastAutoShotAction(ai); }
             static Action* aimed_shot(PlayerbotAI* ai) { return new CastAimedShotAction(ai); }
-            static Action* chimera_shot(PlayerbotAI* ai) { return new CastChimeraShotAction(ai); }
-            static Action* explosive_shot(PlayerbotAI* ai) { return new CastExplosiveShotAction(ai); }
             static Action* arcane_shot(PlayerbotAI* ai) { return new CastArcaneShotAction(ai); }
             static Action* concussive_shot(PlayerbotAI* ai) { return new CastConcussiveShotAction(ai); }
             static Action* distracting_shot(PlayerbotAI* ai) { return new CastDistractingShotAction(ai); }
@@ -172,10 +164,8 @@ namespace ai
             static Action* mend_pet(PlayerbotAI* ai) { return new CastMendPetAction(ai); }
             static Action* revive_pet(PlayerbotAI* ai) { return new CastRevivePetAction(ai); }
             static Action* call_pet(PlayerbotAI* ai) { return new CastCallPetAction(ai); }
-            static Action* black_arrow(PlayerbotAI* ai) { return new CastBlackArrow(ai); }
             static Action* freezing_trap(PlayerbotAI* ai) { return new CastFreezingTrap(ai); }
             static Action* rapid_fire(PlayerbotAI* ai) { return new CastRapidFireAction(ai); }
-            static Action* readiness(PlayerbotAI* ai) { return new CastReadinessAction(ai); }
             static Action* aspect_of_the_hawk(PlayerbotAI* ai) { return new CastAspectOfTheHawkAction(ai); }
             static Action* aspect_of_the_wild(PlayerbotAI* ai) { return new CastAspectOfTheWildAction(ai); }
             static Action* aspect_of_the_viper(PlayerbotAI* ai) { return new CastAspectOfTheViperAction(ai); }

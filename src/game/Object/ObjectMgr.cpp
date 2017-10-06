@@ -3218,6 +3218,12 @@ void ObjectMgr::LoadGroups()
 
 void ObjectMgr::LoadQuests()
 {
+	
+
+	// EJ generate class spell quests
+	m_ClassSpellQuestTemplates.clear();
+
+	m_ExclusiveQuestGroups.clear();
     // For reload case
     for (QuestMap::const_iterator itr = mQuestTemplates.begin(); itr != mQuestTemplates.end(); ++itr)
         { delete itr->second; }
@@ -3735,7 +3741,13 @@ void ObjectMgr::LoadQuests()
                 sLog.outErrorDb("Quest %u has `RewSpell` = %u but spell %u is talent, quest will not have a spell reward.",
                                 qinfo->GetQuestId(), qinfo->RewSpell, qinfo->RewSpell);
                 qinfo->RewSpell = 0;                        // no spell reward will display for this quest
-            }
+			}
+			else
+			{
+				// EJ generate class spell quests
+				m_ClassSpellQuestTemplates.insert(std::pair<uint32, Quest*>(qinfo->GetQuestId(), qinfo));
+			}
+		
         }
 
         if (qinfo->RewSpellCast)
@@ -3869,6 +3881,7 @@ void ObjectMgr::LoadQuests()
 
 void ObjectMgr::LoadQuestLocales()
 {
+
     mQuestLocaleMap.clear();                                // need for reload case
 
     QueryResult* result = WorldDatabase.Query("SELECT entry,"

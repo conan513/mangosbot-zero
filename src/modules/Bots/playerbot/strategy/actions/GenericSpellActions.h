@@ -239,24 +239,118 @@ namespace ai
         CastShootAction(PlayerbotAI* ai) : CastSpellAction(ai, "shoot") {}
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };
+	
+	//heal
 
-	class CastLifeBloodAction : public CastHealingSpellAction
+	class CastCannibalizeAction : public CastHealingSpellAction
 	{
 	public:
-		CastLifeBloodAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lifeblood") {}
+		CastCannibalizeAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "cannibalize") {}
 	};
 
-	class CastGiftOfTheNaaruAction : public CastHealingSpellAction
+	class CastDesperatePrayerAction : public CastHealingSpellAction
 	{
 	public:
-		CastGiftOfTheNaaruAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "gift of the naaru") {}
+		CastDesperatePrayerAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "desperate prayer") {}
 	};
 
-    class CastArcaneTorrentAction : public CastBuffSpellAction
-    {
-    public:
-        CastArcaneTorrentAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "arcane torrent") {}
-    };
+	//buff
+
+	class CastShadowmeldAction : public CastBuffSpellAction
+	{
+	public:
+		CastShadowmeldAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shadowmeld") {}
+	};
+
+	class CastElunesGraceAction : public CastBuffSpellAction
+	{
+	public:
+		CastElunesGraceAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "elune's grace") {}
+	};
+
+	class CastBerserkingAction : public CastBuffSpellAction
+	{
+	public:
+		CastBerserkingAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "berserking") {}
+	};
+
+	class CastBloodFuryAction : public CastBuffSpellAction
+	{
+	public:
+		CastBloodFuryAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "blood fury") {}
+	};
+
+	class CastStoneformAction : public CastBuffSpellAction
+	{
+	public:
+		CastStoneformAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "stoneform") {}
+	};
+
+	class CastShadowguardAction : public CastBuffSpellAction
+	{
+	public:
+		CastShadowguardAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shadowguard") {}
+	};
+
+	class CastFeedbackAction : public CastBuffSpellAction
+	{
+	public:
+		CastFeedbackAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "feedback") {}
+	};
+
+	//buff party
+
+	class CastFearWardAction : public BuffOnPartyAction {
+	public:
+		CastFearWardAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "fear ward") {}
+	};
+
+	//debuff
+
+	class CastTouchOfWeaknessAction : public CastDebuffSpellAction
+	{
+	public:
+		CastTouchOfWeaknessAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "touch of weakness") {}
+	};
+
+	class CastDevouringPlagueAction : public CastDebuffSpellAction
+	{
+	public:
+		CastDevouringPlagueAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "devouring plague") {}
+	};
+
+	class CastHexOfWeaknessAction : public CastDebuffSpellAction
+	{
+	public:
+		CastHexOfWeaknessAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "hex of weakness") {}
+	};
+
+	//spell
+
+	class CastStarshardsAction : public CastSpellAction
+	{
+	public:
+		CastStarshardsAction(PlayerbotAI* ai) : CastSpellAction(ai, "starshards") {}
+	};
+
+	class CastWillOfTheForsakenAction : public CastSpellAction
+	{
+	public:
+		CastWillOfTheForsakenAction(PlayerbotAI* ai) : CastSpellAction(ai, "will of the forsaken") {}
+	};
+
+	class CastWarStompAction : public CastSpellAction
+	{
+	public:
+		CastWarStompAction(PlayerbotAI* ai) : CastSpellAction(ai, "war stomp") {}
+	};
+
+	class CastEscapeArtistAction : public CastSpellAction
+	{
+	public:
+		CastEscapeArtistAction(PlayerbotAI* ai) : CastSpellAction(ai, "escape artist") {}
+	};
+
 
     class CastSpellOnEnemyHealerAction : public CastSpellAction
     {
@@ -268,4 +362,5 @@ namespace ai
         }
         virtual string getName() { return spell + " on enemy healer"; }
     };
+
 }

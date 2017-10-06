@@ -126,6 +126,8 @@ bool ScriptMgr::CanSpellEffectStartDBScript(SpellEntry const* spellinfo, SpellEf
 
 void ScriptMgr::LoadScripts(DBScriptType type)
 {
+	
+
     if (IsScriptScheduled())                                // function don't must be called in time scripts use.
         { return; }
 

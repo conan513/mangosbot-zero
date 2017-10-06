@@ -124,6 +124,7 @@ void SuggestWhatToDoAction::grindMaterials()
                 if (name == category->GetName())
                 {
                     string item = category->GetLabel();
+                    //SPP need to convert for osx
                     transform(item.begin(), item.end(), item.begin(), tolower);
                     ostringstream itemout, msg;
                     itemout << "|c0000FF00" << item << "|cffffffff";

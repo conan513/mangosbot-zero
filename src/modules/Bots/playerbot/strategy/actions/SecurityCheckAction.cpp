@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "../../RandomPlayerbotMgr.h"
 #include "SecurityCheckAction.h"
+#include "../../PlayerbotAIConfig.h"
 
 using namespace ai;
 
@@ -13,6 +14,9 @@ bool SecurityCheckAction::isUseful()
 
 bool SecurityCheckAction::Execute(Event event)
 {
+	if (!sPlayerbotAIConfig.lootRestrictions)
+		return false;
+
     Group* group = bot->GetGroup();
     if (group)
     {

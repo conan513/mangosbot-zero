@@ -163,8 +163,8 @@ namespace ai
 	    CastPowerWordPainOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "shadow word: pain") {}
 	};
 
-    BEGIN_DEBUFF_ACTION(CastDevouringPlagueAction, "devouring plague")
-    END_SPELL_ACTION()
+ /*   BEGIN_DEBUFF_ACTION(CastDevouringPlagueAction, "devouring plague")
+    END_SPELL_ACTION()*/  //racial spell
 
     BEGIN_DEBUFF_ACTION(CastVampiricTouchAction, "vampiric touch")
     END_SPELL_ACTION()

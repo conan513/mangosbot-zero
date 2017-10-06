@@ -32,7 +32,7 @@ DpsWarlockStrategy::DpsWarlockStrategy(PlayerbotAI* ai) : GenericWarlockStrategy
 
 NextAction** DpsWarlockStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("incinirate", 10.0f), new NextAction("shadow bolt", 10.0f), NULL);
+    return NextAction::array(0, new NextAction("corruption", 10.0f), new NextAction("shadow bolt", 10.0f), NULL);
 }
 
 void DpsWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -41,10 +41,6 @@ void DpsWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
 		"shadow trance",
-		NextAction::array(0, new NextAction("shadow bolt", 20.0f), NULL)));
-
-	triggers.push_back(new TriggerNode(
-		"backlash",
 		NextAction::array(0, new NextAction("shadow bolt", 20.0f), NULL)));
 }
 
@@ -58,9 +54,9 @@ void DpsAoeWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "medium aoe",
         NextAction::array(0, new NextAction("seed of corruption", 31.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "light aoe",
-        NextAction::array(0, new NextAction("shadowfury", 29.0f), NULL)));
+	triggers.push_back(new TriggerNode(
+		"light aoe",
+		NextAction::array(0, new NextAction("seed of corruption", 31.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "corruption on attacker",

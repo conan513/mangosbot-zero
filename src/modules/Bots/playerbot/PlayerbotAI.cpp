@@ -18,7 +18,7 @@
 #include "Group.h"
 #include "Pet.h"
 #include "SpellAuras.h"
-#include "../AhBot/ahbot.h"
+#include "../ahbot/AhBot.h"
 #include "GuildTaskMgr.h"
 #include "PlayerbotDbStore.h"
 
@@ -1439,4 +1439,84 @@ bool ChatHandler::HandleGuildTaskCommand(char* args)
 {
     return GuildTaskMgr::HandleConsoleCommand(this, args);
 }
+/*
+//Find Poison ...Natsukawa
+Item* PlayerbotAI::FindPoison() const
+{
+	// list out items in main backpack
+	for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+	{
+		Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+		if (pItem)
+		{
+			const ItemPrototype* const pItemProto = pItem->GetProto();
 
+			if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
+				continue;
+
+			if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == 6)
+				return pItem;
+		}
+	}
+	// list out items in other removable backpacks
+	for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+	{
+		const Bag* const pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+		if (pBag)
+			for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
+			{
+				Item* const pItem = bot->GetItemByPos(bag, slot);
+				if (pItem)
+				{
+					const ItemPrototype* const pItemProto = pItem->GetProto();
+
+					if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
+						continue;
+
+					if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == 6)
+						return pItem;
+				}
+			}
+	}
+	return NULL;
+}
+
+Item* PlayerbotAI::FindConsumable(uint32 displayId) const
+{
+	// list out items in main backpack
+	for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+	{
+		Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+		if (pItem)
+		{
+			const ItemPrototype* const pItemProto = pItem->GetProto();
+
+			if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
+				continue;
+
+			if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->DisplayInfoID == displayId)
+				return pItem;
+		}
+	}
+	// list out items in other removable backpacks
+	for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+	{
+		const Bag* const pBag = (Bag *)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+		if (pBag)
+			for (uint8 slot = 0; slot < pBag->GetBagSize(); ++slot)
+			{
+				Item* const pItem = bot->GetItemByPos(bag, slot);
+				if (pItem)
+				{
+					const ItemPrototype* const pItemProto = pItem->GetProto();
+
+					if (!pItemProto || bot->CanUseItem(pItemProto) != EQUIP_ERR_OK)
+						continue;
+
+					if (pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->DisplayInfoID == displayId)
+						return pItem;
+				}
+			}
+	}
+	return NULL;
+}*/
