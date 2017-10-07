@@ -43,16 +43,16 @@ private:
 	static ActionNode* revenge(PlayerbotAI* ai)
 	{
 		return new ActionNode("revenge",
-		/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
-		/*A*/ NULL,
-		/*C*/ NULL);
+		    /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
+		    /*A*/ NULL,
+		    /*C*/ NULL);
 	}
 	static ActionNode* sunder_armor(PlayerbotAI* ai)
 	{
-	return new ActionNode("sunder armor",
-		/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
-		/*A*/ NULL,
-		/*C*/ NULL);
+	    return new ActionNode("sunder armor",
+		    /*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
+		    /*A*/ NULL,
+		    /*C*/ NULL);
 	}
 	static ActionNode* shield_block(PlayerbotAI* ai)
 	{
@@ -64,7 +64,7 @@ private:
     static ActionNode* taunt(PlayerbotAI* ai)
     {
         return new ActionNode ("taunt",
-            /*P*/ NULL,
+            /*P*/ NextAction::array(0, new NextAction("reach melee"), NULL),
             /*A*/ NextAction::array(0, new NextAction("mocking blow"), NULL),
             /*C*/ NULL);
     }

@@ -4,10 +4,10 @@
 
 namespace ai
 {
-	class FuryDpsWarriorStrategy : public GenericWarriorStrategy
+	class FuryWarriorStrategy : public GenericWarriorStrategy
 	{
 	public:
-		FuryDpsWarriorStrategy(PlayerbotAI* ai);
+		FuryWarriorStrategy(PlayerbotAI* ai);
 
 	public:
 		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
@@ -16,10 +16,10 @@ namespace ai
 		virtual int GetType() { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
 	};
 
-	class FuryDpsWarriorAoeStrategy : public CombatStrategy
+	class FuryWarriorAoeStrategy : public CombatStrategy
 	{
 	public:
-		FuryDpsWarriorAoeStrategy(PlayerbotAI* ai) : CombatStrategy(ai) {}
+		FuryWarriorAoeStrategy(PlayerbotAI* ai) : CombatStrategy(ai) {}
 
 	public:
 		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
