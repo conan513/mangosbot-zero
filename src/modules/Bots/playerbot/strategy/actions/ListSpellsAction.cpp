@@ -8,54 +8,43 @@ using namespace ai;
 map<uint32, SkillLineAbilityEntry const*> ListSpellsAction::skillSpells;
 set<uint32> ListSpellsAction::vendorItems;
 
-int SortSpells(pair<uint32, string>& s1, pair<uint32, string>& s2)
+bool CompareSpells(pair<uint32, string>& s1, pair<uint32, string>& s2)
 {
-    int p1 = IsPositiveSpell(s1.first) ? 1 : 0;
-    int p2 = IsPositiveSpell(s2.first) ? 1 : 0;
-    if (p1 == p2)
+    const SpellEntry* const si1 = sSpellStore.LookupEntry(s1.first);
+    const SpellEntry* const si2 = sSpellStore.LookupEntry(s2.first);
+    int p1 = si1->School * 20000;
+    int p2 = si2->School * 20000;
+
+    uint32 skill1 = 0, skill2 = 0;
+    uint32 skillValue1 = 0, skillValue2 = 0;
+    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
     {
-        const SpellEntry* const si1 = sSpellStore.LookupEntry(s1.first);
-        const SpellEntry* const si2 = sSpellStore.LookupEntry(s2.first);
-        p1 = si1->School;
-        p2 = si2->School;
-
-        if (p1 == p2)
+        SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        if (skillLine && skillLine->spellId == s1.first)
         {
-            uint32 skill1 = 0, skill2 = 0;
-            uint32 skillValue1 = 0, skillValue2 = 0;
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-            {
-                SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
-                if (skillLine && skillLine->spellId == s1.first)
-                {
-                    skill1 = skillLine->skillId;
-                    skillValue1 = skillLine->min_value;
-                }
-                if (skillLine && skillLine->spellId == s2.first)
-                {
-                    skill2 = skillLine->skillId;
-                    skillValue2 = skillLine->min_value;
-                }
-                if (skill1 && skill2) break;
-            }
-
-            p1 = skill1;
-            p2 = skill2;
-            if (p1 == p2)
-            {
-                p1 = skillValue1;
-                p2 = skillValue2;
-
-                if (p1 == p2)
-                {
-                    return strcmp(si1->SpellName[0], si1->SpellName[1]);
-                }
-            }
-
+            skill1 = skillLine->skillId;
+            skillValue1 = skillLine->min_value;
         }
+        if (skillLine && skillLine->spellId == s2.first)
+        {
+            skill2 = skillLine->skillId;
+            skillValue2 = skillLine->min_value;
+        }
+        if (skill1 && skill2) break;
     }
 
-    return p1 = p2;
+    p1 += skill1 * 500;
+    p2 += skill2 * 500;
+
+    p1 += skillValue1;
+    p2 += skillValue2;
+
+    if (p1 == p2)
+    {
+        return strcmp(si1->SpellName[0], si1->SpellName[1]) > 0;
+    }
+
+    return p1 > p2;
 }
 
 bool ListSpellsAction::Execute(Event event)
@@ -158,7 +147,7 @@ bool ListSpellsAction::Execute(Event event)
             continue;
 
         bool first = true;
-        int craftCount = 0;
+        int craftCount = -1;
         ostringstream materials;
         for (uint32 x = 0; x < MAX_SPELL_REAGENTS; ++x)
         {
@@ -166,32 +155,34 @@ bool ListSpellsAction::Execute(Event event)
                 { continue; }
 
             uint32 itemid = pSpellInfo->Reagent[x];
-            uint32 itemcount = pSpellInfo->ReagentCount[x];
+            uint32 reagentsRequired = pSpellInfo->ReagentCount[x];
             if (itemid)
             {
                 ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
                 if (proto)
                 {
                     if (first) { materials << ": "; first = false; } else materials << ", ";
-                    materials << chat->formatItem(proto, itemcount);
+                    materials << chat->formatItem(proto, reagentsRequired);
 
                     FindItemByIdVisitor visitor(itemid);
-                    uint32 reagentCount = InventoryAction::GetItemCount(&visitor);
-                    bool vendored = (vendorItems.find(itemid) != vendorItems.end());
-                    if (!vendored)
+                    uint32 reagentsInInventory = InventoryAction::GetItemCount(&visitor);
+                    bool buyable = (vendorItems.find(itemid) != vendorItems.end());
+                    if (!buyable)
                     {
-                        uint32 craftable = reagentCount / itemcount;
-                        if (!craftCount || craftCount > craftable)
+                        uint32 craftable = reagentsInInventory / reagentsRequired;
+                        if (craftCount < 0 || craftCount > craftable)
                             craftCount = craftable;
                     }
 
-                    if (reagentCount)
-                        materials << "|cffffff00(x" << reagentCount << ")|r ";
-                    else if (vendored)
+                    if (reagentsInInventory)
+                        materials << "|cffffff00(x" << reagentsInInventory << ")|r ";
+                    else if (buyable)
                         materials << "|cffffff00(buy)|r ";
                 }
             }
         }
+
+        if (craftCount < 0) craftCount = 0;
 
         ostringstream out;
         bool filtered = false;
@@ -235,6 +226,25 @@ bool ListSpellsAction::Execute(Event event)
 
         out << materials.str();
 
+        if (skillLine && skillLine->skillId)
+        {
+            int GrayLevel = (int)skillLine->max_value,
+                   GreenLevel = (int)(skillLine->max_value + skillLine->min_value) / 2,
+                   YellowLevel = (int)skillLine->min_value,
+                   SkillValue = (int)bot->GetBaseSkillValue(skillLine->skillId);
+
+            out << " - ";
+            if (SkillValue >= GrayLevel)
+                out << " |cff808080gray";
+            else if (SkillValue >= GreenLevel)
+                out << " |cff80be80green";
+            else if (SkillValue >= YellowLevel)
+                out << " |cffffff00yellow";
+            else
+                out << " |cffff8040orange";
+            out << "|r";
+        }
+
         if (out.str().empty())
             continue;
 
@@ -244,7 +254,7 @@ bool ListSpellsAction::Execute(Event event)
     }
 
     ai->TellMaster("=== Spells ===");
-    spells.sort(SortSpells);
+    spells.sort(CompareSpells);
 
     for (list<pair<uint32, string> >::iterator i = spells.begin(); i != spells.end(); ++i)
     {
