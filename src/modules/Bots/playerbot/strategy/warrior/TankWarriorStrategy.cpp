@@ -30,7 +30,7 @@ private:
     {
         return new ActionNode ("shield wall",
 			/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
-            /*A*/ NextAction::array(0, new NextAction("shield block"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
 	static ActionNode* shield_slam(PlayerbotAI* ai)
@@ -51,7 +51,7 @@ private:
 	{
 	return new ActionNode("sunder armor",
 		/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
-		/*A*/ NextAction::array(0, new NextAction("revenge"), NULL),
+		/*A*/ NULL,
 		/*C*/ NULL);
 	}
 	static ActionNode* shield_block(PlayerbotAI* ai)
@@ -59,7 +59,7 @@ private:
 		return new ActionNode("shield block",
 			/*P*/ NextAction::array(0, new NextAction("defensive stance"), NULL),
 			/*A*/ NULL,
-			/*C*/ NextAction::array(0, new NextAction("revenge"), NULL));
+			/*C*/ NULL);
     }
     static ActionNode* taunt(PlayerbotAI* ai)
     {
@@ -77,25 +77,33 @@ TankWarriorStrategy::TankWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrate
 
 NextAction** TankWarriorStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("revenge", ACTION_HIGH + 2),
-		new NextAction("shield slam", ACTION_NORMAL + 5),
-		new NextAction("shield block", ACTION_NORMAL + 4),
-		new NextAction("sunder armor", ACTION_NORMAL + 3),
-		new NextAction("melee", ACTION_NORMAL),
-		NULL);
+	return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+    
 }
 
 void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 
+	triggers.push_back(new TriggerNode(
+		"revenge",
+		NextAction::array(0, new NextAction("revenge", ACTION_NORMAL + 5), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"shield block",
+		NextAction::array(0, new NextAction("shield block", ACTION_NORMAL + 9), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"shield slam",
+		NextAction::array(0, new NextAction("shield slam", ACTION_NORMAL + 6), NULL)));
+
     triggers.push_back(new TriggerNode(
         "medium rage available",
-        NextAction::array(0, new NextAction("shield slam", ACTION_NORMAL + 2), new NextAction("heroic strike", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("heroic strike", ACTION_NORMAL + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
         "disarm",
-        NextAction::array(0, new NextAction("disarm", ACTION_NORMAL), NULL)));
+        NextAction::array(0, new NextAction("disarm", ACTION_NORMAL + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
         "lose aggro",
@@ -126,10 +134,6 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		NextAction::array(0, new NextAction("concussion blow", ACTION_INTERRUPT), NULL)));
 
 	triggers.push_back(new TriggerNode(
-		"has aggro",
-		NextAction::array(0, new NextAction("shield block", ACTION_NORMAL + 4), NULL)));
-
-	triggers.push_back(new TriggerNode(
 		"sunder armor",
-		NextAction::array(0, new NextAction("sunder armor", ACTION_NORMAL + 2), NULL)));
+		NextAction::array(0, new NextAction("sunder armor", ACTION_NORMAL + 4), NULL)));
 }

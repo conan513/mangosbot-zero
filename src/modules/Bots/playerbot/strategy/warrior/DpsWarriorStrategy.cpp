@@ -3,7 +3,7 @@
 #include "WarriorMultipliers.h"
 #include "DpsWarriorStrategy.h"
 
-using namespace ai;
+using namespace ai;                           //   ARMS
 
 class DpsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
@@ -13,7 +13,6 @@ public:
 		creators["overpower"] = &overpower;
 		creators["melee"] = &melee;
 		creators["charge"] = &charge;
-		//creators["bloodthirst"] = &bloodthirst;
 		creators["mortal strike"] = &mortal_strike;
 		creators["whirlwind"] = &whirlwind;
 		creators["death wish"] = &death_wish;
@@ -24,7 +23,7 @@ private:
     {
         return new ActionNode ("overpower",
             /*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-            /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* melee(PlayerbotAI* ai)
@@ -45,14 +44,14 @@ private:
 	{
 		return new ActionNode("mortal strike",
 			/*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("melee"), NULL),
+			/*A*/ NULL,
 			/*C*/ NULL);
     }
 	static ActionNode* whirlwind(PlayerbotAI* ai)
 	{
 		return new ActionNode("whirlwind",
 			/*P*/ NextAction::array(0, new NextAction("battle stance"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("mortal strike"), NULL),
+			/*A*/ NULL,
 			/*C*/ NULL);
     }
     static ActionNode* death_wish(PlayerbotAI* ai)
@@ -78,8 +77,7 @@ DpsWarriorStrategy::DpsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy
 
 NextAction** DpsWarriorStrategy::getDefaultActions()
 {
-	return NextAction::array(0, new NextAction("bloodthirst", ACTION_HIGH + 5),
-		new NextAction("whirlwind", ACTION_HIGH + 3), NULL);
+	return NextAction::array(0, new NextAction("mortal strike", ACTION_NORMAL + 8), NULL);
 }
 
 void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -89,6 +87,18 @@ void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "enemy out of melee",
         NextAction::array(0, new NextAction("charge", ACTION_NORMAL + 9), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"mortal strike",
+		NextAction::array(0, new NextAction("mortal strike", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"overpower",
+		NextAction::array(0, new NextAction("overpower", ACTION_NORMAL + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"whirlwind",
+		NextAction::array(0, new NextAction("whirlwind", ACTION_NORMAL + 8), NULL)));
 
     triggers.push_back(new TriggerNode(
         "target critical health",

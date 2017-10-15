@@ -79,7 +79,13 @@ namespace ai
 				creators["sunder armor"] = &TriggerFactoryInternal::sunder_armor;
                 creators["shield bash on enemy healer"] = &TriggerFactoryInternal::shield_bash_on_enemy_healer;
 				creators["sweeping strikes"] = &TriggerFactoryInternal::sweeping_strikes;
-
+				creators["mortal strike"] = &TriggerFactoryInternal::mortal_strike;
+				creators["whirlwind"] = &TriggerFactoryInternal::whirlwind;
+				creators["overpower"] = &TriggerFactoryInternal::overpower;
+				creators["bloodthirst"] = &TriggerFactoryInternal::bloodthirst;
+				creators["shield slam"] = &TriggerFactoryInternal::shield_slam;
+				creators["shield block"] = &TriggerFactoryInternal::shield_block;
+				creators["revenge"] = &TriggerFactoryInternal::revenge;
             }
 
         private:
@@ -96,6 +102,13 @@ namespace ai
 			static Trigger* sunder_armor(PlayerbotAI* ai) { return new SunderArmorDebuffTrigger(ai); }
             static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new ShieldBashInterruptEnemyHealerSpellTrigger(ai); }
 			static Trigger* sweeping_strikes(PlayerbotAI* ai) { return new SweepingStrikesTrigger(ai); }
+			static Trigger* mortal_strike(PlayerbotAI* ai) { return new MortalStrikeAvailableTrigger(ai); }
+			static Trigger* whirlwind(PlayerbotAI* ai) { return new WhirlwindAvailableTrigger(ai); }
+			static Trigger* overpower(PlayerbotAI* ai) { return new OverpowerAvailableTrigger(ai); }
+			static Trigger* bloodthirst(PlayerbotAI* ai) { return new BloodthirstAvailableTrigger(ai); }
+			static Trigger* shield_slam(PlayerbotAI* ai) { return new ShieldSlamAvailableTrigger(ai); }
+			static Trigger* shield_block(PlayerbotAI* ai) { return new ShieldBlockAvailableTrigger(ai); }
+			static Trigger* revenge(PlayerbotAI* ai) { return new RevengeAvailableTrigger(ai); }
         };
     };
 };
@@ -153,6 +166,7 @@ namespace ai
                 creators["shield bash on enemy healer"] = &AiObjectContextInternal::shield_bash_on_enemy_healer;
 				creators["sweeping strikes"] = &AiObjectContextInternal::sweeping_strikes;
 				creators["recklessness"] = &AiObjectContextInternal::recklessness;
+				creators["shield block"] = &AiObjectContextInternal::shield_block;
             }
 
         private:

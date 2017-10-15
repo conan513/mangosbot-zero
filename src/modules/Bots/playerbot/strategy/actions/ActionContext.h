@@ -96,11 +96,11 @@ namespace ai
             creators["greet"] = &ActionContext::greet;
 			creators["stealth"] = &ActionContext::stealth;
 			creators["prowl"] = &ActionContext::prowl;
-			creators["poison"] = &ActionContext::poison;
+			//creators["poisoning"] = &ActionContext::poisoning;
         }
 
     private:
-		static Action* poison(PlayerbotAI* ai) { return new UseItemAction(ai, "poison"); }
+		//static Action* poisoning(PlayerbotAI* ai) { return new UseItemAction(ai, "poisoning"); }
 		static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }
 		static Action* stealth(PlayerbotAI* ai) { return new CastStealthAction(ai); }
         static Action* greet(PlayerbotAI* ai) { return new GreetAction(ai); }

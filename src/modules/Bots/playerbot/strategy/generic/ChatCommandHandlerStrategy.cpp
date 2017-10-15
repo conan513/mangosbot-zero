@@ -144,9 +144,9 @@ void ChatCommandHandlerStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"stealth",
 		NextAction::array(0, new NextAction("prowl", relevance), NULL)));
 
-	triggers.push_back(new TriggerNode(
+	/*triggers.push_back(new TriggerNode(
 		"poisoning",
-		NextAction::array(0, new NextAction("poisoning", relevance), NULL)));
+		NextAction::array(0, new NextAction("poisoning", relevance), NULL)));*/
 }
 
 
@@ -198,5 +198,5 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("go");
     supported.push_back("debug");
     supported.push_back("prowl");
-    supported.push_back("poisoning");
+    //supported.push_back("poisoning");
 }

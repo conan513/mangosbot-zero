@@ -45,10 +45,10 @@ namespace ai
         }
     };
 
-	class PoisonAction : public UseItemAction
+/*	class PoisoningAction : public UseItemAction
 	{
 	public:
-		PoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "poison") {}
+		PoisoningAction(PlayerbotAI* ai) : UseItemAction(ai, "poisoning") {}
 
 		virtual bool Execute(Event event)
 		{
@@ -71,11 +71,7 @@ namespace ai
 			if (weapon && weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 0)
 			{
 				poison = ai->FindConsumable(INSTANT_POISON_DISPLAYID);
-				if (!poison)
-					poison = ai->FindConsumable(DEADLY_POISON_DISPLAYID);
-				if (!poison)
-					poison = ai->FindConsumable(WOUND_POISON_DISPLAYID);
-				if (poison)
+				
 				{
 					ai->UseItem(poison, EQUIPMENT_SLOT_MAINHAND);
 					ai->SetNextCheckDelay(5);
@@ -86,11 +82,7 @@ namespace ai
 			if (weapon && weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 0)
 			{
 				poison = ai->FindConsumable(DEADLY_POISON_DISPLAYID);
-				if (!poison)
-					poison = ai->FindConsumable(WOUND_POISON_DISPLAYID);
-				if (!poison)
-					poison = ai->FindConsumable(INSTANT_POISON_DISPLAYID);
-				if (poison)
+				
 				{
 					ai->UseItem(poison, EQUIPMENT_SLOT_OFFHAND);
 					ai->SetNextCheckDelay(5);
@@ -100,5 +92,5 @@ namespace ai
 		}
 
 	};
-
+	*/
 }

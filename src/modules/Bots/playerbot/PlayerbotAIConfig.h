@@ -29,7 +29,8 @@ public:
         aoeRadius;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
-
+	uint32 InvLevel;
+	bool lootRestrictions;
     uint32 openGoSpell;
     bool randomBotAutologin;
     bool botAutologin;
