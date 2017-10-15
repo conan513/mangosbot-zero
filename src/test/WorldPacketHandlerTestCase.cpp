@@ -36,6 +36,7 @@ class WorldPacketHandlerTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( guild_accept );
       CPPUNIT_TEST( random_bot_update );
       CPPUNIT_TEST( delay );
+      CPPUNIT_TEST( inventory_change_failure );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -252,6 +253,14 @@ protected:
         tick();
 
         assertActions(">S:delay");
+    }
+
+    void inventory_change_failure()
+    {
+        trigger("inventory change failure");
+        tick();
+
+        assertActions(">S:inventory change failure");
     }
 
 };

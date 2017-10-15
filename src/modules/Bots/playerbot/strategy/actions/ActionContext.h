@@ -67,6 +67,7 @@ namespace ai
             creators["add loot"] = &ActionContext::add_loot;
             creators["add gathering loot"] = &ActionContext::add_gathering_loot;
             creators["add all loot"] = &ActionContext::add_all_loot;
+            creators["release loot"] = &ActionContext::release_loot;
             creators["shoot"] = &ActionContext::shoot;
             creators["follow"] = &ActionContext::follow;
             creators["follow"] = &ActionContext::follow;
@@ -146,6 +147,7 @@ namespace ai
         static Action* add_loot(PlayerbotAI* ai) { return new AddLootAction(ai); }
         static Action* add_all_loot(PlayerbotAI* ai) { return new AddAllLootAction(ai); }
         static Action* loot(PlayerbotAI* ai) { return new LootAction(ai); }
+        static Action* release_loot(PlayerbotAI* ai) { return new ReleaseLootAction(ai); }
         static Action* dps_assist(PlayerbotAI* ai) { return new DpsAssistAction(ai); }
         static Action* attack_rti_target(PlayerbotAI* ai) { return new AttackRtiTargetAction(ai); }
         static Action* tank_assist(PlayerbotAI* ai) { return new TankAssistAction(ai); }

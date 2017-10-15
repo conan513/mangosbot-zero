@@ -17,7 +17,12 @@ bool LootAction::Execute(Event event)
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
+    LootObject prevLoot = AI_VALUE(LootObject, "loot target");
     LootObject const& lootObject = AI_VALUE(LootObjectStack*, "available loot")->GetLoot(sPlayerbotAIConfig.lootDistance);
+
+    if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
+        bot->GetSession()->DoLootRelease(prevLoot.guid);
+
     context->GetValue<LootObject>("loot target")->Set(lootObject);
     return true;
 }
@@ -63,9 +68,9 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     if (creature && creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
     {
         bot->GetMotionMaster()->Clear();
-        WorldPacket* const packet = new WorldPacket(CMSG_LOOT, 8);
-        *packet << lootObject.guid;
-        bot->GetSession()->QueuePacket(packet);
+        WorldPacket packet(CMSG_LOOT, 8);
+        packet << lootObject.guid;
+        bot->GetSession()->HandleLootOpcode(packet);
         return true;
     }
 
@@ -248,24 +253,24 @@ bool StoreLootAction::Execute(Event event)
         if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, ai))
             continue;
 
+        ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
+        if (!proto)
+            continue;
+
         if (sRandomPlayerbotMgr.IsRandomBot(bot))
         {
-			ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype>(itemid);
-			if (proto)
-            {
-                uint32 price = itemcount * auctionbot.GetSellPrice(proto) * sRandomPlayerbotMgr.GetSellMultiplier(bot) + gold;
-                uint32 lootAmount = sRandomPlayerbotMgr.GetLootAmount(bot);
-                if (price)
-                    sRandomPlayerbotMgr.SetLootAmount(bot, bot->GetGroup() ? lootAmount + price : 0);
+            uint32 price = itemcount * auctionbot.GetSellPrice(proto) * sRandomPlayerbotMgr.GetSellMultiplier(bot) + gold;
+            uint32 lootAmount = sRandomPlayerbotMgr.GetLootAmount(bot);
+            if (price)
+                sRandomPlayerbotMgr.SetLootAmount(bot, bot->GetGroup() ? lootAmount + price : 0);
 
-                Group* group = bot->GetGroup();
-                if (group)
+            Group* group = bot->GetGroup();
+            if (group)
+            {
+                for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
                 {
-                    for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
-                    {
-                        if( ref->getSource() != bot)
-                            sGuildTaskMgr.CheckItemTask(itemid, itemcount, ref->getSource(), bot);
-                    }
+                    if( ref->getSource() != bot)
+                        sGuildTaskMgr.CheckItemTask(itemid, itemcount, ref->getSource(), bot);
                 }
             }
         }
@@ -273,6 +278,9 @@ bool StoreLootAction::Execute(Event event)
         WorldPacket packet(CMSG_AUTOSTORE_LOOT_ITEM, 1);
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
+
+        ostringstream out; out << "Looting " << chat->formatItem(proto);
+        ai->TellMasterNoFacing(out.str());
     }
 
     AI_VALUE(LootObjectStack*, "available loot")->Remove(guid);
@@ -322,4 +330,17 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     }
 
     return lootStrategy->CanLoot(proto, context);
+}
+
+bool ReleaseLootAction::Execute(Event event)
+{
+    list<ObjectGuid> gos = context->GetValue<list<ObjectGuid> >("nearest game objects")->Get();
+    for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); i++)
+        bot->GetSession()->DoLootRelease(*i);
+
+    list<ObjectGuid> corpses = context->GetValue<list<ObjectGuid> >("nearest corpses")->Get();
+    for (list<ObjectGuid>::iterator i = corpses.begin(); i != corpses.end(); i++)
+        bot->GetSession()->DoLootRelease(*i);
+
+    return true;
 }

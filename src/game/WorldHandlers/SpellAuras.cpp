@@ -1187,8 +1187,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 28834:                             // Mark of Rivendare
                     case 28835:                             // Mark of Zeliek
                     {
-                        int32 damage = 0;
-
+                        int32 damage;
                         switch (GetStackAmount())
                         {
                             case 1:
@@ -1408,6 +1407,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     return;
                 }
             }
+            break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Seal of the Crusader deals less damage with each attack. -28% damage,multiple tests.
+            if (GetSpellProto()->SpellIconID == 237 && GetSpellProto()->SpellFamilyFlags & UI64LIT(0x00000200))
+                target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, -28.0f, apply);
+
             break;
         }
     }
@@ -2458,8 +2465,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                 { return; }
 
-            uint32 spell_id = 0;
-
+            uint32 spell_id;
             switch (GetId())
             {
                 case 19386: spell_id = 24131; break;

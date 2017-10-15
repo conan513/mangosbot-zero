@@ -34,4 +34,11 @@ namespace ai
         virtual bool Execute(Event event);
         static bool IsLootAllowed(uint32 itemid, PlayerbotAI *ai);
     };
+
+    class ReleaseLootAction : public MovementAction
+    {
+    public:
+        ReleaseLootAction(PlayerbotAI* ai) : MovementAction(ai, "release loot") {}
+        virtual bool Execute(Event event);
+    };
 }

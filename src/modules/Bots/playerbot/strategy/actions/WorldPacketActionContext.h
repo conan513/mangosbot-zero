@@ -60,9 +60,11 @@ namespace ai
             creators["uninvite"] = &WorldPacketActionContext::uninvite;
             creators["security check"] = &WorldPacketActionContext::security_check;
             creators["guild accept"] = &WorldPacketActionContext::guild_accept;
+            creators["inventory change failure"] = &WorldPacketActionContext::inventory_change_failure;
         }
 
     private:
+        static Action* inventory_change_failure(PlayerbotAI* ai) { return new InventoryChangeFailureAction(ai); }
         static Action* guild_accept(PlayerbotAI* ai) { return new GuildAcceptAction(ai); }
         static Action* security_check(PlayerbotAI* ai) { return new SecurityCheckAction(ai); }
         static Action* uninvite(PlayerbotAI* ai) { return new UninviteAction(ai); }
