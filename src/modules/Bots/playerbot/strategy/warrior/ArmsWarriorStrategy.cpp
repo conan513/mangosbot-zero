@@ -1,14 +1,14 @@
 #include "botpch.h"
 #include "../../playerbot.h"
 #include "WarriorMultipliers.h"
-#include "DpsWarriorStrategy.h"
+#include "ArmsWarriorStrategy.h"
 
-using namespace ai;                           //   ARMS
+using namespace ai;                          
 
-class DpsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+class ArmsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    DpsWarriorStrategyActionNodeFactory()
+	ArmsWarriorStrategyActionNodeFactory()
     {
 		creators["overpower"] = &overpower;
 		creators["melee"] = &melee;
@@ -70,17 +70,17 @@ private:
     }
 };
 
-DpsWarriorStrategy::DpsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy(ai)
+ArmsWarriorStrategy::ArmsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy(ai)
 {
-    actionNodeFactories.Add(new DpsWarriorStrategyActionNodeFactory());
+    actionNodeFactories.Add(new ArmsWarriorStrategyActionNodeFactory());
 }
 
-NextAction** DpsWarriorStrategy::getDefaultActions()
+NextAction** ArmsWarriorStrategy::getDefaultActions()
 {
 	return NextAction::array(0, new NextAction("mortal strike", ACTION_NORMAL + 8), NULL);
 }
 
-void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+void ArmsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericWarriorStrategy::InitTriggers(triggers);
 
@@ -114,7 +114,7 @@ void DpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 }
 
 
-void DpsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+void ArmsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "light aoe",

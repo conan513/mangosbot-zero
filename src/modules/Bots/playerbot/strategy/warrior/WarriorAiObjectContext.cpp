@@ -4,8 +4,8 @@
 #include "WarriorAiObjectContext.h"
 #include "GenericWarriorNonCombatStrategy.h"
 #include "TankWarriorStrategy.h"
-#include "DpsWarriorStrategy.h"
-#include "FuryDpsWarriorStrategy.h"
+#include "ArmsWarriorStrategy.h"
+#include "FuryWarriorStrategy.h"
 #include "../generic/PullStrategy.h"
 #include "WarriorTriggers.h"
 #include "../NamedObjectContext.h"
@@ -32,8 +32,8 @@ namespace ai
 
         private:
             static Strategy* nc(PlayerbotAI* ai) { return new GenericWarriorNonCombatStrategy(ai); }
-            static Strategy* arms_aoe(PlayerbotAI* ai) { return new DpsWarrirorAoeStrategy(ai); }
-			static Strategy* fury_aoe(PlayerbotAI* ai) { return new FuryDpsWarriorAoeStrategy(ai); }
+            static Strategy* arms_aoe(PlayerbotAI* ai) { return new ArmsWarrirorAoeStrategy(ai); }
+			static Strategy* fury_aoe(PlayerbotAI* ai) { return new FuryWarriorAoeStrategy(ai); }
             static Strategy* pull(PlayerbotAI* ai) { return new PullStrategy(ai, "shoot"); }
         };
 
@@ -49,8 +49,8 @@ namespace ai
 
         private:
             static Strategy* tank(PlayerbotAI* ai) { return new TankWarriorStrategy(ai); }
-            static Strategy* arms(PlayerbotAI* ai) { return new DpsWarriorStrategy(ai); }
-			static Strategy* fury(PlayerbotAI* ai) { return new FuryDpsWarriorStrategy(ai); }
+            static Strategy* arms(PlayerbotAI* ai) { return new ArmsWarriorStrategy(ai); }
+			static Strategy* fury(PlayerbotAI* ai) { return new FuryWarriorStrategy(ai); }
         };
     };
 };

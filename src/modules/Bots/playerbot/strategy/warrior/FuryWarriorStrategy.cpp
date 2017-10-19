@@ -1,14 +1,14 @@
 #include "botpch.h"
 #include "../../playerbot.h"
 #include "WarriorMultipliers.h"
-#include "FuryDpsWarriorStrategy.h"
+#include "FuryWarriorStrategy.h"
 
 using namespace ai;                           //FURY
 
-class FuryDpsWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+class FuryWarriorStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-	FuryDpsWarriorStrategyActionNodeFactory()
+	FuryWarriorStrategyActionNodeFactory()
 	{
 		creators["melee"] = &melee;
 		creators["charge"] = &charge;
@@ -63,18 +63,18 @@ private:
 	}
 };
 
-FuryDpsWarriorStrategy::FuryDpsWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy(ai)
+FuryWarriorStrategy::FuryWarriorStrategy(PlayerbotAI* ai) : GenericWarriorStrategy(ai)
 {
-	actionNodeFactories.Add(new FuryDpsWarriorStrategyActionNodeFactory());
+	actionNodeFactories.Add(new FuryWarriorStrategyActionNodeFactory());
 }
 
-NextAction** FuryDpsWarriorStrategy::getDefaultActions()
+NextAction** FuryWarriorStrategy::getDefaultActions()
 {
 	return NextAction::array(0, new NextAction("bloodthirst", ACTION_NORMAL + 7), NULL);
 }
 
 
-void FuryDpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+void FuryWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
 	GenericWarriorStrategy::InitTriggers(triggers);
 
@@ -94,17 +94,13 @@ void FuryDpsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"target critical health",
 		NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), NULL)));
 
-	/*triggers.push_back(new TriggerNode(
-		"hamstring",
-		NextAction::array(0, new NextAction("hamstring", ACTION_INTERRUPT), NULL)));*/
-
 	triggers.push_back(new TriggerNode(
 		"death wish",
 		NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), NULL)));
 }
 
 
-void FuryDpsWarriorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+void FuryWarriorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
 	triggers.push_back(new TriggerNode(
 		"medium aoe",

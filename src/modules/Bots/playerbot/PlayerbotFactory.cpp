@@ -676,6 +676,9 @@ void PlayerbotFactory::InitEquipment(bool incremental)
                 if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
                     continue;
 
+				if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_PALADIN && proto->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
+					continue;
+
                 uint16 dest = 0;
                 if (CanEquipUnseenItem(slot, dest, itemId))
                     items[slot].push_back(itemId);
