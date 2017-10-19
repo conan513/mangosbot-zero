@@ -75,7 +75,7 @@ string WhoAction::QuerySkill(string text)
 {
     ostringstream out;
     uint32 skill = chat->parseSkill(text);
-    if (!skill || !bot->HasSkill(skill))
+    if (!skill || !bot->HasSkill(skill) || bot->GetBaseSkillValue(skill) < 2)
         return "";
 
     string skillName = chat->formatSkill(skill);
