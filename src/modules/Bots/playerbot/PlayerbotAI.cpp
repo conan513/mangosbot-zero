@@ -1420,6 +1420,11 @@ string PlayerbotAI::HandleRemoteCommand(string command)
     return out.str();
 }
 
+bool PlayerbotAI::HasSkill(SkillType skill)
+{
+    return bot->HasSkill(skill) && bot->GetBaseSkillValue(skill) > 1;
+}
+
 bool ChatHandler::HandlePlayerbotCommand(char* args)
 {
     return PlayerbotMgr::HandlePlayerbotMgrCommand(this, args);
