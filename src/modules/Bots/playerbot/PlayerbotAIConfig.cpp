@@ -112,6 +112,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotLoginAtStartup = config.GetBoolDefault("AiPlayerbot.RandomBotLoginAtStartup", true);
     randomBotTeleLevel = config.GetIntDefault("AiPlayerbot.RandomBotTeleLevel", 3);
     openGoSpell = config.GetIntDefault("AiPlayerbot.OpenGoSpell", 6477);
+	randomBotShowHelmet = config.GetBoolDefault("AiPlayerbot.randomBotShowHelmet", true);
 
     randomChangeMultiplier = config.GetFloatDefault("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
