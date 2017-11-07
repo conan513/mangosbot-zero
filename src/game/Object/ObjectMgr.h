@@ -44,6 +44,8 @@
 #include <map>
 #include <limits>
 
+#include<unordered_map>
+
 class Group;
 class Item;
 class SQLStorage;
