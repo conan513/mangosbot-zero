@@ -72,6 +72,9 @@
 #ifdef ENABLE_PLAYERBOTS
 #include "playerbot.h"
 #endif
+#ifdef ENABLE_IMMERSIVE
+#include "immersive.h"
+#endif
 
 #include <cmath>
 
@@ -2368,6 +2371,9 @@ void Player::GiveLevel(uint32 level)
 
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), level, &info);
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.GetPlayerLevelInfo(this, &info);
+#endif
 
     PlayerClassLevelInfo classInfo;
     sObjectMgr.GetPlayerClassLevelInfo(getClass(), level, &classInfo);
@@ -2483,6 +2489,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), getLevel(), &info);
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.GetPlayerLevelInfo(this, &info);
+#endif
 
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr.GetXPForLevel(getLevel()));
 
@@ -11687,6 +11696,7 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
                 case GOSSIP_OPTION_PETITIONER:
                 case GOSSIP_OPTION_TABARDDESIGNER:
                 case GOSSIP_OPTION_AUCTIONEER:
+                case GOSSIP_OPTION_IMMERSIVE:
                     break;                                  // no checks
                 default:
                     sLog.outErrorDb("Creature entry %u have unknown gossip option %u for menu %u", pCreature->GetEntry(), gossipMenu.option_id, gossipMenu.menu_id);
@@ -11909,6 +11919,12 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
             GetSession()->SendBattlegGroundList(guid, bgTypeId);
             break;
         }
+#ifdef ENABLE_IMMERSIVE
+        case GOSSIP_OPTION_IMMERSIVE:
+            sImmersive.OnGossipSelect(this, gossipListId, &pMenuData);
+            PlayerTalkClass->CloseGossip();
+            break;
+#endif
     }
 
     if (pMenuData.m_gAction_script)
