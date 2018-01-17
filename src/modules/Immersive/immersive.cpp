@@ -2,6 +2,10 @@
 #include "immersive.h"
 #include "../../game/Server/SharedDefines.h"
 
+#ifdef ENABLE_PLAYERBOTS
+#include "../Bots/playerbot/PlayerbotAIConfig.h"
+#endif
+
 using namespace immersive;
 
 map<Stats, string> Immersive::statValues;
@@ -60,6 +64,12 @@ Immersive::Immersive()
 
 void Immersive::GetPlayerLevelInfo(Player *player, PlayerLevelInfo* info)
 {
+#ifdef ENABLE_PLAYERBOTS
+    uint32 account = sObjectMgr.GetPlayerAccountIdByGUID(player->GetObjectGuid());
+    if (sPlayerbotAIConfig.IsInRandomAccountList(account))
+        return;
+#endif
+
     PlayerInfo const* playerInfo = sObjectMgr.GetPlayerInfo(player->getRace(), player->getClass());
     *info = playerInfo->levelInfo[0];
 
