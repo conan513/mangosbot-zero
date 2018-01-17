@@ -1,4 +1,4 @@
-DROP TABLE IN EXISTS `immersive_values`;
+DROP TABLE IF EXISTS `immersive_values`;
 
 CREATE TABLE `immersive_values` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

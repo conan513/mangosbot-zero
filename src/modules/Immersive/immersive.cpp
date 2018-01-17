@@ -5,6 +5,7 @@
 using namespace immersive;
 
 map<Stats, string> Immersive::statValues;
+map<Stats, string> Immersive::statNames;
 
 string formatMoney(uint32 copper)
 {
@@ -49,6 +50,12 @@ Immersive::Immersive()
     statValues[STAT_STAMINA] = "Stamina";
     statValues[STAT_INTELLECT] = "Intellect";
     statValues[STAT_SPIRIT] = "Spirit";
+
+    statNames[STAT_STRENGTH] = "STR";
+    statNames[STAT_AGILITY] = "AGI";
+    statNames[STAT_STAMINA] = "STA";
+    statNames[STAT_INTELLECT] = "INT";
+    statNames[STAT_SPIRIT] = "SPI";
 }
 
 void Immersive::GetPlayerLevelInfo(Player *player, PlayerLevelInfo* info)
@@ -63,7 +70,7 @@ void Immersive::GetPlayerLevelInfo(Player *player, PlayerLevelInfo* info)
 
 void Immersive::OnGossipSelect(Player *player, uint32 gossipListId, GossipMenuItemData *menuData)
 {
-    switch (gossipListId)
+    switch (menuData->m_gAction_poi)
     {
     case 0: // Help
         PrintHelp(player, true);
@@ -73,7 +80,7 @@ void Immersive::OnGossipSelect(Player *player, uint32 gossipListId, GossipMenuIt
     case 3:
     case 4:
     case 5:
-        IncreaseStat(player, gossipListId - 1);
+        IncreaseStat(player, menuData->m_gAction_poi - 1);
         break;
     case 6:
         ResetStats(player);
@@ -89,13 +96,26 @@ void Immersive::PrintHelp(Player *player, bool detailed)
     uint32 totalStats = GetTotalStats(player);
     uint32 cost = GetStatCost(player);
 
-    ChatHandler(player->GetSession()).PSendSysMessage("Attribute points available: %d (%d used)", (totalStats - usedStats), usedStats);
-    ChatHandler(player->GetSession()).PSendSysMessage("Training cost: %s", formatMoney(cost));
+    ChatHandler &chat = ChatHandler(player->GetSession());
+    chat.PSendSysMessage("|cffa0a0ff== Attribute Points ==");
+    chat.PSendSysMessage("|cffa0a0ffAvailable: |cff00ff00%d|cffa0a0ff (|cffffff00%s|cffa0a0ff per use)", (totalStats - usedStats), formatMoney(cost));
 
     if (detailed)
     {
+        ostringstream out;
+        out << "|cffa0a0ffUsed: ";
+        bool first = true;
+        bool used = false;
         for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
-            ChatHandler(player->GetSession()).PSendSysMessage("%s: %d", statValues[(Stats)i].c_str(), GetValue(owner, statValues[(Stats)i]));
+        {
+            uint32 value = GetValue(owner, statValues[(Stats)i]);
+            if (!value) continue;
+            if (!first) out << ", "; else first = false;
+            out << "|cff00ff00+" << value << "|cffa0a0ff " << statNames[(Stats)i];
+            used = true;
+        }
+        if (used)
+            chat.PSendSysMessage(out.str().c_str());
     }
 }
 
@@ -109,25 +129,29 @@ void Immersive::IncreaseStat(Player *player, uint32 type)
 
     if (usedStats >= totalStats)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("You have no attribute points left");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cffffa0a0You have no attribute points left");
         return;
     }
 
     if (player->GetMoney() < cost)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("You have not enough gold");
+        ChatHandler(player->GetSession()).PSendSysMessage("|cffffa0a0You have not enough gold");
         return;
     }
 
     uint32 value = GetValue(owner, statValues[(Stats)type]);
     SetValue(owner, statValues[(Stats)type], value + 1);
-    ChatHandler(player->GetSession()).PSendSysMessage("You have gained +1 %s", statValues[(Stats)type].c_str());
+
+    usedStats = GetUsedStats(player);
+    totalStats = GetTotalStats(player);
+    cost = GetStatCost(player);
+    ChatHandler(player->GetSession()).PSendSysMessage("|cffa0a0ffYou have gained |cff00ff00+1|cffa0a0ff %s, |cff00ff00%d|cffa0a0ff points left (|cffffff00%s|cffa0a0ff per use)",
+            statNames[(Stats)type].c_str(), (totalStats - usedStats), formatMoney(cost));
+
     player->InitStatsForLevel(true);
     player->UpdateAllStats();
     player->ModifyMoney(-cost);
     player->SaveGoldToDB();
-
-    PrintHelp(player);
 }
 
 void Immersive::ResetStats(Player *player)
@@ -137,11 +161,13 @@ void Immersive::ResetStats(Player *player)
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetValue(owner, statValues[(Stats)i], 0);
 
-    ChatHandler(player->GetSession()).PSendSysMessage("Your attribute points have been reset");
+    uint32 usedStats = GetUsedStats(player);
+    uint32 totalStats = GetTotalStats(player);
+    uint32 cost = GetStatCost(player);
+    ChatHandler(player->GetSession()).PSendSysMessage("|cffa0a0ffYour attributes have been reset, |cff00ff00%d|cffa0a0ff points available (|cffffff00%s|cffa0a0ff per use)",
+            (totalStats - usedStats), formatMoney(cost));
     player->InitStatsForLevel(true);
     player->UpdateAllStats();
-
-    PrintHelp(player);
 }
 
 uint32 Immersive::GetTotalStats(Player *player)

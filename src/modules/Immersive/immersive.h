@@ -30,6 +30,7 @@ namespace immersive
 
     private:
         static map<Stats, string> statValues;
+        static map<Stats, string> statNames;
     };
 }
 
