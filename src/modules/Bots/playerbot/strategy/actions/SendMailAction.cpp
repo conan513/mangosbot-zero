@@ -12,6 +12,13 @@ bool SendMailAction::Execute(Event event)
     if (!master)
         return false;
 
+    uint32 account = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
+    if (sPlayerbotAIConfig.IsInRandomAccountList(account))
+    {
+        ai->TellMaster("I can't do that");
+        return false;
+    }
+
     list<ObjectGuid> gos = *context->GetValue<list<ObjectGuid> >("nearest game objects");
     bool mailboxFound = false;
     for (list<ObjectGuid>::iterator i = gos.begin(); i != gos.end(); ++i)
