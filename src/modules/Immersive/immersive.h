@@ -13,6 +13,7 @@ namespace immersive
     public:
         static void GetPlayerLevelInfo(Player *player, PlayerLevelInfo* info);
         static void OnGossipSelect(Player *player, uint32 gossipListId, GossipMenuItemData *menuData);
+        static float GetFallDamage(float zdist);
 
     private:
         static void PrintHelp(Player *player, bool detailed = false);

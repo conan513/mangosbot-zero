@@ -19498,7 +19498,13 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
     // Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !IsDead() && !isGameMaster() && !HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
+    if (
+#ifdef ENABLE_IMMERSIVE
+        z_diff >= 4.57f &&
+#else
+        z_diff >= 14.57f &&
+#endif
+        !IsDead() && !isGameMaster() && !HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
         !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
         !IsImmuneToDamage(SPELL_SCHOOL_MASK_NORMAL))
     {
@@ -19506,6 +19512,9 @@ void Player::HandleFall(MovementInfo const& movementInfo)
         int32 safe_fall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
 
         float damageperc = 0.018f * (z_diff - safe_fall) - 0.2426f;
+#ifdef ENABLE_IMMERSIVE
+        damageperc = sImmersive.GetFallDamage(z_diff - safe_fall);
+#endif
 
         if (damageperc > 0)
         {

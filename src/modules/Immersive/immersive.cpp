@@ -98,6 +98,11 @@ void Immersive::OnGossipSelect(Player *player, uint32 gossipListId, GossipMenuIt
     }
 }
 
+float Immersive::GetFallDamage(float zdist)
+{
+    return 0.0075 * zdist * zdist;
+}
+
 void Immersive::PrintHelp(Player *player, bool detailed)
 {
     uint32 owner = player->GetObjectGuid().GetRawValue();
