@@ -103,6 +103,53 @@ float Immersive::GetFallDamage(float zdist)
     return 0.0075 * zdist * zdist;
 }
 
+void Immersive::OnDeath(Player *player)
+{
+    uint32 owner = player->GetObjectGuid().GetRawValue();
+
+    map<Stats, int> loss;
+    for (int j = STAT_STRENGTH; j < MAX_STATS; ++j)
+        loss[(Stats)j] = 0;
+
+    int totalLoss = 0;
+    int lossPerDeath = 3;
+    for (uint32 i = 0; i < lossPerDeath && totalLoss < lossPerDeath; i++)
+    {
+        for (int type = STAT_STRENGTH; type < MAX_STATS && totalLoss < lossPerDeath; ++type)
+        {
+            uint32 value = GetValue(owner, statValues[(Stats)type]);
+            if (value)
+            {
+                SetValue(owner, statValues[(Stats)type], value - 1);
+                loss[(Stats)type]++;
+                totalLoss++;
+            }
+        }
+    }
+
+    ostringstream out;
+    out << "|cffa0a0ffYou have lost these attributes: ";
+    bool first = true;
+    bool used = false;
+    for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
+    {
+        uint32 value = loss[(Stats)i];
+        if (!value) continue;
+        if (!first) out << ", "; else first = false;
+        out << "|cffffa0a0-" << value << "|cffa0a0ff " << statNames[(Stats)i];
+        used = true;
+    }
+
+    if (used)
+    {
+        ChatHandler &chat = ChatHandler(player->GetSession());
+        chat.PSendSysMessage(out.str().c_str());
+    }
+
+    player->InitStatsForLevel(true);
+    player->UpdateAllStats();
+}
+
 void Immersive::PrintHelp(Player *player, bool detailed)
 {
     uint32 owner = player->GetObjectGuid().GetRawValue();
@@ -165,7 +212,7 @@ void Immersive::IncreaseStat(Player *player, uint32 type)
 
     player->InitStatsForLevel(true);
     player->UpdateAllStats();
-    player->ModifyMoney(-cost);
+    player->ModifyMoney(-(int32)cost);
     player->SaveGoldToDB();
 }
 

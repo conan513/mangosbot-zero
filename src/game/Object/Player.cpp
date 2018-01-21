@@ -4617,6 +4617,9 @@ void Player::RepopAtGraveyard()
         if (updateVisibility && IsInWorld())
             { UpdateVisibilityAndView(); }
     }
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.OnDeath(this);
+#endif
 }
 
 void Player::JoinedChannel(Channel* c)
