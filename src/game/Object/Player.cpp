@@ -72,6 +72,9 @@
 #ifdef ENABLE_PLAYERBOTS
 #include "playerbot.h"
 #endif
+#ifdef ENABLE_IMMERSIVE
+#include "immersive.h"
+#endif
 
 #include <cmath>
 
@@ -2368,6 +2371,9 @@ void Player::GiveLevel(uint32 level)
 
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), level, &info);
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.GetPlayerLevelInfo(this, &info);
+#endif
 
     PlayerClassLevelInfo classInfo;
     sObjectMgr.GetPlayerClassLevelInfo(getClass(), level, &classInfo);
@@ -2483,6 +2489,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), getLevel(), &info);
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.GetPlayerLevelInfo(this, &info);
+#endif
 
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr.GetXPForLevel(getLevel()));
 
@@ -4608,6 +4617,9 @@ void Player::RepopAtGraveyard()
         if (updateVisibility && IsInWorld())
             { UpdateVisibilityAndView(); }
     }
+#ifdef ENABLE_IMMERSIVE
+    sImmersive.OnDeath(this);
+#endif
 }
 
 void Player::JoinedChannel(Channel* c)
@@ -11688,6 +11700,7 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
                 case GOSSIP_OPTION_PETITIONER:
                 case GOSSIP_OPTION_TABARDDESIGNER:
                 case GOSSIP_OPTION_AUCTIONEER:
+                case GOSSIP_OPTION_IMMERSIVE:
                     break;                                  // no checks
                 default:
                     sLog.outErrorDb("Creature entry %u have unknown gossip option %u for menu %u", pCreature->GetEntry(), gossipMenu.option_id, gossipMenu.menu_id);
@@ -11910,6 +11923,12 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
             GetSession()->SendBattlegGroundList(guid, bgTypeId);
             break;
         }
+#ifdef ENABLE_IMMERSIVE
+        case GOSSIP_OPTION_IMMERSIVE:
+            sImmersive.OnGossipSelect(this, gossipListId, &pMenuData);
+            PlayerTalkClass->CloseGossip();
+            break;
+#endif
     }
 
     if (pMenuData.m_gAction_script)
@@ -19486,7 +19505,13 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
     // Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !IsDead() && !isGameMaster() && !HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
+    if (
+#ifdef ENABLE_IMMERSIVE
+        z_diff >= 4.57f &&
+#else
+        z_diff >= 14.57f &&
+#endif
+        !IsDead() && !isGameMaster() && !HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
         !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
         !IsImmuneToDamage(SPELL_SCHOOL_MASK_NORMAL))
     {
@@ -19494,6 +19519,9 @@ void Player::HandleFall(MovementInfo const& movementInfo)
         int32 safe_fall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
 
         float damageperc = 0.018f * (z_diff - safe_fall) - 0.2426f;
+#ifdef ENABLE_IMMERSIVE
+        damageperc = sImmersive.GetFallDamage(z_diff - safe_fall);
+#endif
 
         if (damageperc > 0)
         {

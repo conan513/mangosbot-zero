@@ -84,13 +84,13 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         switch (skill)
         {
         case SKILL_ENGINEERING:
-            return bot->HasSkill(SKILL_ENGINEERING) ? ai->CastSpell(ENGINEERING, creature) : false;
+            return ai->HasSkill(SKILL_ENGINEERING) ? ai->CastSpell(ENGINEERING, creature) : false;
         case SKILL_HERBALISM:
-            return bot->HasSkill(SKILL_HERBALISM) ? ai->CastSpell(32605, creature) : false;
+            return ai->HasSkill(SKILL_HERBALISM) ? ai->CastSpell(32605, creature) : false;
         case SKILL_MINING:
-            return bot->HasSkill(SKILL_MINING) ? ai->CastSpell(32606, creature) : false;
+            return ai->HasSkill(SKILL_MINING) ? ai->CastSpell(32606, creature) : false;
         default:
-            return bot->HasSkill(SKILL_SKINNING) ? ai->CastSpell(SKINNING, creature) : false;
+            return ai->HasSkill(SKILL_SKINNING) ? ai->CastSpell(SKINNING, creature) : false;
         }
     }
 
@@ -100,10 +100,10 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
 
     bot->GetMotionMaster()->Clear();
     if (lootObject.skillId == SKILL_MINING)
-        return bot->HasSkill(SKILL_MINING) ? ai->CastSpell(MINING, bot) : false;
+        return ai->HasSkill(SKILL_MINING) ? ai->CastSpell(MINING, bot) : false;
 
     if (lootObject.skillId == SKILL_HERBALISM)
-        return bot->HasSkill(SKILL_HERBALISM) ? ai->CastSpell(HERB_GATHERING, bot) : false;
+        return ai->HasSkill(SKILL_HERBALISM) ? ai->CastSpell(HERB_GATHERING, bot) : false;
 
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)

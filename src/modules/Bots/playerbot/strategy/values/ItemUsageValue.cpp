@@ -34,7 +34,7 @@ ItemUsage ItemUsageValue::Calculate()
         return equip;
 
     if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP &&
-            bot->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
+            ai->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
         return ITEM_USAGE_DISENCHANT;
 
     return ITEM_USAGE_NONE;
@@ -90,31 +90,31 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemPrototype const * proto)
     case ITEM_CLASS_MISC:
     case ITEM_CLASS_REAGENT:
         {
-            if (bot->HasSkill(SKILL_TAILORING) && auctionbot.IsUsedBySkill(proto, SKILL_TAILORING))
+            if (ai->HasSkill(SKILL_TAILORING) && auctionbot.IsUsedBySkill(proto, SKILL_TAILORING))
                 return true;
-            if (bot->HasSkill(SKILL_LEATHERWORKING) && auctionbot.IsUsedBySkill(proto, SKILL_LEATHERWORKING))
+            if (ai->HasSkill(SKILL_LEATHERWORKING) && auctionbot.IsUsedBySkill(proto, SKILL_LEATHERWORKING))
                 return true;
-            if (bot->HasSkill(SKILL_ENGINEERING) && auctionbot.IsUsedBySkill(proto, SKILL_ENGINEERING))
+            if (ai->HasSkill(SKILL_ENGINEERING) && auctionbot.IsUsedBySkill(proto, SKILL_ENGINEERING))
                 return true;
-            if (bot->HasSkill(SKILL_BLACKSMITHING) && auctionbot.IsUsedBySkill(proto, SKILL_BLACKSMITHING))
+            if (ai->HasSkill(SKILL_BLACKSMITHING) && auctionbot.IsUsedBySkill(proto, SKILL_BLACKSMITHING))
                 return true;
-            if (bot->HasSkill(SKILL_ALCHEMY) && auctionbot.IsUsedBySkill(proto, SKILL_ALCHEMY))
+            if (ai->HasSkill(SKILL_ALCHEMY) && auctionbot.IsUsedBySkill(proto, SKILL_ALCHEMY))
                 return true;
-            if (bot->HasSkill(SKILL_ENCHANTING) && auctionbot.IsUsedBySkill(proto, SKILL_ENCHANTING))
+            if (ai->HasSkill(SKILL_ENCHANTING) && auctionbot.IsUsedBySkill(proto, SKILL_ENCHANTING))
                 return true;
-            if (bot->HasSkill(SKILL_FISHING) && auctionbot.IsUsedBySkill(proto, SKILL_FISHING))
+            if (ai->HasSkill(SKILL_FISHING) && auctionbot.IsUsedBySkill(proto, SKILL_FISHING))
                 return true;
-            if (bot->HasSkill(SKILL_FIRST_AID) && auctionbot.IsUsedBySkill(proto, SKILL_FIRST_AID))
+            if (ai->HasSkill(SKILL_FIRST_AID) && auctionbot.IsUsedBySkill(proto, SKILL_FIRST_AID))
                 return true;
-            if (bot->HasSkill(SKILL_COOKING) && auctionbot.IsUsedBySkill(proto, SKILL_COOKING))
+            if (ai->HasSkill(SKILL_COOKING) && auctionbot.IsUsedBySkill(proto, SKILL_COOKING))
                 return true;
-            if (bot->HasSkill(SKILL_MINING) &&
+            if (ai->HasSkill(SKILL_MINING) &&
                     (auctionbot.IsUsedBySkill(proto, SKILL_MINING) || auctionbot.IsUsedBySkill(proto, SKILL_BLACKSMITHING) || auctionbot.IsUsedBySkill(proto, SKILL_ENGINEERING)))
                 return true;
-            if (bot->HasSkill(SKILL_SKINNING) &&
+            if (ai->HasSkill(SKILL_SKINNING) &&
                     (auctionbot.IsUsedBySkill(proto, SKILL_SKINNING) || auctionbot.IsUsedBySkill(proto, SKILL_LEATHERWORKING)))
                 return true;
-            if (bot->HasSkill(SKILL_HERBALISM) &&
+            if (ai->HasSkill(SKILL_HERBALISM) &&
                     (auctionbot.IsUsedBySkill(proto, SKILL_HERBALISM) || auctionbot.IsUsedBySkill(proto, SKILL_ALCHEMY)))
                 return true;
 
@@ -128,23 +128,23 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemPrototype const * proto)
             switch (proto->SubClass)
             {
             case ITEM_SUBCLASS_LEATHERWORKING_PATTERN:
-                return bot->HasSkill(SKILL_LEATHERWORKING);
+                return ai->HasSkill(SKILL_LEATHERWORKING);
             case ITEM_SUBCLASS_TAILORING_PATTERN:
-                return bot->HasSkill(SKILL_TAILORING);
+                return ai->HasSkill(SKILL_TAILORING);
             case ITEM_SUBCLASS_ENGINEERING_SCHEMATIC:
-                return bot->HasSkill(SKILL_ENGINEERING);
+                return ai->HasSkill(SKILL_ENGINEERING);
             case ITEM_SUBCLASS_BLACKSMITHING:
-                return bot->HasSkill(SKILL_BLACKSMITHING);
+                return ai->HasSkill(SKILL_BLACKSMITHING);
             case ITEM_SUBCLASS_COOKING_RECIPE:
-                return bot->HasSkill(SKILL_COOKING);
+                return ai->HasSkill(SKILL_COOKING);
             case ITEM_SUBCLASS_ALCHEMY_RECIPE:
-                return bot->HasSkill(SKILL_ALCHEMY);
+                return ai->HasSkill(SKILL_ALCHEMY);
             case ITEM_SUBCLASS_FIRST_AID_MANUAL:
-                return bot->HasSkill(SKILL_FIRST_AID);
+                return ai->HasSkill(SKILL_FIRST_AID);
             case ITEM_SUBCLASS_ENCHANTING_FORMULA:
-                return bot->HasSkill(SKILL_ENCHANTING);
+                return ai->HasSkill(SKILL_ENCHANTING);
             case ITEM_SUBCLASS_FISHING_MANUAL:
-                return bot->HasSkill(SKILL_FISHING);
+                return ai->HasSkill(SKILL_FISHING);
             }
         }
     }

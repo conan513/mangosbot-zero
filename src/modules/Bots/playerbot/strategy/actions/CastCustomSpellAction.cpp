@@ -22,7 +22,8 @@ bool CastCustomSpellAction::Execute(Event event)
     if (pos != string::npos)
     {
         castCount = atoi(text.substr(pos + 1).c_str());
-        text = text.substr(0, pos);
+        if (castCount > 0)
+            text = text.substr(0, pos);
     }
 
     uint32 spell = AI_VALUE2(uint32, "spell id", text);

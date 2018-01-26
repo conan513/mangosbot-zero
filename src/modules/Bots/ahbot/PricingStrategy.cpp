@@ -217,7 +217,7 @@ uint32 PricingStrategy::GetDefaultBuyPrice(ItemPrototype const* proto)
 
 uint32 PricingStrategy::GetDefaultSellPrice(ItemPrototype const* proto)
 {
-    return GetDefaultBuyPrice(proto) * 4;
+    return GetDefaultBuyPrice(proto) * 4 / 3;
 }
 
 

@@ -168,6 +168,15 @@ if(PLAYERBOTS)
     add_dependencies(${LIBRARY_NAME} Bots)
 endif()
 
+if(IMMERSIVE)
+    include_directories(
+        ${CMAKE_SOURCE_DIR}/src/modules/Immersive
+        ${CMAKE_SOURCE_DIR}/src/modules/Immersive
+    )
+    target_link_libraries(${LIBRARY_NAME} Immersive)
+    add_dependencies(${LIBRARY_NAME} Immersive)
+endif()
+
 if(SCRIPT_LIB_SD3)
     include_directories(${CMAKE_SOURCE_DIR}/src/modules/SD3)
     target_link_libraries(${LIBRARY_NAME} mangosscript)

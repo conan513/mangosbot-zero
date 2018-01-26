@@ -40,31 +40,20 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
                     return PLAYERBOT_SECURITY_ALLOW_ALL;
             }
         }
-		int InvLevel = sPlayerbotAIConfig.InvLevel;
 
-        if ((int)bot->getLevel() - (int)from->getLevel() > InvLevel)
-
+        if ((int)bot->getLevel() - (int)from->getLevel() > 5)
         {
             if (reason) *reason = PLAYERBOT_DENY_LOW_LEVEL;
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (bot->GetMapId() != from->GetMapId() || bot->GetDistance(from) > sPlayerbotAIConfig.whisperDistance)
-        {
-            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
-            {
-                if (reason) *reason = PLAYERBOT_DENY_FAR;
-                return PLAYERBOT_SECURITY_TALK;
-            }
-        }
-/*
         int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
         int fromGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(from, false, false);
-        if (botGS && bot->getLevel() > 15 && (100 * (botGS - fromGS) / botGS) >= 12 * sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) / from->getLevel())
+        if (botGS && bot->getLevel() > 15 && botGS > fromGS && (100 * (botGS - fromGS) / botGS) >= 12 * sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) / from->getLevel())
         {
             if (reason) *reason = PLAYERBOT_DENY_GEARSCORE;
             return PLAYERBOT_SECURITY_TALK;
-        }*/
+        }
 
         if (bot->IsDead())
         {
@@ -90,6 +79,15 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         {
             if (reason) *reason = PLAYERBOT_DENY_FULL_GROUP;
             return PLAYERBOT_SECURITY_TALK;
+        }
+
+        if (bot->GetMapId() != from->GetMapId() || bot->GetDistance(from) > sPlayerbotAIConfig.whisperDistance)
+        {
+            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+            {
+                if (reason) *reason = PLAYERBOT_DENY_FAR;
+                return PLAYERBOT_SECURITY_TALK;
+            }
         }
 
         if (reason) *reason = PLAYERBOT_DENY_INVITE;
@@ -132,7 +130,9 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
             {
                 int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
                 int fromGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(from, false, false);
-                out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS;
+                int diff = (100 * (botGS - fromGS) / botGS);
+                int req = 12 * sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) / from->getLevel();
+                out << "Your gearscore is too low: |cffff0000" << fromGS << "|cffffffff/|cff00ff00" << botGS << " |cffff0000" << diff << "%|cffffffff/|cff00ff00" << req << "%";
             }
             break;
         case PLAYERBOT_DENY_NOT_YOURS:
@@ -152,7 +152,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
             break;
         case PLAYERBOT_DENY_FAR:
             {
-                out << "I am too far away";
+                out << "You must be closer to invite me to your group. I am in ";
 
                 uint32 area = bot->GetAreaId();
                 if (area)

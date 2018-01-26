@@ -70,7 +70,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
             skillId = creature->GetCreatureInfo()->GetRequiredLootSkill();
             uint32 targetLevel = creature->getLevel();
             reqSkillValue = targetLevel < 10 ? 2 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
-            if (bot->HasSkill(skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
+            if (ai->HasSkill((SkillType)skillId) && bot->GetSkillValue(skillId) >= reqSkillValue)
                 this->guid = guid;
         }
 
@@ -156,7 +156,7 @@ bool LootObject::IsLootPossible(Player* bot)
     if (skillId == SKILL_FISHING)
         return false;
 
-    if (!bot->HasSkill(skillId))
+    if (!ai->HasSkill((SkillType)skillId))
         return false;
 
     if (!reqSkillValue)
