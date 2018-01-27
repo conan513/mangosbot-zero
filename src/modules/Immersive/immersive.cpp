@@ -239,7 +239,7 @@ void Immersive::ResetStats(Player *player)
 
 uint32 Immersive::GetTotalStats(Player *player)
 {
-    return player->getLevel() * 3;
+    return (player->getLevel() - 1) * 3;
 }
 
 uint32 Immersive::GetUsedStats(Player *player)
