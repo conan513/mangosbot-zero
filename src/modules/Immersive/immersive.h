@@ -20,6 +20,7 @@ namespace immersive
         static void PrintHelp(Player *player, bool detailed = false);
         static void IncreaseStat(Player *player, uint32 type);
         static void ResetStats(Player *player);
+        static void SendMessage(Player *player, string message);
 
     private:
         static uint32 GetTotalStats(Player *player);
