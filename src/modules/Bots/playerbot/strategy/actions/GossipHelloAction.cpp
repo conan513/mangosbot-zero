@@ -36,36 +36,88 @@ bool GossipHelloAction::Execute(Event event)
 	if (pMenuItemBounds.first == pMenuItemBounds.second)
 		return false;
 
-	WorldPacket p1;
-	p1 << guid;
-	bot->GetSession()->HandleGossipHelloOpcode(p1);
-	bot->SetFacingToObject(pCreature);
-
-	ostringstream out; out << "--- " << pCreature->GetName() << " ---";
-	ai->TellMasterNoFacing(out.str());
-
-	GossipMenu& menu = bot->PlayerTalkClass->GetGossipMenu();
-	unsigned int i = 0, loops = 0;
-	set<uint32> alreadyTalked;
-	while (i < menu.MenuItemCount() && loops++ < 100)
+	string text = event.getParam();
+	int menuToSelect = -1;
+	if (text.empty())
 	{
-		GossipMenuItem const& item = menu.GetItem(i);
-		ai->TellMasterNoFacing(item.m_gMessage);
+        WorldPacket p1;
+        p1 << guid;
+        bot->GetSession()->HandleGossipHelloOpcode(p1);
+        bot->SetFacingToObject(pCreature);
 
-		if (item.m_gOptionId < 1000 && item.m_gOptionId != GOSSIP_OPTION_GOSSIP)
-		{
-			i++;
-			continue;
-		}
+        ostringstream out; out << "--- " << pCreature->GetName() << " ---";
+        ai->TellMasterNoFacing(out.str());
 
-		WorldPacket p1;
-		std::string code;
-		p1 << guid << menu.GetMenuId() << i << code;
-		bot->GetSession()->HandleGossipSelectOptionOpcode(p1);
-
-		i = 0;
+        TellGossipMenus();
+	}
+	else if (!bot->PlayerTalkClass)
+	{
+	    ai->TellMaster("I need to talk first");
+	    return false;
+	}
+	else
+	{
+	    menuToSelect = atoi(text.c_str());
+	    if (menuToSelect > 0) menuToSelect--;
+        ProcessGossip(menuToSelect);
 	}
 
 	bot->TalkedToCreature(pCreature->GetEntry(), pCreature->GetObjectGuid());
 	return true;
+}
+
+void GossipHelloAction::TellGossipText(uint32 textId)
+{
+    if (!textId)
+        return;
+
+    GossipText const* text = sObjectMgr.GetGossipText(textId);
+    if (text)
+    {
+        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
+        {
+            string text0 = text->Options[i].Text_0;
+            if (!text0.empty()) ai->TellMasterNoFacing(text0);
+            string text1 = text->Options[i].Text_1;
+            if (!text1.empty()) ai->TellMasterNoFacing(text1);
+        }
+    }
+}
+
+void GossipHelloAction::TellGossipMenus()
+{
+    if (!bot->PlayerTalkClass)
+        return;
+
+    Creature *pCreature = bot->GetNPCIfCanInteractWith(GetMaster()->GetSelectionGuid(), UNIT_NPC_FLAG_NONE);
+    GossipMenu& menu = bot->PlayerTalkClass->GetGossipMenu();
+    if (pCreature)
+    {
+        uint32 textId = bot->GetGossipTextId(menu.GetMenuId(), pCreature);
+        TellGossipText(textId);
+    }
+
+    for (int i = 0; i < menu.MenuItemCount(); i++)
+    {
+        GossipMenuItem const& item = menu.GetItem(i);
+        ostringstream out; out << "[" << (i+1) << "] " << item.m_gMessage;
+        ai->TellMasterNoFacing(out.str());
+    }
+}
+
+bool GossipHelloAction::ProcessGossip(int menuToSelect)
+{
+    GossipMenu& menu = bot->PlayerTalkClass->GetGossipMenu();
+    if (menuToSelect != -1 && menuToSelect >= menu.MenuItemCount())
+    {
+        ai->TellMaster("Unknown gossip option");
+        return false;
+    }
+    GossipMenuItem const& item = menu.GetItem(menuToSelect);
+    WorldPacket p;
+    std::string code;
+    p << GetMaster()->GetSelectionGuid() << menuToSelect << code;
+    bot->GetSession()->HandleGossipSelectOptionOpcode(p);
+
+    TellGossipMenus();
 }
