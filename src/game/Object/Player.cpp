@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2018  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -5768,7 +5768,8 @@ void Player::CheckAreaExploreAndOutdoor()
             ShapeshiftForm form = GetShapeshiftForm();
             if (!(spellInfo->Stances & (1 << (form - 1))))
                 { continue; }
-
+            if ((spellInfo->Stances || spellInfo->StancesNot) && !IsNeedCastSpellAtFormApply(spellInfo, GetShapeshiftForm()))
+                continue;
             CastSpell(this, itr->first, true, NULL);
         }
     }
@@ -12546,11 +12547,11 @@ void Player::AddQuest(Quest const* pQuest, Object* questGiver)
     UpdateForQuestWorldObjects();
 }
 
-void Player::CompleteQuest(uint32 quest_id)
+void Player::CompleteQuest(uint32 quest_id, QuestStatus status)
 {
     if (quest_id)
     {
-        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
+        SetQuestStatus(quest_id, status);
 
         uint16 log_slot = FindQuestSlot(quest_id);
         if (log_slot < MAX_QUEST_LOG_SIZE)
@@ -13141,7 +13142,11 @@ QuestStatus Player::GetQuestStatus(uint32 quest_id) const
     {
         QuestStatusMap::const_iterator itr = mQuestStatus.find(quest_id);
         if (itr != mQuestStatus.end())
-            { return itr->second.m_status; }
+        {
+            if (itr->second.m_status == QUEST_STATUS_FORCE_COMPLETE)
+                return QUEST_STATUS_COMPLETE;
+            return itr->second.m_status;
+        }
     }
     return QUEST_STATUS_NONE;
 }
@@ -13524,8 +13529,7 @@ void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
                     // skip spell casts and Gameobject objectives
                     if (qInfo->ReqSpell[j] > 0 || qInfo->ReqCreatureOrGOId[j] < 0)
                         { continue; }
-					uint32 reqTarget = qInfo->ReqCreatureOrGOId[j];
-                        { continue; }
+                    uint32 reqTarget = qInfo->ReqCreatureOrGOId[j];
 
                     if (reqTarget == entry)
                     {

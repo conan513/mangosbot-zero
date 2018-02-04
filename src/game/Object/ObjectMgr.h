@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2018  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -704,16 +704,12 @@ class ObjectMgr
 
         void LoadGameTele();
 
-        void LoadNpcGossips();
-
         void LoadGossipMenus();
 
-        void LoadVendorTemplates();
         void LoadVendors()
         {
             LoadVendors("npc_vendor", false);
         }
-        void LoadTrainerTemplates();
         void LoadTrainers()
         {
             LoadTrainers("npc_trainer", false);
@@ -761,13 +757,13 @@ class ObjectMgr
         uint32 GenerateStaticCreatureLowGuid()
         {
             if (m_StaticCreatureGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryCreatureGuid)
-            { return 0; } 
+            { return 0; }
             return m_StaticCreatureGuids.Generate();
         }
         uint32 GenerateStaticGameObjectLowGuid()
         {
             if (m_StaticGameObjectGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryGameObjectGuid)
-            { return 0; } 
+            { return 0; }
             return m_StaticGameObjectGuids.Generate();
         }
 

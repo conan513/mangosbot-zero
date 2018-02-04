@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2018  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -270,8 +270,6 @@ bool ChatHandler::HandleReloadAllLootCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllNpcCommand(char* args)
 {
-    if (*args != 'a')                                       // will be reloaded from all_gossips
-        { HandleReloadNpcGossipCommand((char*)"a"); }
     HandleReloadNpcTrainerCommand((char*)"a");
     HandleReloadNpcVendorCommand((char*)"a");
     HandleReloadPointsOfInterestCommand((char*)"a");
@@ -342,7 +340,6 @@ bool ChatHandler::HandleReloadAllGossipsCommand(char* args)
     if (*args != 'a')                                       // already reload from all_scripts
         { HandleReloadDBScriptsOnGossipCommand((char*)"a"); }
     HandleReloadGossipMenuCommand((char*)"a");
-    HandleReloadNpcGossipCommand((char*)"a");
     HandleReloadPointsOfInterestCommand((char*)"a");
     return true;
 }
@@ -572,14 +569,6 @@ bool ChatHandler::HandleReloadMangosStringCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleReloadNpcGossipCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading `npc_gossip` Table!");
-    sObjectMgr.LoadNpcGossips();
-    SendGlobalSysMessage("DB table `npc_gossip` reloaded.", SEC_MODERATOR);
-    return true;
-}
-
 bool ChatHandler::HandleReloadNpcTextCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `npc_text` Table!");
@@ -590,10 +579,6 @@ bool ChatHandler::HandleReloadNpcTextCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadNpcTrainerCommand(char* /*args*/)
 {
-    sLog.outString("Re-Loading `npc_trainer_template` Table!");
-    sObjectMgr.LoadTrainerTemplates();
-    SendGlobalSysMessage("DB table `npc_trainer_template` reloaded.", SEC_MODERATOR);
-
     sLog.outString("Re-Loading `npc_trainer` Table!");
     sObjectMgr.LoadTrainers();
     SendGlobalSysMessage("DB table `npc_trainer` reloaded.", SEC_MODERATOR);
@@ -603,10 +588,6 @@ bool ChatHandler::HandleReloadNpcTrainerCommand(char* /*args*/)
 bool ChatHandler::HandleReloadNpcVendorCommand(char* /*args*/)
 {
     // not safe reload vendor template tables independent...
-    sLog.outString("Re-Loading `npc_vendor_template` Table!");
-    sObjectMgr.LoadVendorTemplates();
-    SendGlobalSysMessage("DB table `npc_vendor_template` reloaded.", SEC_MODERATOR);
-
     sLog.outString("Re-Loading `npc_vendor` Table!");
     sObjectMgr.LoadVendors();
     SendGlobalSysMessage("DB table `npc_vendor` reloaded.", SEC_MODERATOR);
@@ -5004,7 +4985,7 @@ bool ChatHandler::HandleQuestCompleteCommand(char* args)
     if (ReqOrRewMoney < 0)
         { player->ModifyMoney(-ReqOrRewMoney); }
 
-    player->CompleteQuest(entry);
+    player->CompleteQuest(entry, QUEST_STATUS_FORCE_COMPLETE);
     return true;
 }
 

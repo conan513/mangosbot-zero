@@ -2,7 +2,7 @@
  * MaNGOS is a full featured server for World of Warcraft, supporting
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
- * Copyright (C) 2005-2017  MaNGOS project <https://getmangos.eu>
+ * Copyright (C) 2005-2018  MaNGOS project <https://getmangos.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -293,8 +293,9 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
 
         SetVisible(&faction);
 
-        if (ReputationToRank(standing) <= REP_HOSTILE)
-            { SetAtWar(&itr->second, true); }
+        // check and, if needed, modify AtWar flag every rep rank crossing
+        if (ReputationToRank(standing) != ReputationToRank(BaseRep))
+            SetAtWar(&itr->second, ReputationToRank(standing) <= REP_HOSTILE);
 
         m_player->ReputationChanged(factionEntry);
 
@@ -369,12 +370,12 @@ void ReputationMgr::SetAtWar(FactionState* faction, bool atWar)
     else
         { faction->Flags &= ~FACTION_FLAG_AT_WAR; }
 
-    WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
-    data << uint32(faction->ID);
-    data << uint8(faction->Flags & FACTION_FLAG_AT_WAR);    // the client tests only FACTION_FLAG_AT_WAR
-    m_player->SendDirectMessage(&data);
+    //WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
+    //data << uint32(faction->ID);
+    //data << uint8(faction->Flags & FACTION_FLAG_AT_WAR);    // the client tests only FACTION_FLAG_AT_WAR
+    //m_player->SendDirectMessage(&data);
 
-    faction->needSend = false;
+    faction->needSend = true;
     faction->needSave = true;
 }
 
