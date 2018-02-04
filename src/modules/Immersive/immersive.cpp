@@ -6,6 +6,7 @@
 
 #ifdef ENABLE_PLAYERBOTS
 #include "../Bots/playerbot/PlayerbotAIConfig.h"
+#include "../Bots/playerbot/PlayerbotAI.h"
 #endif
 
 using namespace immersive;
@@ -147,8 +148,7 @@ void Immersive::OnDeath(Player *player)
 
     if (used)
     {
-        ChatHandler &chat = ChatHandler(player->GetSession());
-        chat.PSendSysMessage(out.str().c_str());
+        SendMessage(player, out.str());
     }
 
     player->InitStatsForLevel(true);
@@ -163,9 +163,11 @@ void Immersive::PrintHelp(Player *player, bool detailed)
     uint32 totalStats = GetTotalStats(player);
     uint32 cost = GetStatCost(player);
 
-    ChatHandler &chat = ChatHandler(player->GetSession());
-    chat.PSendSysMessage("|cffa0a0ff== Attribute Points ==");
-    chat.PSendSysMessage("|cffa0a0ffAvailable: |cff00ff00%d|cffa0a0ff (|cffffff00%s|cffa0a0ff per use)", (totalStats - usedStats), formatMoney(cost));
+    SendMessage(player, "|cffa0a0ff== Attribute Points ==");
+    ostringstream out;
+    out << "|cffa0a0ffAvailable: |cff00ff00" << (totalStats - usedStats) <<
+            "|cffa0a0ff (|cffffff00" << formatMoney(cost) << "|cffa0a0ff per use)";
+    SendMessage(player, out.str());
 
     if (detailed)
     {
@@ -182,7 +184,7 @@ void Immersive::PrintHelp(Player *player, bool detailed)
             used = true;
         }
         if (used)
-            chat.PSendSysMessage(out.str().c_str());
+            SendMessage(player, out.str().c_str());
     }
 }
 
@@ -196,13 +198,13 @@ void Immersive::IncreaseStat(Player *player, uint32 type)
 
     if (usedStats >= totalStats)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cffffa0a0You have no attribute points left");
+        SendMessage(player, "|cffffa0a0You have no attribute points left");
         return;
     }
 
     if (player->GetMoney() < cost)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("|cffffa0a0You have not enough gold");
+        SendMessage(player, "|cffffa0a0You have not enough gold");
         return;
     }
 
@@ -212,8 +214,10 @@ void Immersive::IncreaseStat(Player *player, uint32 type)
     usedStats = GetUsedStats(player);
     totalStats = GetTotalStats(player);
     cost = GetStatCost(player);
-    ChatHandler(player->GetSession()).PSendSysMessage("|cffa0a0ffYou have gained |cff00ff00+1|cffa0a0ff %s, |cff00ff00%d|cffa0a0ff points left (|cffffff00%s|cffa0a0ff per use)",
-            statNames[(Stats)type].c_str(), (totalStats - usedStats), formatMoney(cost));
+    ostringstream out;
+    out << "|cffa0a0ffYou have gained |cff00ff00+1|cffa0a0ff " << statNames[(Stats)type].c_str() <<
+            ", |cff00ff00" << (totalStats - usedStats) << "|cffa0a0ff points left (|cffffff00" << formatMoney(cost) << "|cffa0a0ff per use)";
+    SendMessage(player, out.str());
 
     player->InitStatsForLevel(true);
     player->UpdateAllStats();
@@ -231,15 +235,17 @@ void Immersive::ResetStats(Player *player)
     uint32 usedStats = GetUsedStats(player);
     uint32 totalStats = GetTotalStats(player);
     uint32 cost = GetStatCost(player);
-    ChatHandler(player->GetSession()).PSendSysMessage("|cffa0a0ffYour attributes have been reset, |cff00ff00%d|cffa0a0ff points available (|cffffff00%s|cffa0a0ff per use)",
-            (totalStats - usedStats), formatMoney(cost));
+    ostringstream out;
+    out << "|cffa0a0ffYour attributes have been reset, |cff00ff00" << (totalStats - usedStats) <<
+            "|cffa0a0ff points available (|cffffff00" << formatMoney(cost) << "|cffa0a0ff per use)";
+    SendMessage(player, out.str());
     player->InitStatsForLevel(true);
     player->UpdateAllStats();
 }
 
 uint32 Immersive::GetTotalStats(Player *player)
 {
-    return player->getLevel() * 3;
+    return (player->getLevel() - 1) * 3;
 }
 
 uint32 Immersive::GetUsedStats(Player *player)
@@ -291,5 +297,17 @@ uint32 Immersive::SetValue(uint32 owner, string type, uint32 value)
     return value;
 }
 
+void Immersive::SendMessage(Player *player, string message)
+{
+#ifdef ENABLE_PLAYERBOTS
+    if (player->GetPlayerbotAI())
+    {
+        player->GetPlayerbotAI()->TellMaster(message);
+        return;
+    }
+#endif
+    ChatHandler &chat = ChatHandler(player->GetSession());
+    chat.PSendSysMessage(message.c_str());
+}
 
 INSTANTIATE_SINGLETON_1( immersive::Immersive );
