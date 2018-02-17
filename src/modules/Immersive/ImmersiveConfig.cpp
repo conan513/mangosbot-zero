@@ -14,7 +14,7 @@ bool ImmersiveConfig::Initialize()
 {
     sLog.outString("Initializing Immersive by ike3");
 
-    if (!config.SetSource(SYSCONFDIR"immersive.conf"))
+    if (!config.SetSource(SYSCONFDIR"Settings/immersive.conf"))
     {
         sLog.outString("Immersive is Disabled. Unable to open configuration file immersive.conf");
         return false;
