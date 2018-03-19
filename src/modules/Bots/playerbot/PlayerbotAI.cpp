@@ -246,14 +246,18 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
     if (filtered.empty())
         return;
 
-    if (filtered.find("who") != 0 && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
-        return;
-
     if (filtered.substr(0, 6) == "debug ")
     {
-        TellMasterNoFacing(HandleRemoteCommand(filtered.substr(6)));
+        string response = HandleRemoteCommand(filtered.substr(6));
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_ADDON, response.c_str(), LANG_ADDON,
+                CHAT_TAG_NONE, bot->GetObjectGuid(), bot->GetName());
+        fromPlayer.GetSession()->SendPacket(&data);
         return;
     }
+
+    if (filtered.find("who") != 0 && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
+        return;
 
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != string::npos && filtered.find("award") == string::npos)
     {
@@ -398,6 +402,9 @@ void PlayerbotAI::DoNextAction()
 
     if (currentEngine == engines[BOT_STATE_DEAD] && bot->IsAlive())
         ChangeEngine(BOT_STATE_NON_COMBAT);
+
+    if (currentEngine != engines[BOT_STATE_COMBAT] && bot->IsInCombat())
+        ChangeEngine(BOT_STATE_COMBAT);
 
     Group *group = bot->GetGroup();
     if (!master && group)
