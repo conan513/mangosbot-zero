@@ -177,11 +177,7 @@ void PlayerbotFactory::InitPet()
             if (!co->isTameable())
                 continue;
 
-            if (co->MinLevel > bot->getLevel())
-                continue;
-
-			PetLevelInfo const* petInfo = sObjectMgr.GetPetLevelInfo(co->Entry, bot->getLevel());
-            if (!petInfo)
+            if ((int)co->MinLevel > (int)bot->getLevel())
                 continue;
 
 			ids.push_back(id);
@@ -200,10 +196,6 @@ void PlayerbotFactory::InitPet()
             if (!co)
                 continue;
 
-            PetLevelInfo const* petInfo = sObjectMgr.GetPetLevelInfo(co->Entry, bot->getLevel());
-            if (!petInfo)
-                continue;
-
             uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
             CreatureCreatePos pos(map, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation());
             uint32 pet_number = sObjectMgr.GeneratePetNumber();
@@ -219,6 +211,7 @@ void PlayerbotFactory::InitPet()
             pet->SetCreatorGuid(bot->GetObjectGuid());
             pet->setFaction(bot->getFaction());
             pet->SetLevel(bot->getLevel());
+            pet->InitStatsForLevel(bot->getLevel(), bot);
             pet->SetLoyaltyLevel(BEST_FRIEND);
             pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
             pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
