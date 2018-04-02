@@ -4,11 +4,27 @@
 
 namespace ai
 {
-    BUFF_ON_PARTY_TRIGGER(PowerWordFortitudeOnPartyTrigger, "power word: fortitude", "power word: fortitude on party")
-    BUFF_TRIGGER(PowerWordFortitudeTrigger, "power word: fortitude", "power word: fortitude")
+    class PowerWordFortitudeOnPartyTrigger : public BuffOnPartyTrigger {
+    public:
+        PowerWordFortitudeOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "power word: fortitude", 35) {}
+    };
 
-    BUFF_ON_PARTY_TRIGGER(DivineSpiritOnPartyTrigger, "divine spirit", "divine spirit on party")
-    BUFF_TRIGGER(DivineSpiritTrigger, "divine spirit", "divine spirit")
+    class PowerWordFortitudeTrigger : public BuffTrigger {
+    public:
+        PowerWordFortitudeTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "power word: fortitude", 30) {}
+    };
+
+    class DivineSpiritOnPartyTrigger : public BuffOnPartyTrigger {
+    public:
+        DivineSpiritOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "divine spirit", 45) {}
+    };
+
+    class DivineSpiritTrigger : public BuffTrigger {
+    public:
+        DivineSpiritTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "divine spirit", 40) {}
+    };
+
+
     BUFF_TRIGGER(InnerFireTrigger, "inner fire", "inner fire")
     BUFF_TRIGGER(VampiricEmbraceTrigger, "vampiric embrace", "vampiric embrace")
 

@@ -5,13 +5,13 @@ namespace ai {
     class MarkOfTheWildOnPartyTrigger : public BuffOnPartyTrigger
     {
     public:
-        MarkOfTheWildOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "mark of the wild") {}
+        MarkOfTheWildOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "mark of the wild", 30) {}
     };
 
     class MarkOfTheWildTrigger : public BuffTrigger
     {
     public:
-        MarkOfTheWildTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "mark of the wild") {}
+        MarkOfTheWildTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "mark of the wild", 25) {}
     };
 
     class ThornsTrigger : public BuffTrigger

@@ -227,7 +227,7 @@ namespace ai
     class BuffTrigger : public SpellTrigger
     {
     public:
-        BuffTrigger(PlayerbotAI* ai, string spell, int checkInterval = 5) : SpellTrigger(ai, spell, checkInterval) {}
+        BuffTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : SpellTrigger(ai, spell, checkInterval) {}
     public:
 		virtual string GetTargetName() { return "self target"; }
         virtual bool IsActive();
@@ -236,9 +236,10 @@ namespace ai
     class BuffOnPartyTrigger : public BuffTrigger
     {
     public:
-        BuffOnPartyTrigger(PlayerbotAI* ai, string spell) : BuffTrigger(ai, spell) {}
+        BuffOnPartyTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {}
     public:
 		virtual Value<Unit*>* GetTargetValue();
+		virtual string getName() { return spell + " on party"; }
     };
 
     BEGIN_TRIGGER(NoAttackersTrigger, Trigger)
@@ -259,7 +260,7 @@ namespace ai
     class DebuffTrigger : public BuffTrigger
     {
     public:
-        DebuffTrigger(PlayerbotAI* ai, string spell, int checkInterval = 5) : BuffTrigger(ai, spell, checkInterval) {
+        DebuffTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {
 			checkInterval = 1;
 		}
     public:
@@ -361,7 +362,7 @@ namespace ai
 	class NoPetTrigger : public Trigger
 	{
 	public:
-		NoPetTrigger(PlayerbotAI* ai) : Trigger(ai, "no pet", 5) {}
+		NoPetTrigger(PlayerbotAI* ai) : Trigger(ai, "no pet", 30) {}
 
 		virtual bool IsActive() {
 			return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");
@@ -370,7 +371,7 @@ namespace ai
 
 	class ItemCountTrigger : public Trigger {
 	public:
-		ItemCountTrigger(PlayerbotAI* ai, string item, int count) : Trigger(ai, item, 5) {
+		ItemCountTrigger(PlayerbotAI* ai, string item, int count) : Trigger(ai, item, 30) {
 			this->item = item;
 			this->count = count;
 		}
@@ -385,7 +386,7 @@ namespace ai
 
 	class HasAuraTrigger : public Trigger {
 	public:
-		HasAuraTrigger(PlayerbotAI* ai, string spell) : Trigger(ai, spell, 5) {}
+		HasAuraTrigger(PlayerbotAI* ai, string spell) : Trigger(ai, spell) {}
 
 		virtual string GetTargetName() { return "self target"; }
 		virtual bool IsActive();
@@ -549,7 +550,7 @@ namespace ai
     class NoNonBotPlayersAroundTrigger : public Trigger
     {
     public:
-        NoNonBotPlayersAroundTrigger(PlayerbotAI* ai) : Trigger(ai, "no non bot players around", 5) {}
+        NoNonBotPlayersAroundTrigger(PlayerbotAI* ai) : Trigger(ai, "no non bot players around", 25) {}
 
     public:
         virtual bool IsActive()

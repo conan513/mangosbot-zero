@@ -25,8 +25,17 @@ namespace ai
     DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light", "judgement of light")
     DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")
 
-    BUFF_ON_PARTY_TRIGGER(BlessingOnPartyTrigger, "blessing of", "blessing of kings on party")
-    BUFF_TRIGGER(BlessingTrigger, "blessing of sanctuary", "blessing of sanctuary")
+    class BlessingOnPartyTrigger : public BuffOnPartyTrigger
+    {
+    public:
+        BlessingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of kings", 15) {}
+    };
+
+    class BlessingTrigger : public BuffTrigger
+    {
+    public:
+        BlessingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "blessing of sanctuary", 10) {}
+    };
 
     class HammerOfJusticeInterruptSpellTrigger : public InterruptSpellTrigger
     {
