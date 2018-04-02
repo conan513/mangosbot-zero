@@ -6,22 +6,22 @@ namespace ai
 {
     class PowerWordFortitudeOnPartyTrigger : public BuffOnPartyTrigger {
     public:
-        PowerWordFortitudeOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "power word: fortitude", 35) {}
+        PowerWordFortitudeOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "power word: fortitude", 25) {}
     };
 
     class PowerWordFortitudeTrigger : public BuffTrigger {
     public:
-        PowerWordFortitudeTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "power word: fortitude", 30) {}
+        PowerWordFortitudeTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "power word: fortitude", 20) {}
     };
 
     class DivineSpiritOnPartyTrigger : public BuffOnPartyTrigger {
     public:
-        DivineSpiritOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "divine spirit", 45) {}
+        DivineSpiritOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "divine spirit", 20) {}
     };
 
     class DivineSpiritTrigger : public BuffTrigger {
     public:
-        DivineSpiritTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "divine spirit", 40) {}
+        DivineSpiritTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "divine spirit", 15) {}
     };
 
 
