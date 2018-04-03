@@ -106,7 +106,7 @@ void ChatCommandHandlerStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "talk",
-        NextAction::array(0, new NextAction("gossip hello", relevance), NULL)));
+        NextAction::array(0, new NextAction("gossip hello", relevance), new NextAction("talk to quest giver", relevance), NULL)));
 
     triggers.push_back(new TriggerNode(
         "cast",

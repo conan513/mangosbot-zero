@@ -369,7 +369,8 @@ protected:
     {
         trigger("talk");
         tick();
-        assertActions(">S:gossip hello");
+        tick();
+        assertActions(">S:gossip hello>S:talk to quest giver");
     }
 
     void cast()
