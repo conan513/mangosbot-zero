@@ -559,10 +559,10 @@ namespace ai
         }
     };
 
-    class NewPlayerNearbyTrigger : public RandomTrigger
+    class NewPlayerNearbyTrigger : public Trigger
     {
     public:
-        NewPlayerNearbyTrigger(PlayerbotAI* ai) : RandomTrigger(ai, "new player nearby", 20) {}
+        NewPlayerNearbyTrigger(PlayerbotAI* ai) : Trigger(ai, "new player nearby", 15) {}
 
     public:
         virtual bool IsActive()

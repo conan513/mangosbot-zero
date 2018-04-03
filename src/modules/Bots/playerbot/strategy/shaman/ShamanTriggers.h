@@ -92,7 +92,7 @@ namespace ai
 
     class WaterWalkingTrigger : public BuffTrigger {
     public:
-        WaterWalkingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water walking", 20) {}
+        WaterWalkingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water walking", 10) {}
 
         virtual bool IsActive()
         {
@@ -102,7 +102,7 @@ namespace ai
 
     class WaterBreathingTrigger : public BuffTrigger {
     public:
-        WaterBreathingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water breathing", 10) {}
+        WaterBreathingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water breathing", 5) {}
 
         virtual bool IsActive()
         {
@@ -112,7 +112,7 @@ namespace ai
 
     class WaterWalkingOnPartyTrigger : public BuffOnPartyTrigger {
     public:
-        WaterWalkingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "water walking on party", 25) {}
+        WaterWalkingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "water walking on party", 15) {}
 
         virtual bool IsActive()
         {
@@ -122,7 +122,7 @@ namespace ai
 
     class WaterBreathingOnPartyTrigger : public BuffOnPartyTrigger {
     public:
-        WaterBreathingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "water breathing on party", 15) {}
+        WaterBreathingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "water breathing on party", 10) {}
 
         virtual bool IsActive()
         {
