@@ -550,7 +550,7 @@ namespace ai
     class NoNonBotPlayersAroundTrigger : public Trigger
     {
     public:
-        NoNonBotPlayersAroundTrigger(PlayerbotAI* ai) : Trigger(ai, "no non bot players around", 25) {}
+        NoNonBotPlayersAroundTrigger(PlayerbotAI* ai) : Trigger(ai, "no non bot players around", 5) {}
 
     public:
         virtual bool IsActive()
@@ -562,7 +562,7 @@ namespace ai
     class NewPlayerNearbyTrigger : public Trigger
     {
     public:
-        NewPlayerNearbyTrigger(PlayerbotAI* ai) : Trigger(ai, "new player nearby", 15) {}
+        NewPlayerNearbyTrigger(PlayerbotAI* ai) : Trigger(ai, "new player nearby", 2) {}
 
     public:
         virtual bool IsActive()

@@ -44,7 +44,7 @@ bool CastCustomSpellAction::Execute(Event event)
         return false;
     }
 
-    if (target != bot && !bot->IsInFront(target, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+    if (target != bot && !bot->IsInFront(target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
     {
         bot->SetFacingTo(bot->GetAngle(target));
         ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);

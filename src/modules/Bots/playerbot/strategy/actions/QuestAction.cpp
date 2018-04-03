@@ -45,7 +45,7 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
         return false;
     }
 
-    if (!bot->IsInFront(questGiver, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+    if (!bot->IsInFront(questGiver, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
         bot->SetFacingTo(bot->GetAngle(questGiver));
 
     bot->SetSelectionGuid(guid);
