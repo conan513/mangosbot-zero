@@ -16,7 +16,7 @@ bool RememberTaxiAction::Execute(Event event)
     {
     case CMSG_ACTIVATETAXI:
         {
-            LastMovement& movement = context->GetValue<LastMovement&>("last movement")->Get();
+            LastMovement& movement = context->GetValue<LastMovement&>("last taxi")->Get();
             movement.taxiNodes.clear();
             movement.taxiNodes.resize(2);
 
@@ -29,7 +29,7 @@ bool RememberTaxiAction::Execute(Event event)
             uint32 node_count, totalcost;
             p >> guid >> totalcost >> node_count;
 
-            LastMovement& movement = context->GetValue<LastMovement&>("last movement")->Get();
+            LastMovement& movement = context->GetValue<LastMovement&>("last taxi")->Get();
             movement.taxiNodes.clear();
             for (uint32 i = 0; i < node_count; ++i)
             {

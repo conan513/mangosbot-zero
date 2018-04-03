@@ -120,6 +120,8 @@ namespace ai
             creators["always loot list"] = &ValueContext::always_loot_list;
             creators["loot strategy"] = &ValueContext::loot_strategy;
             creators["last movement"] = &ValueContext::last_movement;
+            creators["last taxi"] = &ValueContext::last_movement;
+            creators["last area trigger"] = &ValueContext::last_movement;
             creators["distance"] = &ValueContext::distance;
             creators["moving"] = &ValueContext::moving;
             creators["swimming"] = &ValueContext::swimming;

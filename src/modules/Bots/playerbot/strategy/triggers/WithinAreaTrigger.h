@@ -12,7 +12,7 @@ namespace ai
 		{
 
 
-            LastMovement& movement = context->GetValue<LastMovement&>("last movement")->Get();
+            LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
             if (!movement.lastAreaTrigger)
                 return false;
 

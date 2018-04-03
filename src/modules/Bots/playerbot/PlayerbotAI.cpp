@@ -159,6 +159,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 void PlayerbotAI::HandleTeleportAck()
 {
 	bot->GetMotionMaster()->Clear(true);
+	bot->InterruptMoving(1);
 	if (bot->IsBeingTeleportedNear())
 	{
 		WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 8 + 4 + 4);
@@ -191,8 +192,9 @@ void PlayerbotAI::Reset()
     LastSpellCast & lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
     lastSpell.Reset();
 
-    LastMovement & lastMovement = aiObjectContext->GetValue<LastMovement& >("last movement")->Get();
-    lastMovement.Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last movement")->Get().Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last area trigger")->Get().Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last taxi")->Get().Set(NULL);
 
     bot->GetMotionMaster()->Clear();
     bot->m_taxi.ClearTaxiDestinations();
@@ -925,6 +927,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
         spell->cancel();
         return false;
     }
+    else
+        bot->InterruptMoving(1);
 
     SpellCastTargets targets;
     WorldObject* faceTo = target;
