@@ -31,5 +31,10 @@ bool GreetAction::Execute(Event event)
 
     set<ObjectGuid>& alreadySeenPlayers = ai->GetAiObjectContext()->GetValue<set<ObjectGuid>& >("already seen players")->Get();
     alreadySeenPlayers.insert(guid);
+
+    list<ObjectGuid> nearestPlayers = ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("nearest friendly players")->Get();
+    for (list<ObjectGuid>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i) {
+        alreadySeenPlayers.insert(*i);
+    }
     return true;
 }
