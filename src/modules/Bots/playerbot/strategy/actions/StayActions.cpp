@@ -14,7 +14,7 @@ void StayActionBase::Stay()
         return;
 
     mm.Clear();
-    mm.MoveIdle();
+    bot->InterruptMoving();
 	bot->clearUnitState(UNIT_STAT_CHASE);
 	bot->clearUnitState(UNIT_STAT_FOLLOW);
 

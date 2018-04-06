@@ -927,8 +927,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
         spell->cancel();
         return false;
     }
-    else
-        bot->InterruptMoving(1);
 
     SpellCastTargets targets;
     WorldObject* faceTo = target;
