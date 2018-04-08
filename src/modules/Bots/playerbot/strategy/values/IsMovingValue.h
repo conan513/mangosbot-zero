@@ -27,6 +27,7 @@ namespace ai
                 else
                     { chaseTarget = static_cast<ChaseMovementGenerator<Creature> const*>(target->GetMotionMaster()->GetCurrent())->GetTarget(); }
 
+                if (!chaseTarget) return false;
                 Player* chaseTargetPlayer = sObjectMgr.GetPlayer(chaseTarget->GetObjectGuid());
                 return chaseTargetPlayer && !ai->IsTank(chaseTargetPlayer);
             }

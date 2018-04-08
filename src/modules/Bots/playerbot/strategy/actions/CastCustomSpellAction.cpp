@@ -37,7 +37,7 @@ bool CastCustomSpellAction::Execute(Event event)
     }
 
     SpellEntry const *pSpellInfo = sSpellStore.LookupEntry(spell);
-    if (!spell)
+    if (!pSpellInfo)
     {
         msg << "Unknown spell " << text;
         ai->TellMaster(msg.str());
