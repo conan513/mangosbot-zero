@@ -332,10 +332,10 @@ namespace ai
     class SnareTargetTrigger : public DebuffTrigger
     {
     public:
-        SnareTargetTrigger(PlayerbotAI* ai, string aura) : DebuffTrigger(ai, aura) {}
+        SnareTargetTrigger(PlayerbotAI* ai, string spell) : DebuffTrigger(ai, spell) {}
     public:
-        virtual bool IsActive();
-        virtual string getName() { return "target is moving"; }
+        virtual Value<Unit*>* GetTargetValue();
+        virtual string getName() { return spell + " on snare target"; }
     };
 
 	class LowManaTrigger : public Trigger

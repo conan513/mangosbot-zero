@@ -136,12 +136,6 @@ bool BoostTrigger::IsActive()
 	return BuffTrigger::IsActive() && AI_VALUE(uint8, "balance") <= balance;
 }
 
-bool SnareTargetTrigger::IsActive()
-{
-	Unit* target = GetTarget();
-	return DebuffTrigger::IsActive() && AI_VALUE2(bool, "moving", "current target") && !ai->HasAura(spell, target);
-}
-
 bool ItemCountTrigger::IsActive()
 {
 	return AI_VALUE2(uint8, "item count", item) < count;
@@ -244,4 +238,9 @@ bool TargetChangedTrigger::IsActive()
 Value<Unit*>* InterruptEnemyHealerTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("enemy healer target", spell);
+}
+
+Value<Unit*>* SnareTargetTrigger::GetTargetValue()
+{
+    return context->GetValue<Unit*>("snare target", spell);
 }

@@ -268,4 +268,15 @@ namespace ai
         }
         virtual string getName() { return spell + " on enemy healer"; }
     };
+
+    class CastSnareSpellAction : public CastDebuffSpellAction
+    {
+    public:
+        CastSnareSpellAction(PlayerbotAI* ai, string spell) : CastDebuffSpellAction(ai, spell) {}
+        Value<Unit*>* GetTargetValue()
+        {
+            return context->GetValue<Unit*>("snare target", spell);
+        }
+        virtual string getName() { return spell + " on snare target"; }
+    };
 }

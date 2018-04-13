@@ -83,6 +83,7 @@ protected:
     void tickWithAoeHeal(string type, int amount = 2);
     void tickWithItemForSpell(string spell);
     void tickWithEnemyHealerIsCastingInterruptableSpell(string interrupt);
+    void tickWithSnareTargetSpell(string interrupt);
     void runStressTest();
 
 protected:

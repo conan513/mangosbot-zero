@@ -73,9 +73,9 @@ protected:
 
     void snare()
     {
-        tickWithTargetIsMoving();
+        tickWithSnareTargetSpell("frost shock");
 
-        assertActions(">T:frost shock");
+        assertActions(">Sn:frost shock on snare target");
     }
 };
 

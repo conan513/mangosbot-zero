@@ -23,8 +23,11 @@ namespace ai
     BEGIN_RANGED_SPELL_ACTION(CastChimeraShotAction, "chimera shot")
     END_SPELL_ACTION()
 
-    BEGIN_RANGED_SPELL_ACTION(CastConcussiveShotAction, "concussive shot")
-    END_SPELL_ACTION()
+    class CastConcussiveShotAction : public CastSnareSpellAction
+    {
+    public:
+        CastConcussiveShotAction(PlayerbotAI* ai) : CastSnareSpellAction(ai, "concussive shot") {}
+    };
 
     BEGIN_RANGED_SPELL_ACTION(CastDistractingShotAction, "distracting shot")
     END_SPELL_ACTION()

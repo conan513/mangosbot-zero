@@ -51,7 +51,7 @@ private:
         return new ActionNode ("concussive shot",
             /*P*/ NULL,
             /*A*/ NULL,
-            /*C*/ NextAction::array(0, new NextAction("wyvern sting", 11.0f), NULL));
+            /*C*/ NULL);
     }
 
 };
@@ -93,6 +93,10 @@ void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "freezing trap",
         NextAction::array(0, new NextAction("freezing trap", 83.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "concussive shot on snare target",
+        NextAction::array(0, new NextAction("concussive shot", 83.0f), NULL)));
 }
 
 void DpsAoeHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -18,6 +18,7 @@ class DpsHunterEngineTestCase : public EngineTestBase
   CPPUNIT_TEST( incompatibles );
   CPPUNIT_TEST( feign_death );
   CPPUNIT_TEST( stress );
+  CPPUNIT_TEST( snare );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -160,6 +161,13 @@ protected:
     void stress()
     {
         runStressTest();
+    }
+
+    void snare()
+    {
+        tickWithSnareTargetSpell("concussive shot");
+
+        assertActions(">Sn:concussive shot on snare target");
     }
 };
 
