@@ -8,7 +8,7 @@ using namespace ai;
 class TestValue : public CalculatedValue<int>
 {
 public:
-    TestValue(PlayerbotAI* ai) : CalculatedValue<int>(ai, "name", 20), increment(0) {}
+    TestValue(PlayerbotAI* ai) : CalculatedValue<int>(ai, "name"), increment(0) {}
     virtual int Calculate() { return ++increment; }
 
 private:
@@ -73,9 +73,6 @@ protected:
     {
         MockPlayerbotAIBase ai;
         TestValue value(&ai);
-
-        value.Update();
-        CPPUNIT_ASSERT(value == 1);
 
         value.Update();
         CPPUNIT_ASSERT(value == 1);

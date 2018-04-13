@@ -31,7 +31,7 @@ namespace ai
         CalculatedValue(PlayerbotAI* ai, string name = "value", int checkInterval = 1) : UntypedValue(ai, name),
             checkInterval(checkInterval)
         {
-            lastCheckTime = time(0) - urand(0, checkInterval);
+            lastCheckTime = time(0) - rand() % checkInterval;
         }
         virtual ~CalculatedValue() {}
 

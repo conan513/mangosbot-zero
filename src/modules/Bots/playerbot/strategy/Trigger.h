@@ -24,8 +24,8 @@ namespace ai
 	public:
         Trigger(PlayerbotAI* ai, string name = "trigger", int checkInterval = 1) : AiNamedObject(ai, name) {
 			this->checkInterval = checkInterval;
-			lastCheckTime = time(0) - urand(0, checkInterval);
-        }
+			lastCheckTime = time(0) - rand() % checkInterval;
+		}
         virtual ~Trigger() {}
 
 	public:
