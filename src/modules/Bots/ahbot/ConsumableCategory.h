@@ -79,7 +79,7 @@ namespace ahbot
         {
             return Consumable::Contains(proto) &&
                     (proto->SubClass == ITEM_SUBCLASS_CONSUMABLE ||
-                    proto->SubClass == ITEM_SUBCLASS_CONSUMABLE_OTHER) && (proto->RequiredSkill);
+                    proto->SubClass == ITEM_SUBCLASS_CONSUMABLE_OTHER) && proto->BuyCount < 5;
         }
 
         virtual string GetName() { return "OtherConsumable"; }

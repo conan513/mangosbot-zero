@@ -63,6 +63,7 @@
 #include "OutfitListValue.h"
 #include "RandomBotUpdateValue.h"
 #include "SkipSpellsListValue.h"
+#include "SnareTargetValue.h"
 
 namespace ai
 {
@@ -120,6 +121,8 @@ namespace ai
             creators["always loot list"] = &ValueContext::always_loot_list;
             creators["loot strategy"] = &ValueContext::loot_strategy;
             creators["last movement"] = &ValueContext::last_movement;
+            creators["last taxi"] = &ValueContext::last_movement;
+            creators["last area trigger"] = &ValueContext::last_movement;
             creators["distance"] = &ValueContext::distance;
             creators["moving"] = &ValueContext::moving;
             creators["swimming"] = &ValueContext::swimming;
@@ -151,6 +154,7 @@ namespace ai
             creators["lfg proposal"] = &ValueContext::lfg_proposal;
             creators["bag space"] = &ValueContext::bag_space;
             creators["enemy healer target"] = &ValueContext::enemy_healer_target;
+            creators["snare target"] = &ValueContext::snare_target;
             creators["formation"] = &ValueContext::formation;
             creators["item usage"] = &ValueContext::item_usage;
             creators["speed"] = &ValueContext::speed;
@@ -250,6 +254,7 @@ namespace ai
         static UntypedValue* lfg_proposal(PlayerbotAI* ai) { return new LfgProposalValue(ai); }
         static UntypedValue* bag_space(PlayerbotAI* ai) { return new BagSpaceValue(ai); }
         static UntypedValue* enemy_healer_target(PlayerbotAI* ai) { return new EnemyHealerTargetValue(ai); }
+        static UntypedValue* snare_target(PlayerbotAI* ai) { return new SnareTargetValue(ai); }
         static UntypedValue* speed(PlayerbotAI* ai) { return new SpeedValue(ai); }
         static UntypedValue* last_said(PlayerbotAI* ai) { return new LastSaidValue(ai); }
         static UntypedValue* last_emote(PlayerbotAI* ai) { return new LastEmoteValue(ai); }

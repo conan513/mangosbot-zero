@@ -29,33 +29,31 @@ namespace ai
 	{
 	public:
         CalculatedValue(PlayerbotAI* ai, string name = "value", int checkInterval = 1) : UntypedValue(ai, name),
-            checkInterval(checkInterval), ticksElapsed(checkInterval)
-        { }
+            checkInterval(checkInterval)
+        {
+            lastCheckTime = time(0) - rand() % checkInterval;
+        }
         virtual ~CalculatedValue() {}
 
 	public:
         virtual T Get()
         {
-            if (ticksElapsed >= checkInterval) {
-                ticksElapsed = 0;
+            time_t now = time(0);
+            if (!lastCheckTime || checkInterval < 2 || now - lastCheckTime >= checkInterval) {
+                lastCheckTime = now;
                 value = Calculate();
             }
             return value;
         }
         virtual void Set(T value) { this->value = value; }
-        virtual void Update()
-        {
-            if (ticksElapsed < checkInterval) {
-                ticksElapsed++;
-            }
-        }
+        virtual void Update() { }
 
     protected:
         virtual T Calculate() = 0;
 
     protected:
 		int checkInterval;
-		int ticksElapsed;
+		time_t lastCheckTime;
         T value;
 	};
 

@@ -17,7 +17,7 @@ bool GreetAction::Execute(Event event)
     Player* player = dynamic_cast<Player*>(ai->GetUnit(guid));
     if (!player) return false;
 
-    if (!bot->IsInFront(player, sPlayerbotAIConfig.sightDistance, M_PI / 3.0f) && !bot->IsTaxiFlying())
+    if (!bot->IsInFront(player, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT) && !bot->IsTaxiFlying())
     {
         bot->SetFacingToObject(player);
         return true;
@@ -31,5 +31,10 @@ bool GreetAction::Execute(Event event)
 
     set<ObjectGuid>& alreadySeenPlayers = ai->GetAiObjectContext()->GetValue<set<ObjectGuid>& >("already seen players")->Get();
     alreadySeenPlayers.insert(guid);
+
+    list<ObjectGuid> nearestPlayers = ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("nearest friendly players")->Get();
+    for (list<ObjectGuid>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i) {
+        alreadySeenPlayers.insert(*i);
+    }
     return true;
 }

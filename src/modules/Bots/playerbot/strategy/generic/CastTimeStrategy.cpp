@@ -19,6 +19,7 @@ float CastTimeMultiplier::GetValue(Action* action)
     {
         uint32 spellId = AI_VALUE2(uint32, "spell id", name);
         const SpellEntry* const pSpellInfo = sSpellStore.LookupEntry(spellId);
+        if (!pSpellInfo) return 1.0f;
 
         if (spellId && pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
             return 1.0f;

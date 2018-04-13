@@ -82,9 +82,9 @@ namespace ai
     };
 
     // battle, berserker
-    class CastHamstringAction : public CastMeleeSpellAction {
+    class CastHamstringAction : public CastSnareSpellAction {
     public:
-        CastHamstringAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "hamstring") {}
+        CastHamstringAction(PlayerbotAI* ai) : CastSnareSpellAction(ai, "hamstring") {}
     };
 
     // defensive
@@ -225,9 +225,9 @@ namespace ai
 	};
 
 	// defensive
-	class CastConcussionBlowAction : public CastDefensiveMeleeSpellAction {
+	class CastConcussionBlowAction : public CastSnareSpellAction {
 	public:
-		CastConcussionBlowAction(PlayerbotAI* ai) : CastDefensiveMeleeSpellAction(ai, "concussion blow") {}
+		CastConcussionBlowAction(PlayerbotAI* ai) : CastSnareSpellAction(ai, "concussion blow") {}
 	};
 
     class CastShieldBashOnEnemyHealerAction : public CastSpellOnEnemyHealerAction

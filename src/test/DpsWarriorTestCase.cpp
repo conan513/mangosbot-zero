@@ -89,9 +89,9 @@ protected:
     {
 		tickInMeleeRange(); // reach melee
 
-		tickWithTargetIsMoving();
+		tickWithSnareTargetSpell("hamstring");
 
-		assertActions(">S:battle stance>T:hamstring");
+		assertActions(">S:battle stance>Sn:hamstring on snare target");
     }
 
 

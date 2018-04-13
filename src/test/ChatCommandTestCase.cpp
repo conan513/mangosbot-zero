@@ -18,6 +18,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( log );
       CPPUNIT_TEST( los );
       CPPUNIT_TEST( drop );
+      CPPUNIT_TEST( share );
       CPPUNIT_TEST( query );
       CPPUNIT_TEST( ll );
       CPPUNIT_TEST( ss );
@@ -128,6 +129,11 @@ protected:
     void drop()
     {
         assertCommand("drop");
+    }
+
+    void share()
+    {
+        assertCommand("share");
     }
 
     void query()
@@ -363,7 +369,8 @@ protected:
     {
         trigger("talk");
         tick();
-        assertActions(">S:gossip hello");
+        tick();
+        assertActions(">S:gossip hello>S:talk to quest giver");
     }
 
     void cast()

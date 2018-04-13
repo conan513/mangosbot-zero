@@ -145,9 +145,9 @@ protected:
 	void snare()
 	{
 		tick();
-		tickWithTargetIsMoving();
+		tickWithSnareTargetSpell("concussion blow");
 
-		assertActions(">S:defensive stance>T:concussion blow");
+		assertActions(">S:defensive stance>Sn:concussion blow on snare target");
 	}
 
 

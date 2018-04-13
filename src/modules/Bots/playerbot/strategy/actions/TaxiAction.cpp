@@ -9,7 +9,7 @@ bool TaxiAction::Execute(Event event)
 {
     ai->RemoveShapeshift();
 
-    LastMovement& movement = context->GetValue<LastMovement&>("last movement")->Get();
+    LastMovement& movement = context->GetValue<LastMovement&>("last taxi")->Get();
 
     WorldPacket& p = event.getPacket();
 	if (!p.empty() && p.GetOpcode() == CMSG_MOVE_SPLINE_DONE)

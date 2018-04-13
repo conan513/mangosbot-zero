@@ -32,7 +32,7 @@ file(GLOB AHbot_Source ${CMAKE_CURRENT_SOURCE_DIR}/ahbot/*.cpp ${CMAKE_CURRENT_S
     source_group("AH Bot" FILES ${AHbot_Source})
 
 #Define base source library
-set(LIBRARY_SRCS 
+set(LIBRARY_SRCS
     ${Playerbot_Source}
     ${AHbot_Source}
     ${bots_PCH}
@@ -57,54 +57,54 @@ file(GLOB Playerbot_Generic ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/gener
 file(GLOB Playerbot_Triggers ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/triggers/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/triggers/*.h)
     source_group("Player Bot\\Strategies\\Triggers" FILES ${Playerbot_Triggers})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Triggers})
-    
+
 #Value files
 file(GLOB Playerbot_Values ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/values/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/values/*.h)
     source_group("Player Bot\\Strategies\\Values" FILES ${Playerbot_Values})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Values})
-    
+
 ## Class files
 
 #Druid AI
 file(GLOB Playerbot_Druid ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/druid/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/druid/*.h)
     source_group("Player Bot\\Strategies\\Druid" FILES ${Playerbot_Druid})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Druid})
-    
+
 #Hunter AI
 file(GLOB Playerbot_Hunter ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/hunter/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/hunter/*.h)
     source_group("Player Bot\\Strategies\\Hunter" FILES ${Playerbot_Hunter})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Hunter})
-    
+
 #Mage AI
 file(GLOB Playerbot_Mage ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/mage/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/mage/*.h)
     source_group("Player Bot\\Strategies\\Mage" FILES ${Playerbot_Mage})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Mage})
-    
+
 #Paladin AI
 file(GLOB Playerbot_Paladin ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/paladin/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/paladin/*.h)
     source_group("Player Bot\\Strategies\\Paladin" FILES ${Playerbot_Paladin})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Paladin})
-    
+
 #Priest AI
 file(GLOB Playerbot_Priest ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/priest/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/priest/*.h)
     source_group("Player Bot\\Strategies\\Priest" FILES ${Playerbot_Priest})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Priest})
-    
+
 #Rogue AI
 file(GLOB Playerbot_Rogue ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/rogue/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/rogue/*.h)
     source_group("Player Bot\\Strategies\\Rogue" FILES ${Playerbot_Rogue})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Rogue})
-    
+
 #Shaman AI
 file(GLOB Playerbot_Shaman ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/shaman/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/shaman/*.h)
     source_group("Player Bot\\Strategies\\Shaman" FILES ${Playerbot_Shaman})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Shaman})
-    
+
 #Warlock AI
 file(GLOB Playerbot_Warlock ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/warlock/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/warlock/*.h)
     source_group("Player Bot\\Strategies\\Warlock" FILES ${Playerbot_Warlock})
     LIST(APPEND LIBRARY_SRCS ${Playerbot_Warlock})
-    
+
 #Warrior AI
 file(GLOB Playerbot_Warrior ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/warrior/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/strategy/warrior/*.h)
     source_group("Player Bot\\Strategies\\Warrior" FILES ${Playerbot_Warrior})
@@ -138,6 +138,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/shared/Utilities
   ${CMAKE_SOURCE_DIR}/src/framework
   ${CMAKE_SOURCE_DIR}/src/framework/Platform
+  ${CMAKE_SOURCE_DIR}/dep/g3dlite
   ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/src/shared
   ${MYSQL_INCLUDE_DIR}
@@ -169,6 +170,14 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/aiplayerbot.conf.dist DESTINATION ${CO
 
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ahbot/ahbot.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/ahbot.conf.dist)
 #install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ahbot.conf.dist DESTINATION ${CONF_INSTALL_DIR})
+
+if(WIN32 AND MSVC)
+  add_custom_command(TARGET ${LIBRARY_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/ahbot.conf.dist" "${CONF_COPY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/aiplayerbot.conf.dist" "${CONF_COPY_DIR}"
+  )
+endif()
 
 # Generate PCH
 if(PCH)

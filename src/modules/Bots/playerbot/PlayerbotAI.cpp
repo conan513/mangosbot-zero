@@ -159,6 +159,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 void PlayerbotAI::HandleTeleportAck()
 {
 	bot->GetMotionMaster()->Clear(true);
+	bot->InterruptMoving(1);
 	if (bot->IsBeingTeleportedNear())
 	{
 		WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 8 + 4 + 4);
@@ -191,8 +192,9 @@ void PlayerbotAI::Reset()
     LastSpellCast & lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
     lastSpell.Reset();
 
-    LastMovement & lastMovement = aiObjectContext->GetValue<LastMovement& >("last movement")->Get();
-    lastMovement.Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last movement")->Get().Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last area trigger")->Get().Set(NULL);
+    aiObjectContext->GetValue<LastMovement& >("last taxi")->Get().Set(NULL);
 
     bot->GetMotionMaster()->Clear();
     bot->m_taxi.ClearTaxiDestinations();
@@ -246,14 +248,18 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
     if (filtered.empty())
         return;
 
-    if (filtered.find("who") != 0 && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
-        return;
-
     if (filtered.substr(0, 6) == "debug ")
     {
-        TellMasterNoFacing(HandleRemoteCommand(filtered.substr(6)));
+        string response = HandleRemoteCommand(filtered.substr(6));
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_ADDON, response.c_str(), LANG_ADDON,
+                CHAT_TAG_NONE, bot->GetObjectGuid(), bot->GetName());
+        fromPlayer.GetSession()->SendPacket(&data);
         return;
     }
+
+    if (filtered.find("who") != 0 && !GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, &fromPlayer))
+        return;
 
     if (type == CHAT_MSG_RAID_WARNING && filtered.find(bot->GetName()) != string::npos && filtered.find("award") == string::npos)
     {
@@ -693,7 +699,7 @@ bool PlayerbotAI::TellMaster(string text, PlayerbotSecurityLevel securityLevel)
 
     if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId() && !bot->IsTaxiFlying())
     {
-        if (!bot->IsInFront(master, sPlayerbotAIConfig.sightDistance, M_PI / 2))
+        if (!bot->IsInFront(master, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
             bot->SetFacingTo(bot->GetAngle(master));
 
         bot->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -977,7 +983,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     }
 
 
-    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, M_PI / 2) && !bot->IsTaxiFlying())
+    if (!bot->IsInFront(faceTo, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT) && !bot->IsTaxiFlying())
     {
         bot->SetFacingTo(bot->GetAngle(faceTo));
         spell->cancel();

@@ -14,7 +14,7 @@ namespace ai
             if (!target)
                 return false;
 
-            return bot->IsInFront(target, sPlayerbotAIConfig.sightDistance, M_PI / 3.0f);
+            return bot->IsInFront(target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT);
         }
     };
 }

@@ -53,6 +53,7 @@
 #include "GoAction.h"
 #include "MailAction.h"
 #include "SendMailAction.h"
+#include "ShareQuestAction.h"
 #include "SkipSpellsListAction.h"
 #include "../Bots/playerbot/strategy/druid/DruidActions.h"
 #include "../Bots/playerbot/strategy/rogue/RogueActions.h"
@@ -71,6 +72,7 @@ namespace ai
             creators["log"] = &ChatActionContext::log;
             creators["los"] = &ChatActionContext::los;
             creators["drop"] = &ChatActionContext::drop;
+            creators["share"] = &ChatActionContext::share;
             creators["query quest"] = &ChatActionContext::query_quest;
             creators["query item usage"] = &ChatActionContext::query_item_usage;
             creators["ll"] = &ChatActionContext::ll;
@@ -190,6 +192,7 @@ namespace ai
         static Action* query_item_usage(PlayerbotAI* ai) { return new QueryItemUsageAction(ai); }
         static Action* query_quest(PlayerbotAI* ai) { return new QueryQuestAction(ai); }
         static Action* drop(PlayerbotAI* ai) { return new DropQuestAction(ai); }
+        static Action* share(PlayerbotAI* ai) { return new ShareQuestAction(ai); }
         static Action* stats(PlayerbotAI* ai) { return new StatsAction(ai); }
         static Action* quests(PlayerbotAI* ai) { return new ListQuestsAction(ai); }
         static Action* leave(PlayerbotAI* ai) { return new LeaveGroupAction(ai); }

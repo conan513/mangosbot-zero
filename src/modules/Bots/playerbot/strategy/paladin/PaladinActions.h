@@ -329,4 +329,10 @@ namespace ai
     public:
         CastHammerOfJusticeOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "hammer of justice") {}
     };
+
+    class CastHammerOfJusticeSnareAction : public CastSnareSpellAction
+    {
+    public:
+        CastHammerOfJusticeSnareAction(PlayerbotAI* ai) : CastSnareSpellAction(ai, "hammer of justice") {}
+    };
 }

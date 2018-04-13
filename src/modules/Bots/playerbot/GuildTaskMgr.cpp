@@ -778,6 +778,9 @@ bool GuildTaskMgr::CheckItemTask(uint32 itemId, uint32 obtained, Player* ownerPl
 	if (!guild)
 		return false;
 
+	if (!sRandomPlayerbotMgr.IsRandomBot(bot))
+	    return false;
+
     sLog.outDebug("%s / %s: checking guild task",
 			guild->GetName().c_str(), ownerPlayer->GetName());
 

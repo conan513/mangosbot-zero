@@ -24,8 +24,8 @@ namespace ai
 	public:
         Trigger(PlayerbotAI* ai, string name = "trigger", int checkInterval = 1) : AiNamedObject(ai, name) {
 			this->checkInterval = checkInterval;
-			ticksElapsed = 0;
-        }
+			lastCheckTime = time(0) - rand() % checkInterval;
+		}
         virtual ~Trigger() {}
 
 	public:
@@ -35,14 +35,17 @@ namespace ai
         virtual bool IsActive() { return false; }
         virtual NextAction** getHandlers() { return NULL; }
         void Update() {}
-        virtual void Reset() {}
+        virtual void Reset() { }
         virtual Unit* GetTarget();
         virtual Value<Unit*>* GetTargetValue();
         virtual string GetTargetName() { return "self target"; }
 
 		bool needCheck() {
-			if (++ticksElapsed >= checkInterval) {
-				ticksElapsed = 0;
+		    if (checkInterval < 2) return true;
+
+		    time_t now = time(0);
+			if (!lastCheckTime || now - lastCheckTime >= checkInterval) {
+			    lastCheckTime = now;
 				return true;
 			}
 			return false;
@@ -50,7 +53,7 @@ namespace ai
 
     protected:
 		int checkInterval;
-		int ticksElapsed;
+		time_t lastCheckTime;
 	};
 
 

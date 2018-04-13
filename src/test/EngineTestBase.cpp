@@ -504,6 +504,13 @@ void EngineTestBase::tickWithEnemyHealerIsCastingInterruptableSpell(string inter
     set<Unit*>("enemy healer target", interrupt, NULL);
 }
 
+void EngineTestBase::tickWithSnareTargetSpell(string spell)
+{
+    set<Unit*>("snare target", spell, MockedTargets::GetSnareTarget());
+    tick();
+    set<Unit*>("snare target", spell, NULL);
+}
+
 void EngineTestBase::runStressTest()
 {
     int count = 20;
@@ -550,7 +557,7 @@ void EngineTestBase::runStressTest()
     std::cout << "CC:\n" << ai->buffer << "\n\n";
     CPPUNIT_ASSERT(ai->buffer.find(",,,,,,,") == string::npos);
 
-    set<bool>("moving", "current target", true);
+    set<Unit*>("snare target", "concussive shot", MockedTargets::GetSnareTarget());
     ai->buffer = "";
     ai->spellCooldowns.clear();
     ticks(count);

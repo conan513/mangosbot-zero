@@ -1,11 +1,11 @@
 #include "botpch.h"
 #include "../../playerbot.h"
-#include "DropQuestAction.h"
+#include "ShareQuestAction.h"
 
 
 using namespace ai;
 
-bool DropQuestAction::Execute(Event event)
+bool ShareQuestAction::Execute(Event event)
 {
     string link = event.getParam();
     if (!GetMaster())
@@ -26,16 +26,13 @@ bool DropQuestAction::Execute(Event event)
         uint32 logQuest = bot->GetQuestSlotQuestId(slot);
         if (logQuest == entry)
         {
-            bot->SetQuestSlot(slot, 0);
-
-            // we ignore unequippable quest items in this case, its' still be equipped
-            bot->TakeQuestSourceItem(logQuest, false);
+            WorldPacket p;
+            p << entry;
+            bot->GetSession()->HandlePushQuestToParty(p);
+            ai->TellMaster("Quest shared");
+            return true;
         }
     }
 
-    bot->SetQuestStatus(entry, QUEST_STATUS_NONE);
-    bot->getQuestStatusMap()[entry].m_rewarded = false;
-
-    ai->TellMaster("Quest removed");
-    return true;
+    return false;
 }
