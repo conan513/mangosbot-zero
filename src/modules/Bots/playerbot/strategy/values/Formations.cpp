@@ -92,20 +92,29 @@ namespace ai
     };
 
 
-    class ChaosFormation : public MoveFormation
+    class ChaosFormation : public MoveAheadFormation
     {
     public:
-        ChaosFormation(PlayerbotAI* ai) : MoveFormation(ai, "chaos") {}
-        virtual WorldLocation GetLocation()
+        ChaosFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "chaos"), lastChangeTime(0) {}
+        virtual WorldLocation GetLocationInternal()
         {
             Player* master = GetMaster();
             if (!master)
                 return WorldLocation();
 
-            float range = sPlayerbotAIConfig.lootDistance * (float)(rand() % 10) / 10;
+            float range = sPlayerbotAIConfig.followDistance;
 			float angle = GetFollowAngle();
-            float x = master->GetPositionX() + cos(angle) * range;
-            float y = master->GetPositionY() + sin(angle) * range;
+
+            time_t now = time(0);
+            if (!lastChangeTime || now - lastChangeTime >= 3) {
+                lastChangeTime = now;
+                dx = (urand(0, 10) / 10.0 - 0.5) * sPlayerbotAIConfig.tooCloseDistance;
+                dy = (urand(0, 10) / 10.0 - 0.5) * sPlayerbotAIConfig.tooCloseDistance;
+                dr = sqrt(dx*dx + dy*dy);
+            }
+
+            float x = master->GetPositionX() + cos(angle) * range + dx;
+            float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
             float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
             if (ground <= INVALID_HEIGHT)
@@ -114,7 +123,11 @@ namespace ai
             return WorldLocation(master->GetMapId(), x, y, ground + 0.5f);
         }
 
-        virtual float GetMaxDistance() { return sPlayerbotAIConfig.lootDistance; }
+        virtual float GetMaxDistance() { return sPlayerbotAIConfig.followDistance + dr; }
+
+    private:
+        time_t lastChangeTime;
+        float dx = 0, dy = 0, dr = 0;
     };
 
     class CircleFormation : public MoveFormation
