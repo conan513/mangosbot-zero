@@ -18,6 +18,38 @@ bool Formation::IsNullLocation(WorldLocation const& loc)
 }
 
 
+WorldLocation MoveAheadFormation::GetLocation()
+{
+    Player* master = GetMaster();
+    if (!master)
+        return WorldLocation();
+
+    WorldLocation loc = GetLocationInternal();
+    if (Formation::IsNullLocation(loc))
+        return loc;
+
+    float x = loc.coord_x;
+    float y = loc.coord_y;
+    float z = loc.coord_z;
+
+    if (master->isMoving()) {
+        float ori = master->GetOrientation();
+        float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
+        float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
+        float ground = master->GetMap()->GetHeight(x1, y1, z + 0.5f);
+        if (ground > INVALID_HEIGHT)
+        {
+            x = x1;
+            y = y1;
+        }
+    }
+    float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
+    if (ground <= INVALID_HEIGHT)
+        return Formation::NullLocation;
+
+    return WorldLocation(master->GetMapId(), x, y, ground + 0.5f);
+}
+
 namespace ai
 {
     class MeleeFormation : public FollowFormation
@@ -34,11 +66,11 @@ namespace ai
         virtual string GetTargetName() { return "line target"; }
     };
 
-    class NearFormation : public MoveFormation
+    class NearFormation : public MoveAheadFormation
     {
     public:
-        NearFormation(PlayerbotAI* ai) : MoveFormation(ai, "near") {}
-        virtual WorldLocation GetLocation()
+        NearFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "near") {}
+        virtual WorldLocation GetLocationInternal()
         {
             Player* master = GetMaster();
             if (!master)
@@ -49,17 +81,6 @@ namespace ai
             float x = master->GetPositionX() + cos(angle) * range;
             float y = master->GetPositionY() + sin(angle) * range;
             float z = master->GetPositionZ();
-            if (master->isMoving()) {
-                float ori = master->GetOrientation();
-                float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
-                float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
-                float ground = master->GetMap()->GetHeight(x1, y1, z + 0.5f);
-                if (ground > INVALID_HEIGHT)
-                {
-                    x = x1;
-                    y = y1;
-                }
-            }
             float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;

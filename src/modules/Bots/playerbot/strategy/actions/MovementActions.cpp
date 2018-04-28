@@ -63,8 +63,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z)
 
         bool generatePath = !bot->IsFlying() && !bot->IsUnderWater();
         MotionMaster &mm = *bot->GetMotionMaster();
-        mm.Clear();
-
         mm.MovePoint(mapId, x, y, z, generatePath);
 
         AI_VALUE(LastMovement&, "last movement").Set(x, y, z, bot->GetOrientation());

@@ -85,13 +85,13 @@ namespace ai
         float orientation;
     };
 
-    class ArrowFormation : public MoveFormation
+    class ArrowFormation : public MoveAheadFormation
     {
     public:
-        ArrowFormation(PlayerbotAI* ai) : MoveFormation(ai, "arrow"), built(false), masterUnit(NULL), botUnit(NULL) {}
+        ArrowFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "arrow"), built(false), masterUnit(NULL), botUnit(NULL) {}
 
     public:
-        virtual WorldLocation GetLocation();
+        virtual WorldLocation GetLocationInternal();
 
     private:
         void Build();
