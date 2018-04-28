@@ -176,11 +176,11 @@ namespace ai
         }
     };
 
-    class LineFormation : public MoveFormation
+    class LineFormation : public MoveAheadFormation
     {
     public:
-        LineFormation(PlayerbotAI* ai) : MoveFormation(ai, "line") {}
-        virtual WorldLocation GetLocation()
+        LineFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "line") {}
+        virtual WorldLocation GetLocationInternal()
         {
             Group* group = bot->GetGroup();
             if (!group)
