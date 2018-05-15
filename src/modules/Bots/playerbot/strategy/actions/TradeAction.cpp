@@ -17,10 +17,13 @@ bool TradeAction::Execute(Event event)
         bot->GetSession()->QueuePacket(packet);
     }
 
+    size_t pos = text.rfind(" ");
+    int count = pos!=string::npos ? atoi(text.substr(pos + 1).c_str()) : 1;
     list<Item*> found = parseItems(text);
     if (found.empty())
         return false;
 
+    int traded = 0;
     for (list<Item*>::iterator i = found.begin(); i != found.end(); i++)
     {
         Item* item = *i;
@@ -29,7 +32,7 @@ bool TradeAction::Execute(Event event)
             continue;
 
         int8 slot = item->CanBeTraded() ? -1 : TRADE_SLOT_NONTRADED;
-        if (TradeItem(*item, slot) && slot != TRADE_SLOT_NONTRADED)
+        if (TradeItem(*item, slot) && slot != TRADE_SLOT_NONTRADED && ++traded >= count)
             break;
     }
 
