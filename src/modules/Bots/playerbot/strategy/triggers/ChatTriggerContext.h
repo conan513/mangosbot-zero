@@ -80,9 +80,11 @@ namespace ai
             creators["go"] = &ChatTriggerContext::go;
             creators["ready"] = &ChatTriggerContext::ready_check;
             creators["debug"] = &ChatTriggerContext::debug;
+            creators["cs"] = &ChatTriggerContext::cs;
         }
 
     private:
+        static Trigger* cs(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "cs"); }
         static Trigger* debug(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "debug"); }
         static Trigger* go(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "go"); }
         static Trigger* outfit(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "outfit"); }

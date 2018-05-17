@@ -49,12 +49,14 @@
 #include "WhoAction.h"
 #include "SaveManaAction.h"
 #include "../values/Formations.h"
+#include "CustomStrategyEditAction.h"
 #include "DebugAction.h"
 #include "GoAction.h"
 #include "MailAction.h"
 #include "SendMailAction.h"
 #include "ShareQuestAction.h"
 #include "SkipSpellsListAction.h"
+#include "CustomStrategyEditAction.h"
 
 namespace ai
 {
@@ -127,9 +129,11 @@ namespace ai
             creators["mail"] = &ChatActionContext::mail;
             creators["go"] = &ChatActionContext::go;
             creators["debug"] = &ChatActionContext::debug;
+            creators["cs"] = &ChatActionContext::cs;
         }
 
     private:
+        static Action* cs(PlayerbotAI* ai) { return new CustomStrategyEditAction(ai); }
         static Action* debug(PlayerbotAI* ai) { return new DebugAction(ai); }
         static Action* mail(PlayerbotAI* ai) { return new MailAction(ai); }
         static Action* go(PlayerbotAI* ai) { return new GoAction(ai); }
