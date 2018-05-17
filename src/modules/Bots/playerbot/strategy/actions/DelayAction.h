@@ -20,7 +20,7 @@ namespace ai
             if (bot->IsInCombat())
                 return true;
 
-            ai->SetNextCheckDelay(sPlayerbotAIConfig.maxWaitForMove + sPlayerbotAIConfig.globalCoolDown);
+            ai->SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay + sPlayerbotAIConfig.globalCoolDown);
             return true;
         }
     };

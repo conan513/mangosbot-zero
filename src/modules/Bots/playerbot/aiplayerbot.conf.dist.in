@@ -67,6 +67,12 @@ AiPlayerbot.CommandPrefix =
 # Delay between two bot actions
 #AiPlayerbot.ReactDelay = 100
 
+# Inactivity delay
+#AiPlayerbot.PassiveDelay = 3000
+
+# Minimum delay between repeating actions (chat messages, emotes etc)
+#AiPlayerbot.RepeatDelay = 3000
+
 # Distances
 #AiPlayerbot.SightDistance = 75.0
 #AiPlayerbot.SpellDistance = 30.0
