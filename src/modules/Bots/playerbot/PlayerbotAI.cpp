@@ -630,7 +630,7 @@ Unit* PlayerbotAI::GetUnit(ObjectGuid guid)
     if (!map)
         return NULL;
 
-    return ObjectAccessor::GetUnit(*bot, guid);
+    return sObjectAccessor.GetUnit(*bot, guid);
 }
 
 
