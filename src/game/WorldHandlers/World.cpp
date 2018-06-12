@@ -1990,11 +1990,15 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
         }
 
         if (WorldSession* sess = FindSession(account))
+        {
             if (std::string(sess->GetPlayerName()) != author)
             {
+                sess->LogoutPlayer(true);
                 sess->KickPlayer();
             }
-    } while (resultAccounts->NextRow());
+        }
+    }
+    while (resultAccounts->NextRow());
 
     delete resultAccounts;
     return BAN_SUCCESS;
@@ -2128,7 +2132,7 @@ void World::ShutdownMsg(bool show /*= false*/, Player* player /*= NULL*/)
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
         SendServerMessage(msgid, str.c_str(), player);
-        DEBUG_LOG("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutting down"), str.c_str());
+        DEBUG_LOG("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? "restart" : "shutting down", str.c_str());
     }
 }
 
@@ -2148,7 +2152,7 @@ void World::ShutdownCancel()
     m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
     SendServerMessage(msgid);
 
-    DEBUG_LOG("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
+    DEBUG_LOG("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? "restart" : "shutdown");
 
     ///- Used by Eluna
 #ifdef ENABLE_ELUNA

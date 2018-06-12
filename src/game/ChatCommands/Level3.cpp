@@ -3803,7 +3803,7 @@ bool ChatHandler::HandleNpcAddWeaponCommand(char* /*args*/)
         return true;
     }
 
-    Creature *pCreature = ObjectAccessor::GetCreature(*m_session->GetPlayer(), guid);
+    Creature *pCreature = sObjectAccessor.GetCreature(*m_session->GetPlayer(), guid);
 
     if(!pCreature)
     {
@@ -4609,10 +4609,7 @@ bool ChatHandler::HandleResetAllCommand(char* args)
     }
 
     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE (at_login & '%u') = '0'", atLogin, atLogin);
-    HashMapHolder<Player>::MapType const& plist = sObjectAccessor.GetPlayers();
-    for (HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
-        { itr->second->SetAtLoginFlag(atLogin); }
-
+    sObjectAccessor.DoForAllPlayers([&atLogin](Player* plr){ plr->SetAtLoginFlag(atLogin); });
     return true;
 }
 
@@ -6241,12 +6238,12 @@ bool ChatHandler::HandleAccountSetAddonCommand(char* args)
 bool ChatHandler::HandleSendMailHelper(MailDraft& draft, char* args)
 {
     // format: "subject text" "mail text"
-    char* msgSubject = ExtractQuotedArg(&args);
-    if (!msgSubject)
+    std::string msgSubject = ExtractQuotedArg(&args);
+    if (msgSubject.empty())
         { return false; }
 
-    char* msgText = ExtractQuotedArg(&args);
-    if (!msgText)
+    std::string msgText = ExtractQuotedArg(&args);
+    if (msgText.empty())
         { return false; }
 
     // msgSubject, msgText isn't NUL after prev. check
@@ -6288,12 +6285,12 @@ bool ChatHandler::HandleSendMassMailCommand(char* args)
 bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 {
     // format: "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
-    char* msgSubject = ExtractQuotedArg(&args);
-    if (!msgSubject)
+    std::string msgSubject = ExtractQuotedArg(&args);
+    if (msgSubject.empty())
         { return false; }
 
-    char* msgText = ExtractQuotedArg(&args);
-    if (!msgText)
+    std::string msgText = ExtractQuotedArg(&args);
+    if (msgText.empty())
         { return false; }
 
     // extract items
@@ -6421,8 +6418,8 @@ bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
 {
     /// format: "subject text" "mail text" money
 
-    char* msgSubject = ExtractQuotedArg(&args);
-    if (!msgSubject)
+    std::string  msgSubject = ExtractQuotedArg(&args);
+    if (msgSubject.empty())
         { return false; }
 
     char* msgText = ExtractQuotedArg(&args);

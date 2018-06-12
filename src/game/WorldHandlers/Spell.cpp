@@ -148,7 +148,7 @@ void SpellCastTargets::Update(Unit* caster)
 {
     m_GOTarget   = m_GOTargetGUID ? caster->GetMap()->GetGameObject(m_GOTargetGUID) : NULL;
     m_unitTarget = m_unitTargetGUID ?
-                   (m_unitTargetGUID == caster->GetObjectGuid() ? caster : ObjectAccessor::GetUnit(*caster, m_unitTargetGUID)) :
+                   (m_unitTargetGUID == caster->GetObjectGuid() ? caster : sObjectAccessor.GetUnit(*caster, m_unitTargetGUID)) :
                        NULL;
 
     m_itemTarget = NULL;
@@ -304,7 +304,7 @@ Spell::Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid or
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         { m_currentBasePoints[i] = m_spellInfo->CalculateSimpleValue(SpellEffectIndex(i)); }
 
-    m_spellState = SPELL_STATE_PREPARING;
+    m_spellState = SPELL_STATE_CREATED;
 
     m_castPositionX = m_castPositionY = m_castPositionZ = 0;
     m_TriggerSpells.clear();
@@ -450,7 +450,7 @@ void Spell::FillTargetMap()
                             {
                                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                                 {
-                                    if (Unit* target = ObjectAccessor::Instance().GetUnit(*m_caster, ((Player*)m_caster)->GetSelectionGuid()))
+                                    if (Unit* target = sObjectAccessor.Instance().GetUnit(*m_caster, ((Player*)m_caster)->GetSelectionGuid()))
                                     {
                                         if (!m_caster->IsFriendlyTo(target))
                                             { tmpUnitLists[i /*==effToIndex[i]*/].push_back(target); }
@@ -830,7 +830,7 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
 
 void Spell::AddUnitTarget(ObjectGuid unitGuid, SpellEffectIndex effIndex)
 {
-    if (Unit* unit = m_caster->GetObjectGuid() == unitGuid ? m_caster : ObjectAccessor::GetUnit(*m_caster, unitGuid))
+    if (Unit* unit = m_caster->GetObjectGuid() == unitGuid ? m_caster : sObjectAccessor.GetUnit(*m_caster, unitGuid))
         { AddUnitTarget(unit, effIndex); }
 }
 
@@ -918,7 +918,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     // Get mask of effects for target
     uint32 mask = target->effectMask;
 
-    Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
+    Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, target->targetGUID);
     if (!unit)
         { return; }
 
@@ -1365,7 +1365,7 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo* target)
     // Get mask of effects for target
     uint32 mask = target->effectMask;
 
-    Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
+    Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, target->targetGUID);
     if (!unit)
         { return; }
 
@@ -1448,7 +1448,7 @@ bool Spell::IsAliveUnitPresentInTargetList()
     {
         if (ihit->missCondition == SPELL_MISS_NONE && (needAliveTargetMask & ihit->effectMask))
         {
-            Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
+            Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, ihit->targetGUID);
 
             // either unit is alive and normal spell, or unit dead and deathonly-spell
             if (unit && (unit->IsAlive() != IsDeathOnlySpell(m_spellInfo)))
@@ -1575,17 +1575,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     Cell::VisitAllObjects(m_caster, searcher, max_range);
                     break;
                 }
+				case TARGET_RANDOM_UNIT_CHAIN_IN_AREA: // This works the same as Target_random_friend_chain_in_area but is named differently for some reason
                 case TARGET_RANDOM_FRIEND_CHAIN_IN_AREA:
                 {
                     MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(m_caster, max_range);
                     MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(tempTargetUnitMap, u_check);
-                    Cell::VisitAllObjects(m_caster, searcher, max_range);
-                    break;
-                }
-                case TARGET_RANDOM_UNIT_CHAIN_IN_AREA:
-                {
-                    MaNGOS::AnyUnitInObjectRangeCheck u_check(m_caster, max_range);
-                    MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(tempTargetUnitMap, u_check);
                     Cell::VisitAllObjects(m_caster, searcher, max_range);
                     break;
                 }
@@ -2330,7 +2324,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                                         break;
                                     case TYPEID_CORPSE:
                                         m_targets.setCorpseTarget((Corpse*)result);
-                                        if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGuid()))
+                                        if (Player* owner = sObjectAccessor.FindPlayer(((Corpse*)result)->GetOwnerGuid()))
                                             { targetUnitMap.push_back(owner); }
                                         break;
                                 }
@@ -2389,7 +2383,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (m_targets.getCorpseTargetGuid())
                     {
                         if (Corpse* corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGuid()))
-                            if (Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGuid()))
+                            if (Player* owner = sObjectAccessor.FindPlayer(corpse->GetOwnerGuid()))
                                 { targetUnitMap.push_back(owner); }
                     }
                     break;
@@ -2454,7 +2448,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     else if (m_targets.getCorpseTargetGuid())
                     {
                         if (Corpse* corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGuid()))
-                            if (Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGuid()))
+                            if (Player* owner = sObjectAccessor.FindPlayer(corpse->GetOwnerGuid()))
                                 { targetUnitMap.push_back(owner); }
                     }
                     break;
@@ -2550,8 +2544,6 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
 {
     m_targets = *targets;
 
-    m_spellState = SPELL_STATE_PREPARING;
-
     m_castPositionX = m_caster->GetPositionX();
     m_castPositionY = m_caster->GetPositionY();
     m_castPositionZ = m_caster->GetPositionZ();
@@ -2594,6 +2586,8 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
         finish(false);
         return;
     }
+
+    m_spellState = SPELL_STATE_PREPARING;
 
     // Prepare data for triggers
     prepareDataForTriggerSystem();
@@ -2664,7 +2658,7 @@ void Spell::cancel()
             {
                 if (ihit->missCondition == SPELL_MISS_NONE)
                 {
-                    Unit* unit = m_caster->GetObjectGuid() == (*ihit).targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
+                    Unit* unit = m_caster->GetObjectGuid() == (*ihit).targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, ihit->targetGUID);
                     if (unit && unit->IsAlive())
                         { unit->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid()); }
                 }
@@ -3120,7 +3114,19 @@ void Spell::update(uint32 difftime)
 
                     // check if player has turned if flag is set
                     if (m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_TURNING && m_castOrientation != m_caster->GetOrientation())
-                        { cancel(); }
+                    {
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            if (static_cast<Player*>(m_caster)->GetMover()->GetObjectGuid() == m_caster->GetObjectGuid())
+                            {
+                                cancel();
+                            }
+                        }
+                        else
+                        {
+                            cancel();
+                        }
+                    }
                 }
 
                 // check if there are alive targets left
@@ -3153,7 +3159,7 @@ void Spell::update(uint32 difftime)
                             if (!target.targetGUID.IsCreature())
                                 { continue; }
 
-                            Unit* unit = m_caster->GetObjectGuid() == target.targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target.targetGUID);
+                            Unit* unit = m_caster->GetObjectGuid() == target.targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, target.targetGUID);
                             if (unit == NULL)
                                 { continue; }
 
@@ -3216,7 +3222,7 @@ void Spell::finish(bool ok)
             if (ihit->missCondition == SPELL_MISS_NONE)
             {
                 // check m_caster->GetGUID() let load auras at login and speedup most often case
-                Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
+                Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, ihit->targetGUID);
                 if (unit && unit->IsAlive())
                 {
                     SpellEntry const* auraSpellInfo = (*i)->GetSpellProto();
@@ -3650,7 +3656,7 @@ void Spell::SendChannelUpdate(uint32 time)
 
         ObjectGuid target_guid = m_caster->GetChannelObjectGuid();
         if (target_guid != m_caster->GetObjectGuid() && target_guid.IsUnit())
-            if (Unit* target = ObjectAccessor::GetUnit(*m_caster, target_guid))
+            if (Unit* target = sObjectAccessor.GetUnit(*m_caster, target_guid))
                 { target->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid()); }
 
         // Only finish channeling when latest channeled spell finishes
@@ -3684,7 +3690,7 @@ void Spell::SendChannelStart(uint32 duration)
             if ((itr->effectMask & (1 << EFFECT_INDEX_0)) && itr->reflectResult == SPELL_MISS_NONE &&
                 itr->targetGUID != m_caster->GetObjectGuid())
             {
-                target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID);
+                target = sObjectAccessor.GetUnit(*m_caster, itr->targetGUID);
                 break;
             }
         }
@@ -3962,7 +3968,7 @@ void Spell::HandleThreatSpells()
         if (ihit->missCondition != SPELL_MISS_NONE)
             { continue; }
 
-        Unit* target = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
+        Unit* target = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, ihit->targetGUID);
         if (!target)
             { continue; }
 
@@ -4930,7 +4936,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     { return SPELL_FAILED_SKILL_NOT_HIGH_ENOUGH; }
 
                 // chance for fail at orange skinning attempt
-                if ((m_selfContainer && (*m_selfContainer) == this) &&
+                if (m_spellState != SPELL_STATE_CREATED &&
                     skillValue < sWorld.GetConfigMaxSkillValue() &&
                     (ReqValue < 0 ? 0 : ReqValue) > irand(skillValue - 25, skillValue + 37))
                     { return SPELL_FAILED_TRY_AGAIN; }
@@ -4966,6 +4972,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                     lockId = go->GetGOInfo()->GetLockId();
                     if (!lockId)
                         { return SPELL_FAILED_ALREADY_OPEN; }
+
+                    // Is the lock within the spell max range?
+                    if (!IsLockInRange(go) && go->GetGoType() == GAMEOBJECT_TYPE_TRAP)
+                        { return SPELL_FAILED_OUT_OF_RANGE; }
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {
@@ -4994,7 +5004,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // chance for fail at orange mining/herb/LockPicking gathering attempt
                 // second check prevent fail at rechecks
                 // Check must be executed at the end of  the cast.
-                if (m_executedCurrently && skillId != SKILL_NONE)
+                if (m_spellState != SPELL_STATE_CREATED && skillId != SKILL_NONE)
                 {
                     bool canFailAtMax = skillId != SKILL_HERBALISM && skillId != SKILL_MINING;
 
@@ -6187,7 +6197,7 @@ void Spell::DelayedChannel()
     {
         if ((*ihit).missCondition == SPELL_MISS_NONE)
         {
-            if (Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
+            if (Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : sObjectAccessor.GetUnit(*m_caster, ihit->targetGUID))
                 { unit->DelaySpellAuraHolder(m_spellInfo->Id, delaytime, unit->GetObjectGuid()); }
         }
     }
@@ -6213,7 +6223,7 @@ void Spell::UpdateOriginalCasterPointer()
     }
     else
     {
-        Unit* unit = ObjectAccessor::GetUnit(*m_caster, m_originalCasterGUID);
+        Unit* unit = sObjectAccessor.GetUnit(*m_caster, m_originalCasterGUID);
         m_originalCaster = unit && unit->IsInWorld() ? unit : NULL;
     }
 }
@@ -6499,6 +6509,19 @@ void SpellEvent::Abort(uint64 /*e_time*/)
 bool SpellEvent::IsDeletable() const
 {
     return m_Spell->IsDeletable();
+}
+
+bool Spell::IsLockInRange(GameObject* go)
+{
+    const SpellRangeEntry* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
+
+	
+    // This check is not related to bounding radius
+    float dx = m_caster->GetPositionX() - go->GetPositionX();
+    float dy = m_caster->GetPositionY() - go->GetPositionY();
+    float dz = m_caster->GetPositionZ() - go->GetPositionZ();
+
+    return (dx * dx + dy * dy + dz * dz < srange->maxRange);
 }
 
 SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, SkillType& skillId, int32& reqSkillValue, int32& skillValue)

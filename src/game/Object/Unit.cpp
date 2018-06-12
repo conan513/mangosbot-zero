@@ -361,7 +361,10 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
     // update abilities available only for fraction of time
     UpdateReactives(update_diff);
 
-    ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth() * 0.20f);
+    if (IsAlive())
+    {
+        ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth() * 0.20f);
+    }
     UpdateSplineMovement(p_time);
     i_motionMaster.UpdateMotion(p_time);
 }
@@ -1771,28 +1774,35 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     DealDamage(pVictim, damageInfo->damage, &cleanDamage, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->damageSchoolMask), NULL, durabilityLoss);
 
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
-    if ((damageInfo->hitOutCome == MELEE_HIT_CRIT || damageInfo->hitOutCome == MELEE_HIT_CRUSHING || damageInfo->hitOutCome == MELEE_HIT_NORMAL || damageInfo->hitOutCome == MELEE_HIT_GLANCING) &&
-        GetTypeId() != TYPEID_PLAYER && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(M_PI_F, this))
-    {
-        // -probability is between 0% and 40%
-        // 20% base chance
-        float Probability = 20.0f;
+	if ((!damageInfo->absorb) && (damageInfo->hitOutCome == MELEE_HIT_CRIT || damageInfo->hitOutCome == MELEE_HIT_CRUSHING || damageInfo->hitOutCome == MELEE_HIT_NORMAL || damageInfo->hitOutCome == MELEE_HIT_GLANCING) &&
+		GetTypeId() != TYPEID_PLAYER && !((Creature*)this)->GetCharmerOrOwnerGuid() && !pVictim->HasInArc(M_PI_F, this))
+	{
+		// -probability is between 0% and 40%
+		// 20% base chance
+		float Probability = 20.0f;
 
-        // there is a newbie protection, at level 10 just 7% base chance; assuming linear function
-        if (pVictim->getLevel() < 30)
-            { Probability = 0.65f * pVictim->getLevel() + 0.5f; }
+			// there is a newbie protection, at level 10 just 7% base chance; assuming linear function
+			if (pVictim->getLevel() < 30)
+			{
+				Probability = 0.65f * pVictim->getLevel() + 0.5f;
+			}
 
-        uint32 VictimDefense = pVictim->GetDefenseSkillValue();
-        uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
+			uint32 VictimDefense = pVictim->GetDefenseSkillValue();
+			uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
 
-        Probability *= AttackerMeleeSkill / (float)VictimDefense;
+			Probability *= AttackerMeleeSkill / (float)VictimDefense;
 
-        if (Probability > 40.0f)
-            { Probability = 40.0f; }
+			if (Probability > 40.0f)
+			{
+				Probability = 40.0f;
+			}
 
-        if (roll_chance_f(Probability))
-            { CastSpell(pVictim, 1604, true); }
-    }
+			if (roll_chance_f(Probability))
+			{
+				CastSpell(pVictim, 1604, true);
+			}
+
+		}
 
     // update at damage Judgement aura duration that applied by attacker at victim
     if (damageInfo->damage)
@@ -5207,14 +5217,14 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
 Unit* Unit::GetOwner() const
 {
     if (ObjectGuid ownerid = GetOwnerGuid())
-        { return ObjectAccessor::GetUnit(*this, ownerid); }
+        { return sObjectAccessor.GetUnit(*this, ownerid); }
     return NULL;
 }
 
 Unit* Unit::GetCharmer() const
 {
     if (ObjectGuid charmerid = GetCharmerGuid())
-        { return ObjectAccessor::GetUnit(*this, charmerid); }
+        { return sObjectAccessor.GetUnit(*this, charmerid); }
     return NULL;
 }
 
@@ -5230,7 +5240,7 @@ Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself()
 {
     ObjectGuid guid = GetCharmerOrOwnerGuid();
     if (guid.IsPlayer())
-        { return ObjectAccessor::FindPlayer(guid); }
+        { return sObjectAccessor.FindPlayer(guid); }
 
     return GetTypeId() == TYPEID_PLAYER ? (Player*)this : NULL;
 }
@@ -5239,7 +5249,7 @@ Player const* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
 {
     ObjectGuid guid = GetCharmerOrOwnerGuid();
     if (guid.IsPlayer())
-        { return ObjectAccessor::FindPlayer(guid); }
+        { return sObjectAccessor.FindPlayer(guid); }
 
     return GetTypeId() == TYPEID_PLAYER ? (Player const*)this : NULL;
 }
@@ -5267,7 +5277,7 @@ Unit* Unit::GetCharm() const
 {
     if (ObjectGuid charm_guid = GetCharmGuid())
     {
-        if (Unit* pet = ObjectAccessor::GetUnit(*this, charm_guid))
+        if (Unit* pet = sObjectAccessor.GetUnit(*this, charm_guid))
             { return pet; }
 
         sLog.outError("Unit::GetCharm: Charmed %s not exist.", charm_guid.GetString().c_str());
@@ -6640,8 +6650,8 @@ int32 Unit::ModifyHealth(int32 dVal)
 
     int32 maxHealth = (int32)GetMaxHealth();
 
-	int32 gain;
-	if (val < maxHealth)
+    int32 gain;
+    if (val < maxHealth)
     {
         SetHealth(val);
         gain = val - curHealth;
@@ -6671,7 +6681,7 @@ int32 Unit::ModifyPower(Powers power, int32 dVal)
 
     int32 maxPower = (int32)GetMaxPower(power);
 
-	int32 gain;
+    int32 gain;
     if (val < maxPower)
     {
         SetPower(power, val);
@@ -7613,7 +7623,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         return false;
     }
 
-	float val;
+    float val;
 
     switch (modifierType)
     {
@@ -8794,8 +8804,8 @@ bool Unit::IsStandState() const
 
 bool Unit::IsSeatedState() const
 {
-	uint8 standState = getStandState();
-	return standState != UNIT_STAND_STATE_SLEEP && standState != UNIT_STAND_STATE_STAND;
+    uint8 standState = getStandState();
+    return standState != UNIT_STAND_STATE_SLEEP && standState != UNIT_STAND_STATE_STAND;
 }
 
 void Unit::SetStandState(uint8 state)

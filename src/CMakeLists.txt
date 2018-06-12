@@ -31,11 +31,6 @@ add_subdirectory(framework)
 # Build the mangos shared library
 add_subdirectory(shared)
 
-# Build the mangos realm authentication server
-if(BUILD_REALMD)
-    add_subdirectory(realmd)
-endif()
-
 if(BUILD_MANGOSD)
     # Build the mangos game library
     add_subdirectory(game)
@@ -47,6 +42,11 @@ if(BUILD_MANGOSD)
     add_subdirectory(modules)
 endif()
 
+# Build the mangos realm authentication server
+if(BUILD_REALMD)
+    add_subdirectory(realmd)
+endif()
+
 # If we want the tools for map/vmap/mmap extraction
 if(BUILD_TOOLS)
     add_subdirectory(tools)
@@ -55,3 +55,17 @@ endif()
 if(TESTS)
   add_subdirectory(test)
 endif(TESTS)
+
+if (BUILD_MANGOSD OR BUILD_REALMD)
+if(WIN32 AND MSVC)
+  get_filename_component(MYSQL_LIB_DIR ${MYSQL_LIBRARY} DIRECTORY)
+  get_filename_component(MYSQL_LIB_DLL ${MYSQL_LIBRARY} NAME)
+  STRING(REPLACE ".lib" ".dll" MYSQL_LIB_DLL ${MYSQL_LIB_DLL})
+  install(FILES ${MYSQL_LIB_DIR}/${MYSQL_LIB_DLL} DESTINATION ${BIN_DIR})
+  if (OPENSSL_VERSION VERSION_EQUAL "1.1")
+    install(FILES ${OPENSSL_ROOT_DIR}/libcrypto-1_1.dll DESTINATION ${BIN_DIR} OPTIONAL)
+  else()
+    install(FILES ${OPENSSL_ROOT_DIR}/libeay32.dll DESTINATION ${BIN_DIR} OPTIONAL)
+  endif()
+endif()
+endif()

@@ -1749,8 +1749,8 @@ bool Map::ScriptsStart(DBScriptType type, uint32 id, Object* source, Object* tar
         for (ScriptScheduleMap::const_iterator searchItr = m_scriptSchedule.begin(); searchItr != m_scriptSchedule.end(); ++searchItr)
         {
             if (searchItr->second.IsSameScript(type, id,
-                                               execParams & SCRIPT_EXEC_PARAM_UNIQUE_BY_SOURCE ? sourceGuid : ObjectGuid(),
-                                               execParams & SCRIPT_EXEC_PARAM_UNIQUE_BY_TARGET ? targetGuid : ObjectGuid(), ownerGuid))
+                                               (execParams & SCRIPT_EXEC_PARAM_UNIQUE_BY_SOURCE) ? sourceGuid : ObjectGuid(),
+                                               (execParams & SCRIPT_EXEC_PARAM_UNIQUE_BY_TARGET) ? targetGuid : ObjectGuid(), ownerGuid))
             {
                 DEBUG_LOG("DB-SCRIPTS: Process table `dbscripts [type=%d]` id %u. Skip script as script already started for source %s, target %s - ScriptsStartParams %u", type, id, sourceGuid.GetString().c_str(), targetGuid.GetString().c_str(), execParams);
                 return true;
@@ -1839,7 +1839,7 @@ void Map::ScriptsProcess()
  */
 Player* Map::GetPlayer(ObjectGuid guid)
 {
-    Player* plr = ObjectAccessor::FindPlayer(guid);         // return only in world players
+    Player* plr = sObjectAccessor.FindPlayer(guid);         // return only in world players
     return plr && plr->GetMap() == this ? plr : NULL;
 }
 
@@ -1872,7 +1872,7 @@ Pet* Map::GetPet(ObjectGuid guid)
  */
 Corpse* Map::GetCorpse(ObjectGuid guid)
 {
-    Corpse* ret = ObjectAccessor::GetCorpseInMap(guid, GetId());
+    Corpse* ret = sObjectAccessor.GetCorpseInMap(guid, GetId());
     return ret && ret->GetInstanceId() == GetInstanceId() ? ret : NULL;
 }
 

@@ -38,8 +38,9 @@ class TemporarySummon : public Creature
         void Summon(TempSummonType type, uint32 lifetime);
         void  UnSummon();
         void SaveToDB() override;
+        virtual void RemoveFromWorld() override;
         ObjectGuid const& GetSummonerGuid() const { return m_summoner ; }
-        Unit* GetSummoner() const { return ObjectAccessor::GetUnit(*this, m_summoner); }
+        Unit* GetSummoner() const { return sObjectAccessor.GetUnit(*this, m_summoner); }
     private:
         TempSummonType m_type;
         uint32 m_timer;

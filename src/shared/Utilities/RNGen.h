@@ -3,7 +3,6 @@
  * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
  *
  * Copyright (C) 2005-2018  MaNGOS project <https://getmangos.eu>
- * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +22,58 @@
  * and lore are copyrighted by Blizzard Entertainment, Inc.
  */
 
-#ifndef _AUTH_SARC4_H
-#define _AUTH_SARC4_H
+#ifndef MANGOS_RNG_H
+#define MANGOS_RNG_H
 
-#include <openssl/evp.h>
-#include "Common/Common.h"
+#include <random>
 
-class ARC4
+#include "ace/Singleton.h"
+#include "ace/Synch_Traits.h"
+#include "Platform/Define.h"
+
+class RNGen
 {
-    public:
-        ARC4(uint8 len);
-        ARC4(uint8 *seed, uint8 len);
-        ~ARC4();
-        void Init(uint8 *seed);
-        void UpdateData(int len, uint8 *data);
-    private:
-        EVP_CIPHER_CTX* m_ctx;
+public:
+    RNGen()
+    {
+        std::random_device rd;
+        gen_.seed(rd());
+    }
+
+    int32 rand_i(int32 min, int32 max)
+    {
+        std::uniform_int_distribution<int32> dist{min, max};
+        return dist(gen_);
+    }
+
+    uint32 rand_u(uint32 min, uint32 max)
+    {
+        std::uniform_int_distribution<uint32> dist{min, max};
+        return dist(gen_);
+    }
+
+    uint32 rand()
+    {
+        std::uniform_int_distribution<uint32> dist;
+        return dist(gen_);
+    }
+
+    float rand_f(float min, float max)
+    {
+        std::uniform_real_distribution<float> dist{min, max};
+        return dist(gen_);
+    }
+
+    double rand_d(double min, double max)
+    {
+        std::uniform_real_distribution<double> dist{min, max};
+        return dist(gen_);
+    }
+
+private:
+    std::mt19937 gen_;
 };
+
+typedef ACE_TSS_Singleton<RNGen, ACE_SYNCH_MUTEX> RNG;
 
 #endif

@@ -40,7 +40,7 @@
 #include "ObjectAccessor.h"
 #include "Policies/Singleton.h"
 #include "Totem.h"
-#include "Creature.h"
+#include "TemporarySummon.h"
 #include "BattleGround/BattleGround.h"
 #include "OutdoorPvP/OutdoorPvP.h"
 #include "CreatureAI.h"
@@ -353,7 +353,7 @@ SingleEnemyTargetAura::~SingleEnemyTargetAura()
 
 Unit* SingleEnemyTargetAura::GetTriggerTarget() const
 {
-    return ObjectAccessor::GetUnit(*(m_spellAuraHolder->GetTarget()), m_castersTargetGuid);
+    return sObjectAccessor.GetUnit(*(m_spellAuraHolder->GetTarget()), m_castersTargetGuid);
 }
 
 Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32* currentBasePoints, SpellAuraHolder* holder, Unit* target, Unit* caster, Item* castItem)
@@ -1244,6 +1244,21 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
         switch (GetId())
         {
+            case 126:                                       // Eye of Killrog
+            {
+                Unit* caster = GetCaster();
+                if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                  { return; }
+                TemporarySummon* eye = static_cast<TemporarySummon*>(caster->GetCharm());
+                if (eye)
+                {
+                    if (eye->GetUInt32Value(UNIT_CREATED_BY_SPELL) == GetId())
+                    {
+                        eye->UnSummon();
+                    }
+                }
+                return;
+            }
             case 10255:                                     // Stoned
             {
                 if (Unit* caster = GetCaster())
@@ -4224,7 +4239,7 @@ void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
     // combo points was added in SPELL_EFFECT_ADD_COMBO_POINTS handler
     // remove only if aura expire by time (in case combo points amount change aura removed without combo points lost)
     if (!apply && m_removeMode == AURA_REMOVE_BY_EXPIRE && target->GetComboTargetGuid())
-        if (Unit* unit = ObjectAccessor::GetUnit(*GetTarget(), target->GetComboTargetGuid()))
+        if (Unit* unit = sObjectAccessor.GetUnit(*GetTarget(), target->GetComboTargetGuid()))
             { target->AddComboPoints(unit, -m_modifier.m_amount); }
 }
 
@@ -5252,7 +5267,7 @@ Unit* SpellAuraHolder::GetCaster() const
     if (GetCasterGuid() == m_target->GetObjectGuid())
         { return m_target; }
 
-    return ObjectAccessor::GetUnit(*m_target, m_casterGuid);// player will search at any maps
+    return sObjectAccessor.GetUnit(*m_target, m_casterGuid);// player will search at any maps
 }
 
 bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const

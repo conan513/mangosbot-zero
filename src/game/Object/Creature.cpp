@@ -594,16 +594,17 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         }
         case ALIVE:
         {
-            Unit* charmer = GetCharmer();
-            if (GetCharmerGuid() && (!charmer || (!IsWithinDistInMap(charmer, GetMap()->GetVisibilityDistance()) &&
-                (charmer->GetCharmGuid() == GetObjectGuid()))))
+            if (GetCharmerGuid())
             {
-                if (charmer)
-                  { charmer->Uncharm(); }
-                ForcedDespawn();
-                return;
+                Unit* charmer = GetCharmer();
+                if (!charmer || (!IsWithinDistInMap(charmer, GetMap()->GetVisibilityDistance()) && (charmer->GetCharmGuid() == GetObjectGuid())))
+                {
+                    if (charmer)
+                        { charmer->Uncharm(); }
+                    ForcedDespawn();
+                    return;
+                }
             }
-
             if (m_aggroDelay <= update_diff)
                 m_aggroDelay = 0;
             else
@@ -1040,7 +1041,7 @@ void Creature::PrepareBodyLootState()
  */
 Player* Creature::GetOriginalLootRecipient() const
 {
-    return m_lootRecipientGuid ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
+    return m_lootRecipientGuid ? sObjectAccessor.FindPlayer(m_lootRecipientGuid) : NULL;
 }
 
 /**
