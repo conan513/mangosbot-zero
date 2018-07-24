@@ -7,6 +7,7 @@
 #include "../../FleeManager.h"
 #include "../../LootObjectStack.h"
 #include "../../PlayerbotAIConfig.h"
+#include "MotionGenerators/TargetedMovementGenerator.h"
 
 using namespace ai;
 
@@ -62,8 +63,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z)
 
         bool generatePath = !bot->IsFlying() && !bot->IsUnderWater();
         MotionMaster &mm = *bot->GetMotionMaster();
-        mm.Clear();
-
         mm.MovePoint(mapId, x, y, z, generatePath);
 
         AI_VALUE(LastMovement&, "last movement").Set(x, y, z, bot->GetOrientation());
@@ -208,9 +207,15 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         ai->InterruptSpell();
     }
 
-    mm.MoveFollow(target, distance, angle);
-
     AI_VALUE(LastMovement&, "last movement").Set(target);
+
+    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+    {
+        Unit *currentTarget = static_cast<ChaseMovementGenerator<Player> const*>(bot->GetMotionMaster()->GetCurrent())->GetTarget();
+        if (currentTarget && currentTarget->GetObjectGuid() == target->GetObjectGuid()) return false;
+    }
+
+    mm.MoveFollow(target, distance, angle);
     return true;
 }
 

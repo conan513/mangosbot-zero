@@ -31,11 +31,6 @@ add_subdirectory(framework)
 # Build the mangos shared library
 add_subdirectory(shared)
 
-# Build the mangos realm authentication server
-if(BUILD_REALMD)
-    add_subdirectory(realmd)
-endif()
-
 if(BUILD_MANGOSD)
     # Build the mangos game library
     add_subdirectory(game)
@@ -47,6 +42,11 @@ if(BUILD_MANGOSD)
     add_subdirectory(modules)
 endif()
 
+# Build the mangos realm authentication server
+if(BUILD_REALMD)
+    add_subdirectory(realmd)
+endif()
+
 # If we want the tools for map/vmap/mmap extraction
 if(BUILD_TOOLS)
     add_subdirectory(tools)
@@ -55,7 +55,6 @@ endif()
 if(TESTS)
   add_subdirectory(test)
 endif(TESTS)
-
 
 if (BUILD_MANGOSD OR BUILD_REALMD)
 if(WIN32 AND MSVC)

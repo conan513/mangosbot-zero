@@ -49,6 +49,7 @@
 #include "WhoAction.h"
 #include "SaveManaAction.h"
 #include "../values/Formations.h"
+#include "CustomStrategyEditAction.h"
 #include "DebugAction.h"
 #include "GoAction.h"
 #include "MailAction.h"
@@ -57,6 +58,7 @@
 #include "SkipSpellsListAction.h"
 #include "../Bots/playerbot/strategy/druid/DruidActions.h"
 #include "../Bots/playerbot/strategy/rogue/RogueActions.h"
+#include "CustomStrategyEditAction.h"
 
 namespace ai
 {
@@ -131,10 +133,12 @@ namespace ai
             creators["mail"] = &ChatActionContext::mail;
             creators["go"] = &ChatActionContext::go;
             creators["debug"] = &ChatActionContext::debug;
+            creators["cs"] = &ChatActionContext::cs;
 			//creators["poisoning"] = &ChatActionContext::poisoning;
         }
 
     private:
+        static Action* cs(PlayerbotAI* ai) { return new CustomStrategyEditAction(ai); }
 		//static Action* poisoning(PlayerbotAI* ai) { return new UseItemAction(ai, "poisoning"); }
         static Action* debug(PlayerbotAI* ai) { return new DebugAction(ai); }
         static Action* prowl(PlayerbotAI* ai) { return new CastProwlAction(ai); }

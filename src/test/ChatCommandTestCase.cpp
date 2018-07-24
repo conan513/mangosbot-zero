@@ -76,6 +76,7 @@ class ChatCommandTestCase : public MockedAiObjectContextTestCase
       CPPUNIT_TEST( mail );
       CPPUNIT_TEST( ready );
       CPPUNIT_TEST( debug );
+      CPPUNIT_TEST( cs );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -503,6 +504,11 @@ protected:
     void debug()
     {
         assertParametrizedCommand("debug", "debug");
+    }
+
+    void cs()
+    {
+        assertParametrizedCommand("cs", "cs");
     }
 };
 

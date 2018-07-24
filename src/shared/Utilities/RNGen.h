@@ -22,22 +22,58 @@
  * and lore are copyrighted by Blizzard Entertainment, Inc.
  */
 
-#ifndef MANGOS_H_REVISION
-#define MANGOS_H_REVISION
-    #define REVISION_NR "2114081"
+#ifndef MANGOS_RNG_H
+#define MANGOS_RNG_H
 
-    #define REALMD_DB_VERSION_NR 21
-    #define REALMD_DB_STRUCTURE_NR 1
-    #define REALMD_DB_CONTENT_NR 4
-    #define REALMD_DB_UPDATE_DESCRIPTION "Remove dbDocs"
+#include <random>
 
-    #define CHAR_DB_VERSION_NR 21
-    #define CHAR_DB_STRUCTURE_NR 5
-    #define CHAR_DB_CONTENT_NR 4
-    #define CHAR_DB_UPDATE_DESCRIPTION "Remove dbDocs"
+#include "ace/Singleton.h"
+#include "ace/Synch_Traits.h"
+#include "Platform/Define.h"
 
-    #define WORLD_DB_VERSION_NR 21
-    #define WORLD_DB_STRUCTURE_NR 14
-    #define WORLD_DB_CONTENT_NR 81
-    #define WORLD_DB_UPDATE_DESCRIPTION "NPC_12481_model_update"
-#endif // __REVISION_H__
+class RNGen
+{
+public:
+    RNGen()
+    {
+        std::random_device rd;
+        gen_.seed(rd());
+    }
+
+    int32 rand_i(int32 min, int32 max)
+    {
+        std::uniform_int_distribution<int32> dist{min, max};
+        return dist(gen_);
+    }
+
+    uint32 rand_u(uint32 min, uint32 max)
+    {
+        std::uniform_int_distribution<uint32> dist{min, max};
+        return dist(gen_);
+    }
+
+    uint32 rand()
+    {
+        std::uniform_int_distribution<uint32> dist;
+        return dist(gen_);
+    }
+
+    float rand_f(float min, float max)
+    {
+        std::uniform_real_distribution<float> dist{min, max};
+        return dist(gen_);
+    }
+
+    double rand_d(double min, double max)
+    {
+        std::uniform_real_distribution<double> dist{min, max};
+        return dist(gen_);
+    }
+
+private:
+    std::mt19937 gen_;
+};
+
+typedef ACE_TSS_Singleton<RNGen, ACE_SYNCH_MUTEX> RNG;
+
+#endif

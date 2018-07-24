@@ -49,6 +49,9 @@ Item* ItemForSpellValue::Calculate()
         return NULL;
     }
 
+    if (!(spellInfo->Targets & TARGET_FLAG_ITEM))
+        return NULL;
+
     for( uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++ ) {
         itemForSpell = GetItemFitsToSpellRequirements(slot, spellInfo);
         if (itemForSpell)

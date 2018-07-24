@@ -5,8 +5,10 @@
 
 using namespace ai;
 
-WorldLocation ArrowFormation::GetLocation()
+WorldLocation ArrowFormation::GetLocationInternal()
 {
+    if (!bot->GetGroup()) return Formation::NullLocation;
+
     Build();
 
     int tankLines = 1 + tanks.Size() / 6;
@@ -20,12 +22,13 @@ WorldLocation ArrowFormation::GetLocation()
     MultiLineUnitPlacer placer(orientation);
 
     tanks.PlaceUnits(&placer);
+    tanks.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset = tankLines * sPlayerbotAIConfig.followDistance;
+    offset += tankLines * sPlayerbotAIConfig.followDistance;
     melee.PlaceUnits(&placer);
     melee.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += meleeLines * sPlayerbotAIConfig.followDistance + sPlayerbotAIConfig.tooCloseDistance;
+    offset += meleeLines * sPlayerbotAIConfig.followDistance;
     ranged.PlaceUnits(&placer);
     ranged.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 

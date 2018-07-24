@@ -277,5 +277,5 @@ void EmoteAction::InitEmotes()
 bool EmoteAction::isUseful()
 {
     time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
-    return (time(0) - lastEmote) >= sPlayerbotAIConfig.maxWaitForMove / 1000;
+    return (time(0) - lastEmote) >= sPlayerbotAIConfig.repeatDelay / 1000;
 }

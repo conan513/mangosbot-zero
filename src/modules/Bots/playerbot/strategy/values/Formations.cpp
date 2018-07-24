@@ -18,6 +18,38 @@ bool Formation::IsNullLocation(WorldLocation const& loc)
 }
 
 
+WorldLocation MoveAheadFormation::GetLocation()
+{
+    Player* master = GetMaster();
+    if (!master)
+        return WorldLocation();
+
+    WorldLocation loc = GetLocationInternal();
+    if (Formation::IsNullLocation(loc))
+        return loc;
+
+    float x = loc.coord_x;
+    float y = loc.coord_y;
+    float z = loc.coord_z;
+
+    if (master->isMoving()) {
+        float ori = master->GetOrientation();
+        float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
+        float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
+        float ground = master->GetMap()->GetHeight(x1, y1, z + 0.5f);
+        if (ground > INVALID_HEIGHT)
+        {
+            x = x1;
+            y = y1;
+        }
+    }
+    float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
+    if (ground <= INVALID_HEIGHT)
+        return Formation::NullLocation;
+
+    return WorldLocation(master->GetMapId(), x, y, ground + 0.5f);
+}
+
 namespace ai
 {
     class MeleeFormation : public FollowFormation
@@ -34,11 +66,11 @@ namespace ai
         virtual string GetTargetName() { return "line target"; }
     };
 
-    class NearFormation : public MoveFormation
+    class NearFormation : public MoveAheadFormation
     {
     public:
-        NearFormation(PlayerbotAI* ai) : MoveFormation(ai, "near") {}
-        virtual WorldLocation GetLocation()
+        NearFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "near") {}
+        virtual WorldLocation GetLocationInternal()
         {
             Player* master = GetMaster();
             if (!master)
@@ -49,17 +81,6 @@ namespace ai
             float x = master->GetPositionX() + cos(angle) * range;
             float y = master->GetPositionY() + sin(angle) * range;
             float z = master->GetPositionZ();
-            if (master->isMoving()) {
-                float ori = master->GetOrientation();
-                float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
-                float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
-                float ground = master->GetMap()->GetHeight(x1, y1, z + 0.5f);
-                if (ground > INVALID_HEIGHT)
-                {
-                    x = x1;
-                    y = y1;
-                }
-            }
             float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
@@ -71,20 +92,29 @@ namespace ai
     };
 
 
-    class ChaosFormation : public MoveFormation
+    class ChaosFormation : public MoveAheadFormation
     {
     public:
-        ChaosFormation(PlayerbotAI* ai) : MoveFormation(ai, "chaos") {}
-        virtual WorldLocation GetLocation()
+        ChaosFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "chaos"), lastChangeTime(0) {}
+        virtual WorldLocation GetLocationInternal()
         {
             Player* master = GetMaster();
             if (!master)
                 return WorldLocation();
 
-            float range = sPlayerbotAIConfig.lootDistance * (float)(rand() % 10) / 10;
+            float range = sPlayerbotAIConfig.followDistance;
 			float angle = GetFollowAngle();
-            float x = master->GetPositionX() + cos(angle) * range;
-            float y = master->GetPositionY() + sin(angle) * range;
+
+            time_t now = time(0);
+            if (!lastChangeTime || now - lastChangeTime >= 3) {
+                lastChangeTime = now;
+                dx = (urand(0, 10) / 10.0 - 0.5) * sPlayerbotAIConfig.tooCloseDistance;
+                dy = (urand(0, 10) / 10.0 - 0.5) * sPlayerbotAIConfig.tooCloseDistance;
+                dr = sqrt(dx*dx + dy*dy);
+            }
+
+            float x = master->GetPositionX() + cos(angle) * range + dx;
+            float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
             float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
             if (ground <= INVALID_HEIGHT)
@@ -93,7 +123,11 @@ namespace ai
             return WorldLocation(master->GetMapId(), x, y, ground + 0.5f);
         }
 
-        virtual float GetMaxDistance() { return sPlayerbotAIConfig.lootDistance; }
+        virtual float GetMaxDistance() { return sPlayerbotAIConfig.followDistance + dr; }
+
+    private:
+        time_t lastChangeTime;
+        float dx = 0, dy = 0, dr = 0;
     };
 
     class CircleFormation : public MoveFormation
@@ -142,11 +176,11 @@ namespace ai
         }
     };
 
-    class LineFormation : public MoveFormation
+    class LineFormation : public MoveAheadFormation
     {
     public:
-        LineFormation(PlayerbotAI* ai) : MoveFormation(ai, "line") {}
-        virtual WorldLocation GetLocation()
+        LineFormation(PlayerbotAI* ai) : MoveAheadFormation(ai, "line") {}
+        virtual WorldLocation GetLocationInternal()
         {
             Group* group = bot->GetGroup();
             if (!group)

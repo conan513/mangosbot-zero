@@ -17,26 +17,30 @@ bool TradeAction::Execute(Event event)
         bot->GetSession()->QueuePacket(packet);
     }
 
-    int8 slot = -1;
-
+    size_t pos = text.rfind(" ");
+    int count = pos!=string::npos ? atoi(text.substr(pos + 1).c_str()) : 1;
     list<Item*> found = parseItems(text);
     if (found.empty())
         return false;
 
+    int traded = 0;
     for (list<Item*>::iterator i = found.begin(); i != found.end(); i++)
-        TradeItem(**i, slot);
+    {
+        Item* item = *i;
+
+        if (!bot->GetTrader() || item->IsInTrade())
+            continue;
+
+        int8 slot = item->CanBeTraded() ? -1 : TRADE_SLOT_NONTRADED;
+        if (TradeItem(*item, slot) && slot != TRADE_SLOT_NONTRADED && ++traded >= count)
+            break;
+    }
 
     return true;
 }
 
 bool TradeAction::TradeItem(const Item& item, int8 slot)
 {
-    if (!bot->GetTrader() || item.IsInTrade())
-        return false;
-
-    if (!item.CanBeTraded() && slot != TRADE_SLOT_NONTRADED)
-        slot = TRADE_SLOT_NONTRADED;
-
     int8 tradeSlot = -1;
     Item* itemPtr = const_cast<Item*>(&item);
 

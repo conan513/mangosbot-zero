@@ -36,6 +36,14 @@ namespace ai
         WorldLocation MoveSingleLine(vector<Player*> line, float diff, float cx, float cy, float cz, float orientation, float range);
     };
 
+    class MoveAheadFormation : public MoveFormation
+    {
+    public:
+        MoveAheadFormation(PlayerbotAI* ai, string name) : MoveFormation(ai, name) {}
+        virtual WorldLocation GetLocation();
+        virtual WorldLocation GetLocationInternal() { return NullLocation; }
+    };
+
     class FormationValue : public ManualSetValue<Formation*>
 	{
 	public:

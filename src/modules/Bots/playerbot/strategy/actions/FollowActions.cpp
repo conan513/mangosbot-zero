@@ -45,7 +45,7 @@ bool FollowAction::isUseful()
         if (Formation::IsNullLocation(loc) || bot->GetMapId() != loc.mapid)
             return false;
 
-        distance = bot->GetDistance(loc.coord_x, loc.coord_y, loc.coord_z);
+        distance = bot->GetDistance2d(loc.coord_x, loc.coord_y);
     }
 
     return distance > formation->GetMaxDistance() &&

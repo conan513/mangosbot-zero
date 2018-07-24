@@ -27,11 +27,11 @@ public:
 		EngineTestBase::setUp();
 
 		CustomStrategy::actionLinesCache["say"] = R"(
-(NULL, 'say', 'critical health>say::critical health|99'),
-(NULL, 'say', 'low health>say::low health|99'),
-(NULL, 'say', 'low mana>say::low mana|99'),
-(NULL, 'say', 'tank aoe>say::taunt|99'),
-(NULL, 'say', 'medium aoe>say::aoe|99');
+(NULL, 'say', 'critical health>say::critical health!99'),
+(NULL, 'say', 'low health>say::low health!99'),
+(NULL, 'say', 'low mana>say::low mana!99'),
+(NULL, 'say', 'tank aoe>say::taunt!99'),
+(NULL, 'say', 'medium aoe>say::aoe!99');
         )";
     }
 

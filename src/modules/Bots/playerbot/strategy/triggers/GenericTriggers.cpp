@@ -109,7 +109,7 @@ bool SpellCanBeCastTrigger::IsActive()
 
 bool RandomTrigger::IsActive()
 {
-    if (time(0) - lastCheck < sPlayerbotAIConfig.maxWaitForMove / 1000)
+    if (time(0) - lastCheck < sPlayerbotAIConfig.repeatDelay / 1000)
         return false;
 
     lastCheck = time(0);

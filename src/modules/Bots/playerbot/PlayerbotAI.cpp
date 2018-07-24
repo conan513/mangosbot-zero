@@ -630,7 +630,7 @@ Unit* PlayerbotAI::GetUnit(ObjectGuid guid)
     if (!map)
         return NULL;
 
-    return ObjectAccessor::GetUnit(*bot, guid);
+    return sObjectAccessor.GetUnit(*bot, guid);
 }
 
 
@@ -673,7 +673,7 @@ bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securit
         return false;
 
     time_t lastSaid = whispers[text];
-    if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.maxWaitForMove / 1000)
+    if (!lastSaid || (time(0) - lastSaid) >= sPlayerbotAIConfig.repeatDelay / 1000)
     {
         whispers[text] = time(0);
 
